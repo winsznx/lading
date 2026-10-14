@@ -1,0 +1,11 @@
+{
+  "version": "planner-v1",
+  "robust_shelf_quantile": "P10",
+  "robust_travel_quantile": "P90",
+  "mip_rel_gap": 0.005,
+  "live_time_limit_s": 10,
+  "eval_time_limit_s": 60,
+  "threads": 1,
+  "random_seed": 0,
+  "soft_shelf_penalty_inr_per_kg_h": 1.0
+}

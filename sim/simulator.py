@@ -69,22 +69,21 @@ def execute(scenario: Scenario, plan: Executable, real: Realization) -> Outcome:
     expired = cancelled = unsold_total = 0.0
 
     for trip in plan.trips:
-        slot, market = slots[trip.slot_id], markets[trip.market_id]
+        slot = slots[trip.slot_id]
         lost_from = real.truck_lost_from_slot.get(trip.truck_id)
         if lost_from is not None and slot.index >= lost_from:
             cancelled += sum(load.kg for load in trip.manifest)
             continue
-        sale_h = slot.depart_h + real.travel_h[(market.id, slot.id)] + market.handling_h
-        late_for_order = market.deliver_by_h is not None and sale_h > market.deliver_by_h
         for load in trip.manifest:
-            batch = batches[load.batch_id]
+            batch, market = batches[load.batch_id], markets[load.market_id]
+            sale_h = slot.depart_h + real.travel_h[(market.id, slot.id)] + market.handling_h
             on_road[batch.id] += load.kg
             hauls.append(cost_model.Haul(load.kg, market.transport_inr_per_kg, market.handling_inr_per_kg))
             purchase = commodities[batch.commodity_id].purchase_inr_per_kg
             if sale_h > real.shelf_h[batch.id]:
                 expired += load.kg
                 losses.append(cost_model.Loss(load.kg, purchase))
-            elif late_for_order:
+            elif market.deliver_by_h is not None and sale_h > market.deliver_by_h:
                 unsold_total += load.kg
                 losses.append(cost_model.Loss(load.kg, purchase))
             else:

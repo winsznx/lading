@@ -78,7 +78,6 @@ def scenario(
         "policy": {
             "horizon_h": 48.0,
             "safety_margin_h": margin_h,
-            "turnaround_buffer_h": 2.0,
             "discount_levels": discounts if discounts is not None else [0.0, 0.2],
         },
         "uncertainty": {"demand_sigma": 0.2, "travel_delay": {"median_frac": 0.08, "sigma_log": 0.6}},

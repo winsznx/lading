@@ -1,7 +1,7 @@
 import pytest
 
 from baselines.fefo import plan_fefo
-from plan_assembly import assemble
+from plan_assembly import Leg, assemble
 from scenarios.scenario_gen import generate
 from scenarios.tiny import batch, market, scenario
 from sim.draws import Realization, forecast, realize
@@ -27,7 +27,7 @@ def one_lane():
         [market("near", 3, {"tomato": (26.0, 1000), "onion": (20.0, 1000)}, transport=0.9, handling=0.5)],
         trucks=[5000],
     )
-    plan = assemble(s, "fefo", "point", {"b1": ("near", "s0")}, {("near", "s0"): ["t1"]}, {})
+    plan = assemble(s, "fefo", "point", [Leg("b1", "near", "s0", 1000)], {})
     return s, plan
 
 
@@ -74,10 +74,7 @@ def test_first_on_sale_sells_first():
         [market("near", 3, {"tomato": (26.0, 1000)})],
         trucks=[1000, 1000],
     )
-    plan = assemble(
-        s, "fefo", "point", {"b1": ("near", "s1"), "b2": ("near", "s0")},
-        {("near", "s0"): ["t1"], ("near", "s1"): ["t2"]}, {},
-    )
+    plan = assemble(s, "fefo", "point", [Leg("b1", "near", "s1", 1000), Leg("b2", "near", "s0", 1000)], {})
     out = execute(s, plan, forecast(s))
     assert out.sold_kg == pytest.approx(1000)
     assert out.unsold_kg == pytest.approx(1000)

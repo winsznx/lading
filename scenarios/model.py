@@ -90,7 +90,6 @@ class Slot(Strict):
 class Policy(Strict):
     horizon_h: PosFloat = Field(description="Undispatched stock that expires before this is spoiled at the hub.")
     safety_margin_h: NonNegFloat = Field(description="Sale-ready time must be at least this far before expiry.")
-    turnaround_buffer_h: NonNegFloat = Field(description="Load and unload time added to a truck's round trip.")
     discount_levels: list[Annotated[float, Field(ge=0, lt=1)]] = Field(min_length=1, max_length=8)
     current_slot: Annotated[int, Field(ge=0)] = Field(
         default=0, description="First slot that can still dispatch. Earlier slots have left (replans)."

@@ -8,7 +8,10 @@ from scenarios.tiny import batch, market, scenario
 
 
 def assignment(plan):
-    return {s.batch_id: (s.market_id, s.slot_id) for s in plan.shipments}
+    out = {}
+    for s in plan.shipments:
+        out.setdefault(s.batch_id, (s.market_id, s.slot_id))
+    return out
 
 
 def far_market_trap():
@@ -25,12 +28,12 @@ def far_market_trap():
 
 
 def one_truck_two_batches():
-    # One 1 t truck. near round trip = 2 x 3 + 2 = 8 h, so a truck leaving at 0 h misses the 6 h slot.
-    # b1 leafy greens expires at 9 h; b2 onion has 500 h left but arrived first.
+    # One 1 t truck and one slot. b1 leafy greens expires at 9 h; b2 onion has 500 h left but arrived first.
     return scenario(
         [batch("b1", "leafy_greens", 1000, 9, arrived_h_ago=0), batch("b2", "onion", 1000, 500, arrived_h_ago=30)],
         [market("near", 3, {"leafy_greens": (30.0, 1000), "onion": (22.0, 1000)})],
         trucks=[1000],
+        n_slots=1,
     )
 
 

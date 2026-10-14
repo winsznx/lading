@@ -398,18 +398,11 @@
           "minimum": 0,
           "title": "Safety Margin H",
           "type": "number"
-        },
-        "turnaround_buffer_h": {
-          "description": "Load and unload time added to a truck's round trip.",
-          "minimum": 0,
-          "title": "Turnaround Buffer H",
-          "type": "number"
         }
       },
       "required": [
         "horizon_h",
         "safety_margin_h",
-        "turnaround_buffer_h",
         "discount_levels"
       ],
       "title": "Policy",

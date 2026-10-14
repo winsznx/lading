@@ -11,41 +11,53 @@ from dataclasses import dataclass
 from plan_model import Arm, Basis, Plan, Price, Shipment, SolverInfo, Trip, TripLoad
 from scenarios.model import Scenario
 from sim.simulator import expected
-from world import infeasible_batches
+from world import World, infeasible_batches
 
 Cell = tuple[str, str]
 
 
-def pack_trips(
-    scenario: Scenario, shipments: list[Shipment], trucks_by_cell: dict[Cell, list[str]]
-) -> list[Trip]:
-    """Load each (market, slot) cell's batches onto its trucks in order, splitting a batch across trucks
-    when one fills up. Crates split freely between two trucks going to the same place at the same time."""
-    capacity = {t.id: t.capacity_kg for t in scenario.trucks}
-    by_cell: dict[Cell, list[Shipment]] = defaultdict(list)
+@dataclass(frozen=True)
+class Leg:
+    """Part (or all) of a batch leaving for a market at a slot."""
+
+    batch_id: str
+    market_id: str
+    slot_id: str
+    kg: float
+
+
+def pack_trips(scenario: Scenario, shipments: list[Shipment]) -> list[Trip]:
+    """Load each slot's shipments onto that slot's trucks, biggest truck first, keeping a market's
+    stock together where it fits and splitting a batch across trucks when one fills up."""
+    world = World(scenario, "point")
+    by_slot: dict[str, list[Shipment]] = defaultdict(list)
     for sh in shipments:
-        by_cell[(sh.market_id, sh.slot_id)].append(sh)
+        by_slot[sh.slot_id].append(sh)
 
     trips: list[Trip] = []
-    slot_index = {s.id: s.index for s in scenario.slots}
-    for cell in sorted(by_cell, key=lambda c: (slot_index[c[1]], c[0])):
-        market_id, slot_id = cell
-        queue = [[sh.batch_id, sh.kg] for sh in sorted(by_cell[cell], key=lambda s: s.batch_id)]
-        for truck_id in trucks_by_cell.get(cell, []):
-            room = capacity[truck_id]
+    for slot in scenario.slots:
+        queue = [[sh.batch_id, sh.market_id, sh.kg] for sh in sorted(by_slot.get(slot.id, []), key=lambda s: (s.market_id, s.batch_id))]
+        if not queue:
+            continue
+        fleet = sorted(
+            (t for t in scenario.trucks if t.unavailable_from_slot is None or slot.index < t.unavailable_from_slot),
+            key=lambda t: (-t.capacity_kg, t.id),
+        )
+        for truck in fleet:
+            room = truck.capacity_kg
             manifest: list[TripLoad] = []
             while queue and room > 1e-9:
-                take = min(room, queue[0][1])
-                manifest.append(TripLoad(batch_id=queue[0][0], kg=round(take, 6)))
+                take = min(room, queue[0][2])
+                manifest.append(TripLoad(batch_id=queue[0][0], market_id=queue[0][1], kg=round(take, 6)))
                 room -= take
-                queue[0][1] -= take
-                if queue[0][1] <= 1e-9:
+                queue[0][2] -= take
+                if queue[0][2] <= 1e-9:
                     queue.pop(0)
             if manifest:
-                load = round(sum(m.kg for m in manifest), 6)
-                trips.append(Trip(truck_id=truck_id, slot_id=slot_id, market_id=market_id, load_kg=load, manifest=manifest))
+                trips.append(Trip(truck_id=truck.id, slot_id=slot.id, load_kg=round(sum(m.kg for m in manifest), 6), manifest=manifest))
         if queue:
-            raise ValueError(f"cell {cell} has {sum(q[1] for q in queue):.0f} kg with no truck room")
+            left = sum(q[2] for q in queue)
+            raise ValueError(f"slot {slot.id} has {left:.0f} kg more than {world.slot_capacity_kg(slot):.0f} kg of trucks")
     return trips
 
 
@@ -53,29 +65,33 @@ def assemble(
     scenario: Scenario,
     arm: Arm,
     basis: Basis,
-    assignments: dict[str, tuple[str, str]],
-    trucks_by_cell: dict[Cell, list[str]],
+    legs: list[Leg],
     discounts: dict[Cell, float],
     solver: SolverInfo | None = None,
     locked: set[str] | None = None,
 ) -> Plan:
-    """`assignments` maps batch -> (market, slot). `discounts` maps (market, commodity) -> discount."""
+    """`discounts` maps (market, commodity) to the discount the arm chose. Cells without one sell at list."""
     locked = locked or set()
-    batches = {b.id: b for b in scenario.batches}
+    commodity_of = {b.id: b.commodity_id for b in scenario.batches}
+    slot_index = {s.id: s.index for s in scenario.slots}
+    merged: dict[tuple[str, str, str], float] = defaultdict(float)
+    for leg in legs:
+        merged[(leg.batch_id, leg.market_id, leg.slot_id)] += leg.kg
     shipments = [
         Shipment(
             batch_id=bid,
             market_id=m,
             slot_id=s,
-            kg=batches[bid].kg,
-            discount=discounts.get((m, batches[bid].commodity_id), 0.0),
+            kg=round(kg, 6),
+            discount=discounts.get((m, commodity_of[bid]), 0.0),
             locked=bid in locked,
         )
-        for bid, (m, s) in sorted(assignments.items())
+        for (bid, m, s), kg in sorted(merged.items(), key=lambda kv: (kv[0][0], slot_index[kv[0][2]], kv[0][1]))
     ]
-    used_cells = sorted({(sh.market_id, batches[sh.batch_id].commodity_id) for sh in shipments})
+    used_cells = sorted({(sh.market_id, commodity_of[sh.batch_id]) for sh in shipments})
     prices = [Price(market_id=m, commodity_id=c, discount=discounts.get((m, c), 0.0)) for m, c in used_cells]
-    trips = pack_trips(scenario, shipments, trucks_by_cell)
+    trips = pack_trips(scenario, shipments)
+    shipped = {sh.batch_id for sh in shipments}
     return Plan(
         scenario_id=scenario.id,
         arm=arm,
@@ -83,7 +99,7 @@ def assemble(
         shipments=shipments,
         trips=trips,
         prices=prices,
-        held=sorted(b.id for b in scenario.batches if b.id not in assignments),
+        held=sorted(b.id for b in scenario.batches if b.id not in shipped),
         infeasible=infeasible_batches(scenario),
         expected=expected(scenario, _Draft(trips, prices)),
         solver=solver,

@@ -10,7 +10,6 @@ Every number the generator draws lives in [`scenarios/assumptions.json`](../scen
 | `slot_interval_h` | 6 | h | Gap between dispatch slots. |
 | `n_slots` | 8 | slots | Slots at 0, 6, ..., 42 h (shown as D1 06:00 to D2 12:00). |
 | `safety_margin_h` | 2 | h | Stock must be sale-ready at least this long before it expires. Applies to every arm and the validator. |
-| `turnaround_buffer_h` | 2 | h | Loading plus unloading added to a truck's round trip (2 x travel + buffer). |
 | `discount_levels` | 0, 10, 20, 30 | % | Price ladder. One price per commodity per market. |
 
 ## Inventory
@@ -59,7 +58,9 @@ Hubs and their markets (travel hours and city price factors are assumptions):
 | Key | Value | Unit | Meaning |
 |---|---|---|---|
 | `truck_count` | 2-4 | trucks | Trucks at the hub. |
-| `truck_capacities_kg` | 5,000 / 7,500 / 10,000 | kg | Capacity per truck, one picked per truck. A truck serves one market per trip. |
+| `truck_capacities_kg` | 5,000 / 7,500 / 10,000 | kg | Capacity per truck, one picked per truck. |
+
+Trucks are hired per dispatch slot, as the PRD specifies ("available per slot"): every slot has the full fleet's capacity unless a truck is out of service. A batch can be split across trucks and across slots. Routing a truck between markets inside a slot is out of scope.
 
 ## Uncertainty used in execution
 

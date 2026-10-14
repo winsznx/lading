@@ -28,13 +28,15 @@ class Shipment(Strict):
 
 class TripLoad(Strict):
     batch_id: str
+    market_id: str
     kg: float
 
 
 class Trip(Strict):
+    """One truck leaving at one slot. Trucks are hired per slot, so a load can be split across them."""
+
     truck_id: str
     slot_id: str
-    market_id: str
     load_kg: float
     manifest: list[TripLoad]
 

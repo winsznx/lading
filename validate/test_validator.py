@@ -58,16 +58,23 @@ def test_overloaded_truck_fails(case):
     assert "truck.capacity" in {v["check"] for v in report["violations"]}
 
 
-def test_truck_double_booked_fails(case):
+def test_truck_used_twice_in_a_slot_fails(case):
     scenario, plan = case
     bad = copy.deepcopy(plan)
-    first = bad["trips"][0]
-    clash = copy.deepcopy(first)
+    clash = copy.deepcopy(bad["trips"][0])
     clash["manifest"] = []
     clash["load_kg"] = 0
     bad["trips"].append(clash)
     report = validate(scenario, bad)
-    assert "truck.turnaround" in {v["check"] for v in report["violations"]}
+    assert "truck.once_per_slot" in {v["check"] for v in report["violations"]}
+
+
+def test_lading_plan_passes():
+    from planner.milp import plan_lading
+
+    scenario = generate(3)
+    report = validate(as_json(scenario), as_json(plan_lading(scenario, "lading-robust", time_limit_s=60)))
+    assert report["status"] == "PASS", report["violations"]
 
 
 def test_fifo_expiry_violation_is_caught():

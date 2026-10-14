@@ -1,4 +1,4 @@
-"""The planning view of a scenario: timing, feasibility and truck turnaround under a basis.
+"""The planning view of a scenario: timing, feasibility and truck capacity under a basis.
 
 Every planning arm reads the world through this module so FEFO and Lading see the same facts.
 `point` uses the forecast. `robust` uses P10 shelf life and P90 travel time, both derived from the
@@ -42,9 +42,6 @@ class World:
         """Hours from t=0 until the stock is unloaded and on sale."""
         return slot.depart_h + self.travel_h(market) + market.handling_h
 
-    def round_trip_h(self, market: Market) -> float:
-        return 2.0 * self.travel_h(market) + self.scenario.policy.turnaround_buffer_h
-
     @cached_property
     def open_slots(self) -> list[Slot]:
         return [s for s in self.scenario.slots if s.index >= self.scenario.policy.current_slot]
@@ -56,29 +53,32 @@ class World:
             return False
         return sale <= self.shelf_h(batch) - self.scenario.policy.safety_margin_h
 
+    def fresh_slots(self, batch: Batch, market: Market) -> list[Slot]:
+        """Open slots from which the batch still arrives fresh. Later slots only get later, so this is
+        always a prefix of the open slots."""
+        return [s for s in self.open_slots if self.fresh_on_sale(batch, market, s)]
+
     def sells(self, batch: Batch, market: Market) -> bool:
         return self.scenario.offer(market.id, batch.commodity_id) is not None
 
     def expires_in_horizon(self, batch: Batch) -> bool:
         return self.shelf_h(batch) <= self.scenario.policy.horizon_h
 
-    def truck_available(self, truck_id: str, slot: Slot) -> bool:
-        truck = next(t for t in self.scenario.trucks if t.id == truck_id)
-        return truck.unavailable_from_slot is None or slot.index < truck.unavailable_from_slot
-
-    def trip_blocks(self, market: Market, slot: Slot, later: Slot) -> bool:
-        """Whether a trip leaving at `slot` keeps the truck away when `later` departs."""
-        return slot.depart_h <= later.depart_h < slot.depart_h + self.round_trip_h(market)
+    def slot_capacity_kg(self, slot: Slot) -> float:
+        """Trucks are hired per slot (PRD section 6). A truck marked out of service from a slot on
+        doesn't count from then."""
+        return sum(
+            t.capacity_kg
+            for t in self.scenario.trucks
+            if t.unavailable_from_slot is None or slot.index < t.unavailable_from_slot
+        )
 
 
 def infeasible_batches(scenario: Scenario) -> list[str]:
     """INFEASIBLE_DEMAND: batches no buying market can receive fresh at any open slot, on the forecast."""
     world = World(scenario, "point")
-    out = []
-    for b in scenario.batches:
-        reachable = any(
-            world.sells(b, m) and world.fresh_on_sale(b, m, s) for m in scenario.markets for s in world.open_slots
-        )
-        if not reachable:
-            out.append(b.id)
-    return out
+    return [
+        b.id
+        for b in scenario.batches
+        if not any(world.sells(b, m) and world.fresh_slots(b, m) for m in scenario.markets)
+    ]

@@ -186,7 +186,6 @@ def generate(seed: int, family: str = "base") -> Scenario:
         "policy": {
             "horizon_h": float(a["horizon_h"]),
             "safety_margin_h": float(a["safety_margin_h"]),
-            "turnaround_buffer_h": float(a["turnaround_buffer_h"]),
             "discount_levels": [float(x) for x in a["discount_levels"]],
         },
         "uncertainty": {

@@ -5,7 +5,6 @@
   "slot_interval_h": 6,
   "n_slots": 8,
   "safety_margin_h": 2,
-  "turnaround_buffer_h": 2,
   "discount_levels": [0, 0.1, 0.2, 0.3],
   "batch_count": [25, 60],
   "batch_kg": [200, 2000],
