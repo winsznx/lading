@@ -188,7 +188,7 @@ def _timing_summary(results: list[dict[str, Any]]) -> dict[str, dict[str, float]
     return out
 
 
-def tune(seeds: list[int], draws: int) -> dict[str, Any]:
+def tune(seeds: list[int], draws: int) -> tuple[dict[str, Any], dict[str, dict[str, float]]]:
     scenarios = [generate(s) for s in seeds]
     results = _pool_map([_job(s, BASE_ARMS, draws) for s in scenarios])
     rows, summary = _group(results, ("fifo", *LADING_ARMS))
@@ -200,8 +200,7 @@ def tune(seeds: list[int], draws: int) -> dict[str, Any]:
         "recommended_headline_arm": best,
         "summary": summary,
         "rows": rows,
-        "timings": _timing_summary(results),
-    }
+    }, _timing_summary(results)
 
 
 def _git(*args: str) -> str:
@@ -213,34 +212,36 @@ def _git(*args: str) -> str:
         return "unknown"
 
 
+EVAL_PATHS = (
+    "scenarios",
+    ":(exclude)scenarios/curated/index.json",
+    ":(exclude)scenarios/generated",
+    "baselines",
+    "planner",
+    "sim",
+    "validate",
+    "explain",
+    "evaluation",
+    "schemas",
+    "data",
+    "api/curated.py",
+    "cost_model.py",
+    "errors.py",
+    "plan_assembly.py",
+    "plan_model.py",
+    "world.py",
+    "pyproject.toml",
+    "uv.lock",
+)
+
+
 def code_commit() -> str:
-    return _git(
-        "log",
-        "-1",
-        "--format=%H",
-        "--",
-        ".",
-        ":(exclude)results",
-        ":(exclude)docs",
-        ":(exclude)README.md",
-        ":(exclude)submission-facts.json",
-        ":(exclude)scenarios/curated/index.json",
-    )
+    """The last commit that touched code or data the results depend on."""
+    return _git("log", "-1", "--format=%H", "--", *EVAL_PATHS)
 
 
 def code_dirty() -> bool:
-    status = _git(
-        "status",
-        "--porcelain",
-        "--",
-        ".",
-        ":(exclude)results",
-        ":(exclude)docs",
-        ":(exclude)README.md",
-        ":(exclude)submission-facts.json",
-        ":(exclude)scenarios/curated/index.json",
-        ":(exclude).ci-results",
-    )
+    status = _git("status", "--porcelain", "--", *EVAL_PATHS)
     return bool(status) and status != "unknown"
 
 
@@ -425,7 +426,7 @@ def controls(draws: int, small: bool) -> dict[str, Any]:
 def reproduce(out: Path, small: bool, draws: int) -> None:
     out.mkdir(parents=True, exist_ok=True)
     print("[1/6] tuning set", flush=True)
-    tuning = tune(TUNING[:3] if small else TUNING, draws)
+    tuning, tuning_timings = tune(TUNING[:3] if small else TUNING, draws)
     _write(out, "tuning.json", tuning)
 
     print("[2/6] freeze check", flush=True)
@@ -553,7 +554,7 @@ def reproduce(out: Path, small: bool, draws: int) -> None:
             "note": "Wall-clock solve times on the machine that ran make reproduce. Excluded from the byte-identical replay check.",
             "heldout": _timing_summary(results),
             "stress": _timing_summary(stress_timings),
-            "tuning": tuning["timings"],
+            "tuning": tuning_timings,
         },
     )
 
@@ -634,7 +635,7 @@ def main() -> None:
     args = parser.parse_args()
     out = args.out if args.out.is_absolute() else ROOT / args.out
     if args.command == "tune":
-        data = tune(TUNING[:3] if args.small else TUNING, args.draws)
+        data, _ = tune(TUNING[:3] if args.small else TUNING, args.draws)
         _write(out, "tuning.json", data)
         print(f"tuning rule picks {data['recommended_headline_arm']}")
         for arm, summ in data["summary"].items():
