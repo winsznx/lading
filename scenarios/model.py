@@ -190,6 +190,12 @@ class Scenario(Strict):
     def offer(self, market_id: str, commodity_id: str) -> Offer | None:
         return next((o for o in self.market(market_id).offers if o.commodity_id == commodity_id), None)
 
+    def list_price(self, market_id: str, commodity_id: str) -> float:
+        offer = self.offer(market_id, commodity_id)
+        if offer is None:
+            raise KeyError(f"{market_id} doesn't buy {commodity_id}")
+        return offer.price_inr_per_kg
+
 
 def json_schema() -> dict[str, object]:
     schema = Scenario.model_json_schema()

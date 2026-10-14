@@ -24,9 +24,11 @@ dev = [
 package = false
 
 [tool.pytest.ini_options]
-testpaths = ["scenarios", "baselines", "planner", "explain", "sim", "validate", "evaluation", "api", "tests"]
+testpaths = ["."]
+norecursedirs = ["web", "internal", ".venv", "node_modules", "results", "data", "deploy", ".git"]
 python_files = ["test_*.py"]
 addopts = "-q"
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 110
