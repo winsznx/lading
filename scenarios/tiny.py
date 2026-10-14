@@ -8,7 +8,12 @@ from scenarios.model import SCHEMA_VERSION, Scenario
 
 COMMODITIES = {
     "tomato": {"name": "Tomato", "purchase_inr_per_kg": 14.0, "elasticity": 1.5, "shelf_life_sigma": 0.12},
-    "leafy_greens": {"name": "Leafy greens", "purchase_inr_per_kg": 18.0, "elasticity": 1.2, "shelf_life_sigma": 0.15},
+    "leafy_greens": {
+        "name": "Leafy greens",
+        "purchase_inr_per_kg": 18.0,
+        "elasticity": 1.2,
+        "shelf_life_sigma": 0.15,
+    },
     "onion": {"name": "Onion", "purchase_inr_per_kg": 16.0, "elasticity": 0.6, "shelf_life_sigma": 0.05},
 }
 
@@ -29,7 +34,9 @@ def market(
         "transport_inr_per_kg": transport,
         "handling_h": handling_h,
         "handling_inr_per_kg": handling,
-        "offers": [{"commodity_id": c, "price_inr_per_kg": p, "demand_kg": d} for c, (p, d) in offers.items()],
+        "offers": [
+            {"commodity_id": c, "price_inr_per_kg": p, "demand_kg": d} for c, (p, d) in offers.items()
+        ],
     }
     if deliver_by_h is not None:
         out["deliver_by_h"] = deliver_by_h
@@ -58,7 +65,9 @@ def scenario(
     sid: str = "tiny",
     **extra: Any,
 ) -> Scenario:
-    used = sorted({b["commodity_id"] for b in batches} | {o["commodity_id"] for m in markets for o in m["offers"]})
+    used = sorted(
+        {b["commodity_id"] for b in batches} | {o["commodity_id"] for m in markets for o in m["offers"]}
+    )
     raw: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "id": sid,
@@ -73,7 +82,8 @@ def scenario(
         "markets": markets,
         "trucks": [{"id": f"t{i + 1}", "capacity_kg": cap} for i, cap in enumerate(trucks)],
         "slots": [
-            {"id": f"s{i}", "index": i, "depart_h": i * slot_h, "label": f"T+{int(i * slot_h)}h"} for i in range(n_slots)
+            {"id": f"s{i}", "index": i, "depart_h": i * slot_h, "label": f"T+{int(i * slot_h)}h"}
+            for i in range(n_slots)
         ],
         "policy": {
             "horizon_h": 48.0,

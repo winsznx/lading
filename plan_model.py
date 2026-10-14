@@ -9,7 +9,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-Arm = Literal["fifo", "fefo", "lading-point", "lading-robust", "ablation-no-discount", "ablation-soft-shelf", "no-op"]
+Arm = Literal[
+    "fifo", "fefo", "lading-point", "lading-robust", "ablation-no-discount", "ablation-soft-shelf", "no-op"
+]
 Basis = Literal["point", "robust", "none"]
 
 
@@ -82,6 +84,8 @@ class Plan(Strict):
     trips: list[Trip]
     prices: list[Price]
     held: list[str]
-    infeasible: list[str] = Field(description="Batches no market can receive fresh at any slot (INFEASIBLE_DEMAND).")
+    infeasible: list[str] = Field(
+        description="Batches no market can receive fresh at any slot (INFEASIBLE_DEMAND)."
+    )
     expected: Expected
     solver: SolverInfo | None = None

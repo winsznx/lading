@@ -30,7 +30,10 @@ def test_fefo_plan_passes(case):
 @pytest.mark.parametrize(
     ("tamper", "check"),
     [
-        (lambda p: p["trips"][0]["manifest"][0].__setitem__("kg", p["trips"][0]["manifest"][0]["kg"] + 50), "trip.load"),
+        (
+            lambda p: p["trips"][0]["manifest"][0].__setitem__("kg", p["trips"][0]["manifest"][0]["kg"] + 50),
+            "trip.load",
+        ),
         (lambda p: p["shipments"][0].__setitem__("kg", p["shipments"][0]["kg"] + 50), "stock"),
         (lambda p: p["expected"].__setitem__("net_inr", p["expected"]["net_inr"] + 500), "total.net_inr"),
         (lambda p: p["shipments"][0].__setitem__("discount", 0.2), "price.consistent"),

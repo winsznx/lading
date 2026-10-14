@@ -58,7 +58,10 @@ def test_veto_through_controls_changes_the_plan():
         json={
             "scenario_id": "p4-far-market",
             "draws": 1,
-            "controls": {"locks": [], "vetoes": [{"batch_id": first["batch_id"], "market_id": first["market_id"]}]},
+            "controls": {
+                "locks": [],
+                "vetoes": [{"batch_id": first["batch_id"], "market_id": first["market_id"]}],
+            },
         },
     )
     moved = [s for s in r.json()["lading"]["plan"]["shipments"] if s["batch_id"] == first["batch_id"]]
@@ -108,7 +111,11 @@ def test_results_whitelist():
 
 
 def test_cors_allows_only_configured_origins():
-    ok = client.options("/plan", headers={"origin": "http://localhost:5173", "access-control-request-method": "POST"})
+    ok = client.options(
+        "/plan", headers={"origin": "http://localhost:5173", "access-control-request-method": "POST"}
+    )
     assert ok.headers.get("access-control-allow-origin") == "http://localhost:5173"
-    bad = client.options("/plan", headers={"origin": "https://evil.example", "access-control-request-method": "POST"})
+    bad = client.options(
+        "/plan", headers={"origin": "https://evil.example", "access-control-request-method": "POST"}
+    )
     assert "access-control-allow-origin" not in bad.headers

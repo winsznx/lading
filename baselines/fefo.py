@@ -87,7 +87,8 @@ def plan_fefo(scenario: Scenario) -> Plan:
         hold = -qty * cost_model.spoilage_inr_per_kg(purchase) if world.expires_in_horizon(b) else 0.0
         committed = world.committed_market(b)
         markets = [
-            m for m in scenario.markets
+            m
+            for m in scenario.markets
             if world.sells(b, m) and (b.id, m.id) not in vetoed and (committed is None or m.id == committed)
         ]
 
@@ -119,7 +120,9 @@ def plan_fefo(scenario: Scenario) -> Plan:
                 if parts is None:
                     continue
                 selling_now = min(shipped[cell], room_left(m, b.commodity_id, discount[cell]) + shipped[cell])
-                price_cut = selling_now * scenario.list_price(m.id, b.commodity_id) * (deepest - discount[cell])
+                price_cut = (
+                    selling_now * scenario.list_price(m.id, b.commodity_id) * (deepest - discount[cell])
+                )
                 option = (value(b, m, deepest, qty) - price_cut, -parts[0][0].index, m.id, m, parts)
                 if markdown is None or option[:3] > markdown[:3]:
                     markdown = option
@@ -136,4 +139,8 @@ def plan_fefo(scenario: Scenario) -> Plan:
 def _locked(scenario: Scenario, legs: list[Leg]) -> set[tuple[str, str, str]]:
     fixed = {(d.batch_id, d.market_id, d.slot_id) for d in scenario.controls.dispatched}
     locks = {(lk.batch_id, lk.market_id, lk.slot_id) for lk in scenario.controls.locks}
-    return fixed | {(leg.batch_id, leg.market_id, leg.slot_id) for leg in legs if (leg.batch_id, leg.market_id, leg.slot_id) in locks}
+    return fixed | {
+        (leg.batch_id, leg.market_id, leg.slot_id)
+        for leg in legs
+        if (leg.batch_id, leg.market_id, leg.slot_id) in locks
+    }

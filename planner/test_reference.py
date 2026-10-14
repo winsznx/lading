@@ -7,6 +7,7 @@ and the two searches cover the same plans.
 """
 
 import itertools
+from typing import Any
 
 import pytest
 
@@ -20,7 +21,7 @@ def brute_force(s):
     commodity = {c.id: c for c in s.commodities}
     options = []
     for b in s.batches:
-        mine = [None]
+        mine: list[Any] = [None]
         for m in s.markets:
             offer = next((o for o in m.offers if o.commodity_id == b.commodity_id), None)
             if offer is None:
@@ -59,7 +60,9 @@ def brute_force(s):
                 offer = next(o for o in m.offers if o.commodity_id == cid)
                 d = price[(mid, cid)]
                 sold = min(kg, offer.demand_kg * (1 + commodity[cid].elasticity * d))
-                net += sold * offer.price_inr_per_kg * (1 - d) - (kg - sold) * commodity[cid].purchase_inr_per_kg
+                net += (
+                    sold * offer.price_inr_per_kg * (1 - d) - (kg - sold) * commodity[cid].purchase_inr_per_kg
+                )
             best = max(best, net)
     return best
 
@@ -75,8 +78,15 @@ CASES = {
         sid="ref-expiry",
     ),
     "capacity_choice": scenario(
-        [batch("b1", "leafy_greens", 1000, 14), batch("b2", "leafy_greens", 1000, 8), batch("b3", "tomato", 1000, 40)],
-        [market("a", 2, {"leafy_greens": (30.0, 2500), "tomato": (22.0, 900)}), market("b", 5, {"tomato": (28.0, 1000)})],
+        [
+            batch("b1", "leafy_greens", 1000, 14),
+            batch("b2", "leafy_greens", 1000, 8),
+            batch("b3", "tomato", 1000, 40),
+        ],
+        [
+            market("a", 2, {"leafy_greens": (30.0, 2500), "tomato": (22.0, 900)}),
+            market("b", 5, {"tomato": (28.0, 1000)}),
+        ],
         trucks=[1000],
         n_slots=3,
         sid="ref-capacity",

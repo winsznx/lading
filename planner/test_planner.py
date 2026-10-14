@@ -22,6 +22,7 @@ def day():
 
 def test_point_objective_equals_forecast_net(day):
     plan = plan_lading(day, "lading-point", time_limit_s=60)
+    assert plan.solver is not None
     assert plan.expected.net_inr == pytest.approx(plan.solver.objective_inr, abs=0.01)
 
 
@@ -43,6 +44,7 @@ def test_refuses_far_market_and_says_why():
     assert decision.market_id == "near"
     far = next(a for a in decision.alternatives if a.market_id == "far")
     assert far.code == "EXPIRED_ON_ARRIVAL"
+    assert far.sale_h is not None and far.limit_h is not None
     assert far.sale_h > far.limit_h
 
 
@@ -55,7 +57,10 @@ def test_execution_shocks_never_reach_the_planner(day):
         "elasticity_factor": 0.2,
     }
     shocked = Scenario.model_validate(raw)
-    clean, blind = plan_lading(day, "lading-robust", time_limit_s=60), plan_lading(shocked, "lading-robust", time_limit_s=60)
+    clean, blind = (
+        plan_lading(day, "lading-robust", time_limit_s=60),
+        plan_lading(shocked, "lading-robust", time_limit_s=60),
+    )
     assert clean.shipments == blind.shipments and clean.prices == blind.prices
 
 
@@ -65,18 +70,25 @@ def test_veto_moves_the_batch(day):
     raw = as_json(day)
     raw["controls"] = {"locks": [], "vetoes": [{"batch_id": target.batch_id, "market_id": target.market_id}]}
     vetoed = plan_lading(Scenario.model_validate(raw), "lading-robust", time_limit_s=60)
-    assert all(not (s.batch_id == target.batch_id and s.market_id == target.market_id) for s in vetoed.shipments)
+    assert all(
+        not (s.batch_id == target.batch_id and s.market_id == target.market_id) for s in vetoed.shipments
+    )
 
 
 def test_lock_is_honoured_and_marked(day):
     plan = plan_lading(day, "lading-robust", time_limit_s=60)
     held = next(b for b in day.batches if b.id in plan.held and b.id not in plan.infeasible)
     world_market = next(
-        m for m in day.markets
-        if day.offer(m.id, held.commodity_id) and m.travel_h + m.handling_h <= held.shelf_life_h - day.policy.safety_margin_h
+        m
+        for m in day.markets
+        if day.offer(m.id, held.commodity_id)
+        and m.travel_h + m.handling_h <= held.shelf_life_h - day.policy.safety_margin_h
     )
     raw = as_json(day)
-    raw["controls"] = {"locks": [{"batch_id": held.id, "market_id": world_market.id, "slot_id": "s0"}], "vetoes": []}
+    raw["controls"] = {
+        "locks": [{"batch_id": held.id, "market_id": world_market.id, "slot_id": "s0"}],
+        "vetoes": [],
+    }
     locked = plan_lading(Scenario.model_validate(raw), "lading-robust", time_limit_s=60)
     leg = next(s for s in locked.shipments if s.batch_id == held.id)
     assert (leg.market_id, leg.slot_id, leg.locked) == (world_market.id, "s0", True)

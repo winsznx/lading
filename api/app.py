@@ -42,7 +42,7 @@ from plan_model import Plan
 from planner.decisions import Decision, build_decisions
 from planner.milp import config as planner_config
 from planner.milp import plan_lading
-from planner.replan import Disruption, apply, diff, effect_line
+from planner.replan import apply, diff, effect_line
 from scenarios.loader import parse
 from scenarios.model import Scenario
 from scenarios.tiny import batch, market
@@ -55,7 +55,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS_DIR = Path(os.environ.get("LADING_RESULTS_DIR", ROOT / "results"))
-ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
+ALLOWED_ORIGINS = [
+    o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()
+]
 TRUSTED_PROXIES = [c.strip() for c in os.environ.get("TRUSTED_PROXIES", "127.0.0.1/32").split(",")]
 COMMIT = os.environ.get("LADING_COMMIT", "dev")
 HEADLINE_ARM = str(planner_config()["headline_arm"])
@@ -91,7 +93,8 @@ STATUS = {
 
 def _error(state: State, message: str, path: str | None = None, status: int | None = None) -> JSONResponse:
     return JSONResponse(
-        status_code=status or STATUS.get(state, 400), content={"state": state.value, "message": message, "path": path}
+        status_code=status or STATUS.get(state, 400),
+        content={"state": state.value, "message": message, "path": path},
     )
 
 
@@ -110,7 +113,14 @@ async def _bad_request(_: Request, exc: RequestValidationError) -> JSONResponse:
 @app.exception_handler(Exception)
 async def _unexpected(_: Request, exc: Exception) -> JSONResponse:
     log.exception("unhandled error")
-    return JSONResponse(status_code=500, content={"state": "INTERNAL_ERROR", "message": "Something broke on our side. It has been logged.", "path": None})
+    return JSONResponse(
+        status_code=500,
+        content={
+            "state": "INTERNAL_ERROR",
+            "message": "Something broke on our side. It has been logged.",
+            "path": None,
+        },
+    )
 
 
 def _rate_limit(request: Request) -> None:
@@ -127,12 +137,16 @@ def _check_size(s: Scenario) -> None:
         ("trucks", len(s.trucks), MAX_TRUCKS),
     ):
         if n > cap:
-            raise LadingError(State.SCENARIO_TOO_LARGE, f"{n} {name}; the live planner takes at most {cap}.", path=name)
+            raise LadingError(
+                State.SCENARIO_TOO_LARGE, f"{n} {name}; the live planner takes at most {cap}.", path=name
+            )
 
 
 def _resolve(req: PlanRequest) -> Scenario:
     if (req.scenario_id is None) == (req.scenario is None):
-        raise LadingError(State.SCHEMA_INVALID, "Send exactly one of scenario_id or scenario.", path="scenario_id")
+        raise LadingError(
+            State.SCHEMA_INVALID, "Send exactly one of scenario_id or scenario.", path="scenario_id"
+        )
     s = curated.scenario(req.scenario_id) if req.scenario_id else parse(req.scenario)
     if req.controls is not None:
         raw = json.loads(s.model_dump_json())
@@ -154,7 +168,9 @@ def _arm(scenario: Scenario, plan: Plan, draws: int) -> ArmResult:
 
 def _solve(scenario: Scenario, previous: Plan | None = None) -> Plan:
     if not _solve_slots.acquire(timeout=20):
-        raise LadingError(State.SOLVER_UNAVAILABLE, "The planner is busy with other requests. Try again in a few seconds.")
+        raise LadingError(
+            State.SOLVER_UNAVAILABLE, "The planner is busy with other requests. Try again in a few seconds."
+        )
     try:
         return plan_lading(scenario, HEADLINE_ARM, previous=previous)
     finally:
@@ -163,7 +179,9 @@ def _solve(scenario: Scenario, previous: Plan | None = None) -> Plan:
 
 def _reasons(decisions: list[Decision]) -> dict[str, Reason]:
     return {
-        d.batch_id: Reason(headline=headline(d), alternatives=[alternative_sentence(d, a) for a in d.alternatives])
+        d.batch_id: Reason(
+            headline=headline(d), alternatives=[alternative_sentence(d, a) for a in d.alternatives]
+        )
         for d in decisions
     }
 
@@ -172,13 +190,18 @@ def _guard_valid(arm: ArmResult) -> None:
     if arm.validation["status"] != "PASS":
         first = arm.validation["violations"][0]
         log.error("validator rejected %s plan: %s", arm.arm, first)
-        raise LadingError(State.VALIDATOR_FAIL, f"The independent validator rejected this plan: {first['message']} ({first['ref']}).")
+        raise LadingError(
+            State.VALIDATOR_FAIL,
+            f"The independent validator rejected this plan: {first['message']} ({first['ref']}).",
+        )
 
 
 @app.get("/health", response_model=Health)
 def health() -> Health:
     started = time.perf_counter()
-    probe = tiny_scenario([batch("b1", "tomato", 500, 20)], [market("m", 3, {"tomato": (20.0, 500)})], trucks=[1000])
+    probe = tiny_scenario(
+        [batch("b1", "tomato", 500, 20)], [market("m", 3, {"tomato": (20.0, 500)})], trucks=[1000]
+    )
     plan = plan_lading(probe, "lading-point", time_limit_s=5)
     assert plan.solver is not None
     return Health(
@@ -252,15 +275,21 @@ def replan(req: ReplanRequest, request: Request) -> ReplanResponse:
     started = time.perf_counter()
     s = _resolve(req)
     if (req.disruption_index is None) == (req.disruption is None):
-        raise LadingError(State.SCHEMA_INVALID, "Send exactly one of disruption_index or disruption.", path="disruption")
+        raise LadingError(
+            State.SCHEMA_INVALID, "Send exactly one of disruption_index or disruption.", path="disruption"
+        )
     if req.disruption is not None:
         disruption = req.disruption
     else:
         if req.scenario_id is None:
-            raise LadingError(State.SCHEMA_INVALID, "disruption_index needs a curated scenario_id.", path="disruption_index")
+            raise LadingError(
+                State.SCHEMA_INVALID, "disruption_index needs a curated scenario_id.", path="disruption_index"
+            )
         options = curated.disruptions(req.scenario_id)
         if req.disruption_index is None or req.disruption_index >= len(options):
-            raise LadingError(State.SCHEMA_INVALID, "No such disruption for this scenario.", path="disruption_index")
+            raise LadingError(
+                State.SCHEMA_INVALID, "No such disruption for this scenario.", path="disruption_index"
+            )
         disruption = options[req.disruption_index]
 
     previous = _solve(s)
@@ -299,7 +328,9 @@ def validate_plan(req: ValidateRequest) -> dict[str, Any]:
     try:
         return validate(req.scenario, req.plan)
     except (KeyError, TypeError) as exc:
-        raise LadingError(State.SCHEMA_INVALID, f"plan is missing or mistyped field {exc}", path="plan") from exc
+        raise LadingError(
+            State.SCHEMA_INVALID, f"plan is missing or mistyped field {exc}", path="plan"
+        ) from exc
 
 
 @app.post("/simulate")
@@ -311,8 +342,17 @@ def simulate(req: SimulateRequest, request: Request) -> dict[str, float]:
 
 
 RESULT_FILES = {
-    "heldout.json", "ablations.json", "stress.json", "sensitivity.json", "manifest.json", "verdict.json",
-    "controls.json", "tuning.json", "timings.json", "freeze.json", "canonical.json",
+    "heldout.json",
+    "ablations.json",
+    "stress.json",
+    "sensitivity.json",
+    "manifest.json",
+    "verdict.json",
+    "controls.json",
+    "tuning.json",
+    "timings.json",
+    "freeze.json",
+    "canonical.json",
 }
 
 
@@ -320,8 +360,16 @@ RESULT_FILES = {
 def results(name: str) -> FileResponse:
     path = RESULTS_DIR / name
     if name not in RESULT_FILES or not path.is_file():
-        raise LadingError(State.SCENARIO_NOT_FOUND, f"No results file '{name}'. Run `make reproduce`.", path=name)
+        raise LadingError(
+            State.SCENARIO_NOT_FOUND, f"No results file '{name}'. Run `make reproduce`.", path=name
+        )
     return FileResponse(path, media_type="application/json", headers={"cache-control": "public, max-age=300"})
+
+
+@app.get("/assumptions")
+def assumptions() -> dict[str, Any]:
+    data: dict[str, Any] = json.loads((ROOT / "scenarios" / "assumptions.json").read_text())
+    return data
 
 
 @app.get("/config")

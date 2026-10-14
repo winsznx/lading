@@ -37,7 +37,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import highspy
 import numpy as np
@@ -66,12 +66,23 @@ class Variant:
     hard_shelf: bool = True
 
 
-VARIANTS = {
-    "lading-point": Variant("lading-point", "point"),
-    "lading-robust": Variant("lading-robust", "robust"),
-    "ablation-no-discount": Variant("ablation-no-discount", "robust", discounts=False),
-    "ablation-soft-shelf": Variant("ablation-soft-shelf", "robust", hard_shelf=False),
-}
+LADING_ARMS = ("lading-point", "lading-robust")
+ABLATIONS = ("ablation-no-discount", "ablation-soft-shelf")
+
+
+def variant(arm: str) -> Variant:
+    """The two Lading arms, and the ablations A1 (no discount) and A2 (soft shelf life), which take the
+    frozen headline arm's planning basis so they ablate exactly the arm that is claimed."""
+    if arm == "lading-point":
+        return Variant("lading-point", "point")
+    if arm == "lading-robust":
+        return Variant("lading-robust", "robust")
+    basis = variant(str(config()["headline_arm"])).basis
+    if arm == "ablation-no-discount":
+        return Variant("ablation-no-discount", basis, discounts=False)
+    if arm == "ablation-soft-shelf":
+        return Variant("ablation-soft-shelf", basis, hard_shelf=False)
+    raise ValueError(f"unknown Lading arm '{arm}'")
 
 
 @dataclass
@@ -150,9 +161,13 @@ def in_transit(scenario: Scenario) -> tuple[dict[tuple[str, str], float], float]
     for leg in scenario.controls.dispatched:
         b, m, s = scenario.batch(leg.batch_id), scenario.market(leg.market_id), scenario.slot(leg.slot_id)
         fixed -= leg.kg * cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
-        late = point.sale_h(m, s) > b.shelf_life_h or (m.deliver_by_h is not None and point.sale_h(m, s) > m.deliver_by_h)
+        late = point.sale_h(m, s) > b.shelf_life_h or (
+            m.deliver_by_h is not None and point.sale_h(m, s) > m.deliver_by_h
+        )
         if late:
-            fixed -= leg.kg * cost_model.spoilage_inr_per_kg(scenario.commodity(b.commodity_id).purchase_inr_per_kg)
+            fixed -= leg.kg * cost_model.spoilage_inr_per_kg(
+                scenario.commodity(b.commodity_id).purchase_inr_per_kg
+            )
         else:
             arriving[(m.id, b.commodity_id)] += leg.kg
     return arriving, fixed
@@ -167,16 +182,16 @@ def plan_lading(
 ) -> Plan:
     """Solve one arm. With `previous` (a replan), keeping a batch's market or a cell's price earns a small
     stability bonus, so the new plan only moves what the disruption forces it to move."""
-    variant = VARIANTS[arm]
+    spec = variant(arm)
     cfg = dict(config())
     if mip_rel_gap is not None:
         cfg["mip_rel_gap"] = mip_rel_gap
-    world = World(scenario, variant.basis)
+    world = World(scenario, spec.basis)
     pol = scenario.policy
     commodity = {c.id: c for c in scenario.commodities}
     model = _Model()
 
-    arcs = build_arcs(scenario, world, variant.hard_shelf)
+    arcs = build_arcs(scenario, world, spec.hard_shelf)
     arriving, fixed_inr = in_transit(scenario)
     kept_market = {sh.batch_id: sh.market_id for sh in previous.shipments} if previous else {}
     kept_price = {(p.market_id, p.commodity_id): p.discount for p in previous.prices} if previous else {}
@@ -190,7 +205,7 @@ def plan_lading(
         hub_loss = cost_model.spoilage_inr_per_kg(purchase) if world.expires_in_horizon(b) else 0.0
         unit = cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
         penalty = 0.0
-        if not variant.hard_shelf and arc.locked_slot is None and not world.fresh_slots(b, m):
+        if not spec.hard_shelf and arc.locked_slot is None and not world.fresh_slots(b, m):
             late_h = world.sale_h(m, world.open_slots[0]) - (world.shelf_h(b) - pol.safety_margin_h)
             penalty = cfg["soft_shelf_penalty_inr_per_kg_h"] * late_h * kg
         coef = -kg * unit - kg * cost_model.spoilage_inr_per_kg(purchase) + kg * hub_loss - penalty
@@ -199,7 +214,7 @@ def plan_lading(
         x[(b.id, m.id)] = model.col(coef + stick, 1.0, True, lower=1.0 if locked else 0.0)
         bonus[x[(b.id, m.id)]] = stick
 
-    levels = pol.discount_levels if variant.discounts else [0.0]
+    levels = pol.discount_levels if spec.discounts else [0.0]
     pick: dict[tuple[str, str, float], int] = {}
     sold: dict[tuple[str, str, float], int] = {}
     cells = sorted({(arc.market.id, arc.batch.commodity_id) for arc in arcs} | set(arriving))
@@ -230,7 +245,10 @@ def plan_lading(
         cols = [sold[(mid, cid, d)] for d in levels]
         shipped = by_cell[(mid, cid)]
         model.row(
-            cols + [j for j, _ in shipped], [1.0] * len(cols) + [-kg for _, kg in shipped], -np.inf, arriving.get((mid, cid), 0.0)
+            cols + [j for j, _ in shipped],
+            [1.0] * len(cols) + [-kg for _, kg in shipped],
+            -np.inf,
+            arriving.get((mid, cid), 0.0),
         )
         picks = [pick[(mid, cid, d)] for d in levels]
         model.row(picks, [1.0] * len(picks), 1.0, 1.0)
@@ -257,7 +275,10 @@ def plan_lading(
     paid = sum(v for j, v in bonus.items() if v and values[j] > 0.5)
     if paid:
         info = info.model_copy(
-            update={"objective_inr": round(info.objective_inr - paid, 2), "bound_inr": round(info.bound_inr - paid, 2)}
+            update={
+                "objective_inr": round(info.objective_inr - paid, 2),
+                "bound_inr": round(info.bound_inr - paid, 2),
+            }
         )
 
     chosen = [arc for arc in arcs if values[x[(arc.batch.id, arc.market.id)]] > 0.5]
@@ -266,8 +287,8 @@ def plan_lading(
     discounts = {(mid, cid): d for (mid, cid, d), j in pick.items() if values[j] > 0.5}
     return assemble(
         scenario,
-        variant.arm,
-        "robust" if variant.basis == "robust" else "point",
+        spec.arm,
+        "robust" if spec.basis == "robust" else "point",
         fixed + legs,
         discounts,
         solver=info,
@@ -279,7 +300,11 @@ def locked_legs(scenario: Scenario, legs: list[Leg]) -> set[tuple[str, str, str]
     """Legs the planner may not move: stock already on the road and the dispatcher's locks."""
     out = {(d.batch_id, d.market_id, d.slot_id) for d in scenario.controls.dispatched}
     lock_of = {(lk.batch_id, lk.market_id, lk.slot_id) for lk in scenario.controls.locks}
-    return out | {(leg.batch_id, leg.market_id, leg.slot_id) for leg in legs if (leg.batch_id, leg.market_id, leg.slot_id) in lock_of}
+    return out | {
+        (leg.batch_id, leg.market_id, leg.slot_id)
+        for leg in legs
+        if (leg.batch_id, leg.market_id, leg.slot_id) in lock_of
+    }
 
 
 def _free_capacity(world: World, arcs: list[Arc]) -> dict[str, float]:
@@ -316,11 +341,15 @@ def _schedule(world: World, chosen: list[Arc], capacity: dict[str, float]) -> li
                 room[s.id] -= take
                 left -= take
         if left > 1e-3:
-            raise RuntimeError(f"EDF could not place {left:.1f} kg of {arc.batch.id}; capacity rows are wrong")
+            raise RuntimeError(
+                f"EDF could not place {left:.1f} kg of {arc.batch.id}; capacity rows are wrong"
+            )
     return legs
 
 
-def _solve(model: _Model, offset: float, time_limit_s: float, cfg: dict[str, Any]) -> tuple[np.ndarray, SolverInfo]:
+def _solve(
+    model: _Model, offset: float, time_limit_s: float, cfg: dict[str, Any]
+) -> tuple[np.ndarray, SolverInfo]:
     h = highspy.Highs()
     h.setOptionValue("output_flag", False)
     h.setOptionValue("time_limit", float(time_limit_s))
@@ -334,9 +363,13 @@ def _solve(model: _Model, offset: float, time_limit_s: float, cfg: dict[str, Any
     integer = [i for i, flag in enumerate(model.integer) if flag]
     if integer:
         h.changeColsIntegrality(
-            len(integer), np.array(integer, dtype=np.int32), np.array([highspy.HighsVarType.kInteger] * len(integer))
+            len(integer),
+            np.array(integer, dtype=np.int32),
+            np.array([highspy.HighsVarType.kInteger] * len(integer)),
         )
-    starts, index, value = [], [], []
+    starts: list[int] = []
+    index: list[int] = []
+    value: list[float] = []
     for idx, val in model.rows:
         starts.append(len(index))
         index.extend(idx)
@@ -360,6 +393,7 @@ def _solve(model: _Model, offset: float, time_limit_s: float, cfg: dict[str, Any
     info = h.getInfo()
     has_solution = info.primal_solution_status == 2
 
+    label: Literal["OPTIMAL", "TIME_LIMIT"]
     if status == highspy.HighsModelStatus.kOptimal:
         label = "OPTIMAL"
     elif status == highspy.HighsModelStatus.kTimeLimit and has_solution:
@@ -369,7 +403,9 @@ def _solve(model: _Model, offset: float, time_limit_s: float, cfg: dict[str, Any
     elif status == highspy.HighsModelStatus.kInfeasible:
         raise LadingError(State.LOCK_INFEASIBLE, "The dispatcher locks can't all hold at once.")
     else:
-        raise LadingError(State.SOLVER_UNAVAILABLE, f"Solver stopped with status {h.modelStatusToString(status)}.")
+        raise LadingError(
+            State.SOLVER_UNAVAILABLE, f"Solver stopped with status {h.modelStatusToString(status)}."
+        )
 
     values = np.array(h.getSolution().col_value)
     return values, SolverInfo(

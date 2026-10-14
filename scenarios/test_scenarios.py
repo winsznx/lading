@@ -52,8 +52,12 @@ def test_generated_sizes_stay_inside_disclosed_ranges():
         (lambda r: r["markets"][1].__setitem__("surprise", 1), "markets[1]"),
         (lambda r: r["batches"][1].__setitem__("id", r["batches"][0]["id"]), "batches[1].id"),
         (lambda r: r["policy"].__setitem__("discount_levels", [0.1, 0.2]), "policy.discount_levels"),
-        (lambda r: r["controls"]["locks"].append({"batch_id": "b01", "market_id": "nowhere", "slot_id": "s0"}),
-         "controls.locks[0].market_id"),
+        (
+            lambda r: r["controls"]["locks"].append(
+                {"batch_id": "b01", "market_id": "nowhere", "slot_id": "s0"}
+            ),
+            "controls.locks[0].market_id",
+        ),
     ],
 )
 def test_loader_rejects_bad_input_with_exact_field_path(mutate, path):

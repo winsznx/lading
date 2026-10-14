@@ -79,7 +79,9 @@ def check_references(s: Scenario) -> None:
         seen: set[str] = set()
         for j, o in enumerate(m.offers):
             if o.commodity_id not in commodity_ids:
-                raise _invalid(f"markets[{i}].offers[{j}].commodity_id", f"unknown commodity '{o.commodity_id}'")
+                raise _invalid(
+                    f"markets[{i}].offers[{j}].commodity_id", f"unknown commodity '{o.commodity_id}'"
+                )
             if o.commodity_id in seen:
                 raise _invalid(f"markets[{i}].offers[{j}].commodity_id", "duplicate offer for commodity")
             seen.add(o.commodity_id)
@@ -114,7 +116,9 @@ def check_references(s: Scenario) -> None:
         if leg.batch_id not in batch_ids or leg.market_id not in market_ids or leg.slot_id not in slot_ids:
             raise _invalid(f"controls.dispatched[{i}]", "unknown batch, market or slot")
         if s.slot(leg.slot_id).index >= current:
-            raise _invalid(f"controls.dispatched[{i}].slot_id", "dispatched stock must have left before current_slot")
+            raise _invalid(
+                f"controls.dispatched[{i}].slot_id", "dispatched stock must have left before current_slot"
+            )
     for i, veto in enumerate(s.controls.vetoes):
         if veto.batch_id not in batch_ids:
             raise _invalid(f"controls.vetoes[{i}].batch_id", f"unknown batch '{veto.batch_id}'")

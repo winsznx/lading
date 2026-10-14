@@ -120,14 +120,18 @@ def generate(seed: int, family: str = "base") -> Scenario:
             price = cspec["base_price_inr_per_kg"] * spec["price_factor"]
             price *= 1 + a["price_jitter"] * rng.uniform(-1, 1)
             demand = stock_kg[c] * demand_ratio[c] * weights[(mi, c)] / weight_sum[c]
-            offers.append({"commodity_id": c, "price_inr_per_kg": _r(price), "demand_kg": float(round(demand, -1))})
+            offers.append(
+                {"commodity_id": c, "price_inr_per_kg": _r(price), "demand_kg": float(round(demand, -1))}
+            )
         handling_h = 0.5 * round(rng.uniform(*a["handling_h"]) / 0.5)
         markets.append(
             {
                 "id": spec["id"],
                 "name": spec["name"],
                 "travel_h": float(spec["travel_h"]),
-                "transport_inr_per_kg": _r(a["transport_inr_per_kg_base"] + a["transport_inr_per_kg_per_h"] * spec["travel_h"]),
+                "transport_inr_per_kg": _r(
+                    a["transport_inr_per_kg_base"] + a["transport_inr_per_kg_per_h"] * spec["travel_h"]
+                ),
                 "handling_h": float(handling_h),
                 "handling_inr_per_kg": _r(rng.uniform(*a["handling_inr_per_kg"])),
                 "offers": offers,
@@ -135,13 +139,21 @@ def generate(seed: int, family: str = "base") -> Scenario:
         )
 
     n_trucks = int(rng.integers(a["truck_count"][0], a["truck_count"][1] + 1))
-    capacities = [float(a["truck_capacities_kg"][int(rng.integers(len(a["truck_capacities_kg"])))]) for _ in range(n_trucks)]
+    capacities = [
+        float(a["truck_capacities_kg"][int(rng.integers(len(a["truck_capacities_kg"])))])
+        for _ in range(n_trucks)
+    ]
     if family == "healthy":
         capacities = [float(max(a["truck_capacities_kg"]))] * 4
     trucks = [{"id": f"t{i + 1}", "capacity_kg": cap} for i, cap in enumerate(capacities)]
 
     slots = [
-        {"id": f"s{i}", "index": i, "depart_h": float(i * a["slot_interval_h"]), "label": _slot_label(i * a["slot_interval_h"])}
+        {
+            "id": f"s{i}",
+            "index": i,
+            "depart_h": float(i * a["slot_interval_h"]),
+            "label": _slot_label(i * a["slot_interval_h"]),
+        }
         for i in range(a["n_slots"])
     ]
 
@@ -163,10 +175,16 @@ def generate(seed: int, family: str = "base") -> Scenario:
         execution["demand_shock"] = {"market_id": top["id"], "factor": a["shocks"]["demand_shock_factor"]}
     elif family == "route_delay":
         victim = markets[int(rng.integers(len(markets)))]
-        execution["route_delay"] = {"market_id": victim["id"], "extra_h": float(a["shocks"]["route_delay_extra_h"])}
+        execution["route_delay"] = {
+            "market_id": victim["id"],
+            "extra_h": float(a["shocks"]["route_delay_extra_h"]),
+        }
     elif family == "truck_loss":
         biggest = max(trucks, key=lambda t: (t["capacity_kg"], t["id"]))
-        execution["truck_loss"] = {"truck_id": biggest["id"], "from_slot": a["shocks"]["truck_loss_from_slot"]}
+        execution["truck_loss"] = {
+            "truck_id": biggest["id"],
+            "from_slot": a["shocks"]["truck_loss_from_slot"],
+        }
 
     raw = {
         "schema_version": SCHEMA_VERSION,

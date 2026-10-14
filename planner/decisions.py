@@ -21,7 +21,14 @@ from scenarios.model import Batch, Market, Scenario
 from world import World, infeasible_batches
 
 AltCode = Literal[
-    "EXPIRED_ON_ARRIVAL", "DEADLINE", "VETOED", "TRUCK_FULL", "DEMAND_MET", "LOWER_NET", "PLAN_TRADEOFF", "HOLD"
+    "EXPIRED_ON_ARRIVAL",
+    "DEADLINE",
+    "VETOED",
+    "TRUCK_FULL",
+    "DEMAND_MET",
+    "LOWER_NET",
+    "PLAN_TRADEOFF",
+    "HOLD",
 ]
 HoldCode = Literal["INFEASIBLE_DEMAND", "TOO_RISKY", "CARRY_OVER", "NOT_WORTH_SHIPPING", "NO_ROOM"]
 
@@ -80,7 +87,9 @@ def _sold_by_batch(scenario: Scenario, plan: Plan, world: World) -> dict[str, fl
     for cell, rows in arriving.items():
         offer = scenario.offer(*cell)
         assert offer is not None
-        room = cost_model.demand_cap_kg(offer.demand_kg, scenario.commodity(cell[1]).elasticity, price.get(cell, 0.0))
+        room = cost_model.demand_cap_kg(
+            offer.demand_kg, scenario.commodity(cell[1]).elasticity, price.get(cell, 0.0)
+        )
         for _, bid, kg in sorted(rows):
             take = min(kg, max(room, 0.0))
             sold[bid] += take
@@ -92,7 +101,9 @@ def _local_net(scenario: Scenario, b: Batch, m: Market, sold_kg: float, discount
     purchase = scenario.commodity(b.commodity_id).purchase_inr_per_kg
     unit_sale = cost_model.sale_inr_per_kg(scenario.list_price(m.id, b.commodity_id), discount)
     unit_route = cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
-    return sold_kg * unit_sale - b.kg * unit_route - (b.kg - sold_kg) * cost_model.spoilage_inr_per_kg(purchase)
+    return (
+        sold_kg * unit_sale - b.kg * unit_route - (b.kg - sold_kg) * cost_model.spoilage_inr_per_kg(purchase)
+    )
 
 
 def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
@@ -124,7 +135,9 @@ def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
         chosen_market = markets[mine[0].market_id] if mine else None
         discount = price.get((chosen_market.id, b.commodity_id), 0.0) if chosen_market else None
         own_net = (
-            _local_net(scenario, b, chosen_market, sold.get(b.id, 0.0), discount or 0.0) if chosen_market else hold_value
+            _local_net(scenario, b, chosen_market, sold.get(b.id, 0.0), discount or 0.0)
+            if chosen_market
+            else hold_value
         )
         legs = [
             LegView(
@@ -149,7 +162,12 @@ def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
             if not fresh:
                 sale = world.sale_h(m, first) if first else None
                 limit = world.shelf_h(b) - margin
-                late_for_order = m.deliver_by_h is not None and sale is not None and sale > m.deliver_by_h and sale <= limit
+                late_for_order = (
+                    m.deliver_by_h is not None
+                    and sale is not None
+                    and sale > m.deliver_by_h
+                    and sale <= limit
+                )
                 alternatives.append(
                     Alternative(
                         market_id=m.id,
@@ -177,7 +195,10 @@ def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
             if room < b.kg - 1e-6:
                 alternatives.append(
                     Alternative(
-                        market_id=m.id, market_name=m.name, code="TRUCK_FULL", last_slot_label=fresh[-1].label,
+                        market_id=m.id,
+                        market_name=m.name,
+                        code="TRUCK_FULL",
+                        last_slot_label=fresh[-1].label,
                         demand_left_kg=round(left, 1),
                     )
                 )
@@ -198,7 +219,10 @@ def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
         if chosen_market:
             alternatives.append(
                 Alternative(
-                    market_id=None, market_name="Hold at hub", code="HOLD", net_inr=round(hold_value, 2),
+                    market_id=None,
+                    market_name="Hold at hub",
+                    code="HOLD",
+                    net_inr=round(hold_value, 2),
                     delta_inr=round(own_net - hold_value, 2),
                 )
             )
@@ -214,7 +238,10 @@ def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
                 hold_code = "TOO_RISKY"
             elif not world.expires_in_horizon(b):
                 hold_code = "CARRY_OVER"
-            elif all(a.code in {"TRUCK_FULL", "DEMAND_MET", "VETOED", "EXPIRED_ON_ARRIVAL", "DEADLINE"} for a in alternatives):
+            elif all(
+                a.code in {"TRUCK_FULL", "DEMAND_MET", "VETOED", "EXPIRED_ON_ARRIVAL", "DEADLINE"}
+                for a in alternatives
+            ):
                 hold_code = "NO_ROOM"
             else:
                 hold_code = "NOT_WORTH_SHIPPING"

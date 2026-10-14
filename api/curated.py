@@ -26,7 +26,9 @@ def index() -> list[dict[str, Any]]:
 def entry(scenario_id: str) -> dict[str, Any]:
     found = next((e for e in index() if e["id"] == scenario_id), None)
     if found is None:
-        raise LadingError(State.SCENARIO_NOT_FOUND, f"No curated scenario '{scenario_id}'.", path="scenario_id")
+        raise LadingError(
+            State.SCENARIO_NOT_FOUND, f"No curated scenario '{scenario_id}'.", path="scenario_id"
+        )
     return found
 
 

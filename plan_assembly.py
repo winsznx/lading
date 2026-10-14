@@ -16,6 +16,13 @@ from world import World, infeasible_batches
 Cell = tuple[str, str]
 
 
+@dataclass
+class _Load:
+    batch_id: str
+    market_id: str
+    kg: float
+
+
 @dataclass(frozen=True)
 class Leg:
     """Part (or all) of a batch leaving for a market at a slot."""
@@ -36,28 +43,46 @@ def pack_trips(scenario: Scenario, shipments: list[Shipment]) -> list[Trip]:
 
     trips: list[Trip] = []
     for slot in scenario.slots:
-        queue = [[sh.batch_id, sh.market_id, sh.kg] for sh in sorted(by_slot.get(slot.id, []), key=lambda s: (s.market_id, s.batch_id))]
+        queue = [
+            _Load(sh.batch_id, sh.market_id, sh.kg)
+            for sh in sorted(by_slot.get(slot.id, []), key=lambda s: (s.market_id, s.batch_id))
+        ]
         if not queue:
             continue
         fleet = sorted(
-            (t for t in scenario.trucks if t.unavailable_from_slot is None or slot.index < t.unavailable_from_slot),
+            (
+                t
+                for t in scenario.trucks
+                if t.unavailable_from_slot is None or slot.index < t.unavailable_from_slot
+            ),
             key=lambda t: (-t.capacity_kg, t.id),
         )
         for truck in fleet:
             room = truck.capacity_kg
             manifest: list[TripLoad] = []
             while queue and room > 1e-9:
-                take = min(room, queue[0][2])
-                manifest.append(TripLoad(batch_id=queue[0][0], market_id=queue[0][1], kg=round(take, 6)))
+                take = min(room, queue[0].kg)
+                manifest.append(
+                    TripLoad(batch_id=queue[0].batch_id, market_id=queue[0].market_id, kg=round(take, 6))
+                )
                 room -= take
-                queue[0][2] -= take
-                if queue[0][2] <= 1e-9:
+                queue[0].kg -= take
+                if queue[0].kg <= 1e-9:
                     queue.pop(0)
             if manifest:
-                trips.append(Trip(truck_id=truck.id, slot_id=slot.id, load_kg=round(sum(m.kg for m in manifest), 6), manifest=manifest))
+                trips.append(
+                    Trip(
+                        truck_id=truck.id,
+                        slot_id=slot.id,
+                        load_kg=round(sum(m.kg for m in manifest), 6),
+                        manifest=manifest,
+                    )
+                )
         if queue:
-            left = sum(q[2] for q in queue)
-            raise ValueError(f"slot {slot.id} has {left:.0f} kg more than {world.slot_capacity_kg(slot):.0f} kg of trucks")
+            left = sum(q.kg for q in queue)
+            raise ValueError(
+                f"slot {slot.id} has {left:.0f} kg more than {world.slot_capacity_kg(slot):.0f} kg of trucks"
+            )
     return trips
 
 
@@ -87,7 +112,9 @@ def assemble(
             discount=discounts.get((m, commodity_of[bid]), 0.0),
             locked=(bid, m, s) in locked,
         )
-        for (bid, m, s), kg in sorted(merged.items(), key=lambda kv: (kv[0][0], slot_index[kv[0][2]], kv[0][1]))
+        for (bid, m, s), kg in sorted(
+            merged.items(), key=lambda kv: (kv[0][0], slot_index[kv[0][2]], kv[0][1])
+        )
     ]
     used_cells = sorted({(sh.market_id, commodity_of[sh.batch_id]) for sh in shipments})
     prices = [Price(market_id=m, commodity_id=c, discount=discounts.get((m, c), 0.0)) for m, c in used_cells]

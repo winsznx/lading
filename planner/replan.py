@@ -76,7 +76,8 @@ def apply(scenario: Scenario, previous: Plan, disruption: Disruption) -> Scenari
     raw["policy"]["current_slot"] = at
     gone = [sh for sh in previous.shipments if index[sh.slot_id] < at]
     raw["controls"]["dispatched"] = [
-        {"batch_id": sh.batch_id, "market_id": sh.market_id, "slot_id": sh.slot_id, "kg": sh.kg} for sh in gone
+        {"batch_id": sh.batch_id, "market_id": sh.market_id, "slot_id": sh.slot_id, "kg": sh.kg}
+        for sh in gone
     ]
     raw["controls"]["locks"] = [lk for lk in raw["controls"]["locks"] if index[lk["slot_id"]] >= at]
 
@@ -105,7 +106,13 @@ def apply(scenario: Scenario, previous: Plan, disruption: Disruption) -> Scenari
                 "handling_h": order.handling_h,
                 "handling_inr_per_kg": order.handling_inr_per_kg,
                 "deliver_by_h": order.deliver_by_h,
-                "offers": [{"commodity_id": order.commodity_id, "price_inr_per_kg": order.price_inr_per_kg, "demand_kg": order.kg}],
+                "offers": [
+                    {
+                        "commodity_id": order.commodity_id,
+                        "price_inr_per_kg": order.price_inr_per_kg,
+                        "demand_kg": order.kg,
+                    }
+                ],
             }
         )
     return parse(raw)
@@ -171,7 +178,9 @@ def diff(
     return changes
 
 
-def effect_line(disruption: Disruption, new_scenario: Scenario, changes: list[Change], decisions: list[Decision]) -> str:
+def effect_line(
+    disruption: Disruption, new_scenario: Scenario, changes: list[Change], decisions: list[Decision]
+) -> str:
     """One line from cause to effect, built only from the diff and the new decision objects."""
     by_batch = {d.batch_id: d for d in decisions}
     parts = [disruption.label]
@@ -184,16 +193,21 @@ def effect_line(disruption: Disruption, new_scenario: Scenario, changes: list[Ch
         verb = "no longer reach" if len(expired) > 1 else "no longer reaches"
         parts.append(f"{what} batch{'es' if len(expired) > 1 else ''} {verb} {target} fresh")
     if moved:
-        dest = Counter(c.after.split(" at ")[0] for c in moved).most_common(2)
-        parts.append("moved to " + " and ".join(name for name, _ in dest))
-    rediscounted = [c for c in changes if c.kind == "rediscounted" or (c.kind == "moved" and "off" in c.after)]
+        targets = Counter(c.after.split(" at ")[0] for c in moved).most_common(2)
+        parts.append("moved to " + " and ".join(name for name, _ in targets))
+    rediscounted = [
+        c for c in changes if c.kind == "rediscounted" or (c.kind == "moved" and "off" in c.after)
+    ]
     if rediscounted:
         parts.append(f"{len(rediscounted)} re-priced")
     added = [c for c in changes if c.kind == "added"]
     if added:
         dest = Counter(c.after.split(" at ")[0] for c in added).most_common(1)[0][0]
-        parts.append(f"{len(added)} held batch{'es' if len(added) > 1 else ''} now ship, mostly to {dest}" if len(added) > 1
-                     else f"1 held batch now ships to {dest}")
+        parts.append(
+            f"{len(added)} held batch{'es' if len(added) > 1 else ''} now ship, mostly to {dest}"
+            if len(added) > 1
+            else f"1 held batch now ships to {dest}"
+        )
     dropped = [c for c in changes if c.kind == "dropped"]
     if dropped:
         parts.append(f"{len(dropped)} now held")
@@ -205,7 +219,9 @@ def effect_line(disruption: Disruption, new_scenario: Scenario, changes: list[Ch
     return " → ".join(parts)
 
 
-def replan(scenario: Scenario, previous: Plan, disruption: Disruption, arm: str = "lading-point") -> ReplanResult:
+def replan(
+    scenario: Scenario, previous: Plan, disruption: Disruption, arm: str = "lading-point"
+) -> ReplanResult:
     from planner.milp import plan_lading
 
     started = time.perf_counter()

@@ -26,8 +26,18 @@ def test_noop_replan_changes_nothing_and_keeps_what_left():
     s = generate(1003)
     plan = plan_lading(s, "lading-point")
     first = next(sh for sh in plan.shipments if sh.slot_id == "s0")
-    result = replan(s, plan, Disruption(kind="demand_spike", label="no-op", at_slot=1, market_id=first.market_id,
-                                        commodity_id=s.batch(first.batch_id).commodity_id, factor=1.0))
+    result = replan(
+        s,
+        plan,
+        Disruption(
+            kind="demand_spike",
+            label="no-op",
+            at_slot=1,
+            market_id=first.market_id,
+            commodity_id=s.batch(first.batch_id).commodity_id,
+            factor=1.0,
+        ),
+    )
     assert result.changes == []
     left = [sh for sh in result.plan.shipments if sh.slot_id == "s0"]
     assert [(sh.batch_id, sh.kg, sh.locked) for sh in left] == [
@@ -40,11 +50,17 @@ def test_route_delay_moves_a_batch_that_no_longer_arrives_fresh():
     plan = plan_lading(s, "lading-point")
     b1 = next(sh for sh in plan.shipments if sh.batch_id == "b1")
     assert (b1.market_id, b1.slot_id) == ("mid", "s0")
-    delayed = replan(s, plan, Disruption(kind="route_delay", label="Delay to mid +6h", at_slot=0, market_id="mid", extra_h=6))
+    delayed = replan(
+        s,
+        plan,
+        Disruption(kind="route_delay", label="Delay to mid +6h", at_slot=0, market_id="mid", extra_h=6),
+    )
     change = next(c for c in delayed.changes if c.batch_id == "b1")
     assert change.kind == "moved" and change.after.startswith("Near")
     assert "must be on sale by" in change.reason
-    assert delayed.effect.startswith("Delay to mid +6h → 1 tomato batch no longer reaches Mid fresh → moved to Near")
+    assert delayed.effect.startswith(
+        "Delay to mid +6h → 1 tomato batch no longer reaches Mid fresh → moved to Near"
+    )
 
 
 def test_truck_loss_is_respected_and_still_valid():
@@ -60,9 +76,21 @@ def test_truck_loss_is_respected_and_still_valid():
 def test_new_order_is_served_inside_its_deadline():
     s = two_markets()
     plan = plan_lading(s, "lading-point")
-    order = NewOrder(id="hotel_order", name="Hotel order", commodity_id="tomato", kg=1000, price_inr_per_kg=40,
-                     deliver_by_h=10, travel_h=2, transport_inr_per_kg=0.8, handling_h=1, handling_inr_per_kg=0.5)
-    result = replan(s, plan, Disruption(kind="new_order", label="Hotel order 1 t tomato", at_slot=0, order=order))
+    order = NewOrder(
+        id="hotel_order",
+        name="Hotel order",
+        commodity_id="tomato",
+        kg=1000,
+        price_inr_per_kg=40,
+        deliver_by_h=10,
+        travel_h=2,
+        transport_inr_per_kg=0.8,
+        handling_h=1,
+        handling_inr_per_kg=0.5,
+    )
+    result = replan(
+        s, plan, Disruption(kind="new_order", label="Hotel order 1 t tomato", at_slot=0, order=order)
+    )
     served = [sh for sh in result.plan.shipments if sh.market_id == "hotel_order"]
     assert served and sum(sh.kg for sh in served) == pytest.approx(1000)
     assert validate(result.scenario, json.loads(result.plan.model_dump_json()))["status"] == "PASS"

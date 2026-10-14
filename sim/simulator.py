@@ -172,7 +172,14 @@ METRICS = (
     "demand_filled_pct",
     "unmet_demand_kg",
 )
-COST_METRICS = ("revenue_inr", "discount_given_up_inr", "transport_inr", "handling_inr", "spoilage_inr", "net_inr")
+COST_METRICS = (
+    "revenue_inr",
+    "discount_given_up_inr",
+    "transport_inr",
+    "handling_inr",
+    "spoilage_inr",
+    "net_inr",
+)
 
 
 def execute_many(scenario: Scenario, plan: Executable, draws: int = DEFAULT_DRAWS) -> dict[str, float]:

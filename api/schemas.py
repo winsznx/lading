@@ -56,7 +56,9 @@ class PlanRequest(Strict):
 
 
 class ReplanRequest(PlanRequest):
-    disruption_index: int | None = Field(default=None, ge=0, description="One of the scenario's curated disruptions.")
+    disruption_index: int | None = Field(
+        default=None, ge=0, description="One of the scenario's curated disruptions."
+    )
     disruption: Disruption | None = None
 
 

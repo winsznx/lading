@@ -69,7 +69,9 @@ class World:
 
     def committed_market(self, batch: Batch) -> str | None:
         """A batch that has partly left follows its first load: the rest goes to the same market or stays."""
-        return next((leg.market_id for leg in self.scenario.controls.dispatched if leg.batch_id == batch.id), None)
+        return next(
+            (leg.market_id for leg in self.scenario.controls.dispatched if leg.batch_id == batch.id), None
+        )
 
     def expires_in_horizon(self, batch: Batch) -> bool:
         return self.shelf_h(batch) <= self.scenario.policy.horizon_h

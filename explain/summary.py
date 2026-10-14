@@ -28,18 +28,20 @@ def plan_effect(scenario: Scenario, plan: Plan, decisions: list[Decision]) -> st
             blocked[short(expired[0].market_name)] += 1
     if blocked:
         where, n = blocked.most_common(1)[0]
-        parts.append(f"{n} short-life batch{'es' if n > 1 else ''} kept off {where}, where {'they' if n > 1 else 'it'}'d arrive expired")
+        parts.append(
+            f"{n} short-life batch{'es' if n > 1 else ''} kept off {where}, where {'they' if n > 1 else 'it'}'d arrive expired"
+        )
 
     marked = [p for p in plan.prices if p.discount > 0]
     if marked:
-        moved_kg: Counter[tuple[str, str, float]] = Counter()
+        cut_kg: dict[tuple[str, str, float], float] = {}
         for sh in plan.shipments:
-            cid = scenario.batch(sh.batch_id).commodity_id
             if sh.discount > 0:
-                moved_kg[(sh.market_id, cid, sh.discount)] += sh.kg
-        (mid, cid, d), total = moved_kg.most_common(1)[0]
+                key = (sh.market_id, scenario.batch(sh.batch_id).commodity_id, sh.discount)
+                cut_kg[key] = cut_kg.get(key, 0.0) + sh.kg
+        (mid, cid, level), total = max(cut_kg.items(), key=lambda kv: (kv[1], kv[0]))
         name = scenario.commodity(cid).name.lower()
-        parts.append(f"{name} {pct(d)} off at {short(scenario.market(mid).name)} to sell {kg(total)}")
+        parts.append(f"{name} {pct(level)} off at {short(scenario.market(mid).name)} to sell {kg(total)}")
         if len(marked) > 1:
             parts.append(f"{len(marked) - 1} more price{'s' if len(marked) > 2 else ''} cut")
 

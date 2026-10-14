@@ -48,8 +48,12 @@ class Batch(Strict):
     id: Id
     commodity_id: Id
     kg: PosFloat
-    shelf_life_h: PosFloat = Field(description="Estimated hours until the batch is no longer saleable, from t=0.")
-    arrived_h_ago: NonNegFloat = Field(description="Hours since the batch reached the hub. FIFO sorts on this.")
+    shelf_life_h: PosFloat = Field(
+        description="Estimated hours until the batch is no longer saleable, from t=0."
+    )
+    arrived_h_ago: NonNegFloat = Field(
+        description="Hours since the batch reached the hub. FIFO sorts on this."
+    )
     origin: str = Field(min_length=1, max_length=120)
 
 
@@ -88,8 +92,12 @@ class Slot(Strict):
 
 
 class Policy(Strict):
-    horizon_h: PosFloat = Field(description="Undispatched stock that expires before this is spoiled at the hub.")
-    safety_margin_h: NonNegFloat = Field(description="Sale-ready time must be at least this far before expiry.")
+    horizon_h: PosFloat = Field(
+        description="Undispatched stock that expires before this is spoiled at the hub."
+    )
+    safety_margin_h: NonNegFloat = Field(
+        description="Sale-ready time must be at least this far before expiry."
+    )
     discount_levels: list[Annotated[float, Field(ge=0, lt=1)]] = Field(min_length=1, max_length=8)
     current_slot: Annotated[int, Field(ge=0)] = Field(
         default=0, description="First slot that can still dispatch. Earlier slots have left (replans)."
@@ -97,12 +105,16 @@ class Policy(Strict):
 
 
 class TravelDelay(Strict):
-    median_frac: NonNegFloat = Field(description="Median realized delay as a fraction of forecast travel time.")
+    median_frac: NonNegFloat = Field(
+        description="Median realized delay as a fraction of forecast travel time."
+    )
     sigma_log: NonNegFloat = Field(description="Log-space std-dev of the delay fraction (right-skewed).")
 
 
 class Uncertainty(Strict):
-    demand_sigma: Annotated[float, Field(ge=0, le=1)] = Field(description="Relative std-dev of realized demand.")
+    demand_sigma: Annotated[float, Field(ge=0, le=1)] = Field(
+        description="Relative std-dev of realized demand."
+    )
     travel_delay: TravelDelay
 
 
@@ -128,7 +140,8 @@ class Execution(Strict):
     demand_shock: DemandShock | None = None
     truck_loss: TruckLoss | None = None
     elasticity_factor: PosFloat = Field(
-        default=1.0, description="Realized elasticity = disclosed elasticity x this factor (sensitivity sweep)."
+        default=1.0,
+        description="Realized elasticity = disclosed elasticity x this factor (sensitivity sweep).",
     )
 
 
