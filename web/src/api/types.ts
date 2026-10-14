@@ -318,6 +318,8 @@ export interface Reason {
   alternatives: string[];
 }
 
+export type SolverState = "OPTIMAL" | "SOLVER_TIMEOUT";
+
 export interface PlanResponse {
   scenario: Scenario;
   lading: ArmResult;
@@ -327,6 +329,8 @@ export interface PlanResponse {
   effect: string;
   solve_s: number;
   elapsed_s: number;
+  /** SOLVER_TIMEOUT: the live time budget ran out; the plan is the best found, gap in lading.plan.solver.gap. */
+  solver_state: SolverState;
 }
 
 export interface NewOrder {
@@ -381,6 +385,7 @@ export interface Quartiles {
   q1: number;
   q3: number;
   wins: number;
+  losses?: number;
   n: number;
 }
 
@@ -451,9 +456,11 @@ export interface StressFamily {
   seeds: number[];
   summary: Record<string, MetricSummary>;
   rows: ResultRow[];
+  validator?: Record<string, ValidatorTally>;
 }
 
 export interface StressResults {
+  draws_per_scenario?: number;
   families: Record<string, StressFamily>;
 }
 
@@ -465,11 +472,13 @@ export interface SensitivityResults {
   arm: string;
   factors: number[];
   points: SensitivityPoint[];
+  note?: string;
 }
 
 export interface ControlCheck {
   passed: boolean;
   detail: string;
+  rule?: string;
   [extra: string]: unknown;
 }
 
@@ -480,6 +489,7 @@ export interface VerdictResults {
   falsifier: string;
   median_net_gain_inr: number;
   median_spoiled_delta_kg: number;
+  median_fill_delta_pp?: number;
   triggered: boolean;
   verdict: string;
   statement: string;
@@ -490,7 +500,7 @@ export interface ManifestResults {
   commit: string;
   dirty: boolean;
   seeds: Record<string, unknown>;
-  solver: { name: string; version: string };
+  solver: { name: string; version: string; [setting: string]: unknown };
   cost_model_sha256: string;
   planner_config_sha256: string;
   python: string;
@@ -507,14 +517,16 @@ export interface TimingStat {
   n: number;
 }
 
-export interface TimingsResults {
-  heldout: Record<string, TimingStat>;
-  replan: TimingStat;
-}
+/** Groups such as heldout, stress, tuning or replan: either one stat or one per arm. */
+export type TimingGroup = TimingStat | Record<string, TimingStat>;
+
+export type TimingsResults = Record<string, TimingGroup | string>;
 
 export interface CanonicalArm {
   outcome: Partial<Outcome> & Pick<Outcome, "spoiled_kg" | "demand_filled_pct" | "net_inr">;
   validation: { status: "PASS" | "FAIL"; violation_count: number };
+  held?: number;
+  shipments?: number;
 }
 
 export interface CanonicalResults {
@@ -539,3 +551,8 @@ export interface ResultFiles {
 export type ResultName = keyof ResultFiles;
 
 export type Assumptions = Record<string, unknown>;
+
+export interface PlannerConfig {
+  headline_arm: string;
+  planner: { live_time_limit_s?: number; [setting: string]: unknown };
+}

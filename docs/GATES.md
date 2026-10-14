@@ -8,6 +8,7 @@ Dated log of checkpoints, pre-registered splits, freezes, failures and withdrawn
 |---|---|---|---|---|---|
 | 2026-10-14 23:20 | 0.0 | 0.0 | 0.1 | 20.1 | Repo scaffolded, build contract written |
 | 2026-10-15 00:12 | 0.7 | 0.25 | 0.15 | 19.3 | Steps 1-10 done. API live at https://vps-api-host.invalid. Held-out measured, falsifier not triggered. Console in progress. |
+| 2026-10-15 00:38 | 0.9 | 0.45 | 0.2 | 18.85 | Audit fixed, re-frozen, held-out rerun. Console still building. |
 
 ## Held-out exposure during development (2026-10-15 00:00 WAT)
 
@@ -56,7 +57,3 @@ Because items 1 and 3 change the baseline and the evaluation code after held-out
 ## Held-out rerun after the re-freeze (2026-10-15 00:38 WAT)
 
 Clean tree, eval commit `b6ccec4`, frozen code hashes matched. Lading-point vs the strengthened FEFO, 50 held-out days x 30 draws: median paired net +INR 46,412 (IQR 31,382 to 78,250, wins 50/50), spoiled -342 kg (IQR -733 to +10, fewer on 37/50), demand filled +1.82 pp (44/50), 0 validator violations. Falsifier not triggered; verdict HOLDS with P2 listed as a failed control. Lading-robust: +INR 47,377 (38/50), -185 kg (29/50). The stronger baseline cut the median net gain by 21% and the spoilage gain by 48% compared with the first run. Ablations are unchanged (they compare Lading variants). The elasticity sweep now slopes down (+INR 61,043 at 0.5x to +INR 38,318 at 1.5x) because FEFO's own markdowns gain from higher elasticity.
-
-| When (WAT) | Product h | Proof h | Docs h | Hours left | Note |
-|---|---|---|---|---|---|
-| 2026-10-15 00:38 | 0.9 | 0.45 | 0.2 | 18.85 | Audit fixed, re-frozen, held-out rerun. Console still building. |
