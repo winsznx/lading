@@ -1,0 +1,168 @@
+@import "./tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: var(--fs-13);
+    line-height: var(--lh-13);
+    font-weight: var(--fw-regular);
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background: var(--lading-wash);
+    color: var(--ink);
+  }
+
+  [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  kbd {
+    font-family: var(--font-num);
+  }
+}
+
+@layer components {
+  .num {
+    font-family: var(--font-num);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "zero" 0;
+    letter-spacing: -0.01em;
+  }
+
+  .scroll-quiet {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  /* Phones stack outcome first, then the plan, then disruptions, then inventory. */
+  .console-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  .console-grid > .area-outcome {
+    order: 1;
+  }
+  .console-grid > .area-plan {
+    order: 2;
+  }
+  .console-grid > .area-ops {
+    order: 3;
+  }
+  .console-grid > .area-rail {
+    order: 4;
+  }
+
+  @media (min-width: 1024px) {
+    .console-grid {
+      display: grid;
+      grid-template-columns: 232px minmax(0, 1fr) 304px;
+      grid-template-rows: auto minmax(0, 1fr);
+      grid-template-areas:
+        "rail plan outcome"
+        "rail plan ops";
+    }
+    .console-grid > .area-rail {
+      grid-area: rail;
+    }
+    .console-grid > .area-plan {
+      grid-area: plan;
+    }
+    .console-grid > .area-outcome {
+      grid-area: outcome;
+    }
+    .console-grid > .area-ops {
+      grid-area: ops;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .console-grid {
+      grid-template-columns: 248px minmax(0, 1fr) 320px;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .console-grid {
+      grid-template-columns: 272px minmax(0, 1fr) 344px;
+    }
+  }
+
+  .card-changed {
+    outline: 2px dashed var(--ink);
+    outline-offset: 1px;
+  }
+
+  .sheet[data-state="open"] {
+    animation: sheet-in var(--dur-slow) var(--ease-out);
+  }
+  .sheet[data-state="closed"] {
+    animation: sheet-out var(--dur-fast) var(--ease-out);
+  }
+
+  .popover[data-state="open"],
+  .tooltip[data-state="delayed-open"],
+  .tooltip[data-state="instant-open"] {
+    animation: fade-in var(--dur-fast) var(--ease-out);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-out {
+  to {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}

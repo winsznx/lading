@@ -1,0 +1,175 @@
+/*
+  Lading design tokens. Every colour, size, radius, shadow and duration in the console comes from here;
+  tailwind.config.ts maps its theme onto these variables and nothing else.
+
+  Colour roles:
+    paper/surface/raised/sunken  neutral planes (paper off-white in light, warm graphite in dark)
+    ink, ink-2, ink-3            text, strongest to quietest (all AA on every plane)
+    accent                       primary actions only (Run plan)
+    lading, fefo                 the two fixed comparison series, used identically everywhere
+    good, bad                    better/worse deltas, validator pass/violation
+    warn                         solver hit its time budget (plan shown, flagged)
+    ramp-0..4                    perishability on one ochre hue: fresh -> expired
+*/
+
+:root {
+  color-scheme: light;
+
+  --paper: #f3f3f0;
+  --surface: #fafaf8;
+  --raised: #ffffff;
+  --sunken: #ebebe7;
+  --line: #e0dfda;
+  --line-strong: #c9c8c1;
+
+  --ink: #1c1c1a;
+  --ink-2: #4a4944;
+  --ink-3: #66655e;
+
+  --accent: #0b6a74;
+  --accent-hover: #08575f;
+  --accent-ink: #ffffff;
+
+  --lading: #3150c2;
+  --lading-wash: #e8ecfa;
+  --fefo: #65625a;
+  --fefo-wash: #ecebe7;
+
+  --good: #1d7442;
+  --good-wash: #e5f1e9;
+  --bad: #b02e27;
+  --bad-wash: #f8e6e4;
+  --warn: #8a5000;
+  --warn-wash: #f7eddc;
+
+  --ramp-0: #d6d0bb;
+  --ramp-1: #dcb763;
+  --ramp-2: #cc8c22;
+  --ramp-3: #a2600d;
+  --ramp-4: #6b3a07;
+
+  --highlight: #e9e7df;
+  --scrim: rgba(28, 28, 26, 0.18);
+  --shadow-overlay: 0 12px 32px rgba(28, 28, 26, 0.14), 0 2px 6px rgba(28, 28, 26, 0.08);
+
+  --font-ui: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-20: 20px;
+  --fs-28: 28px;
+
+  --lh-12: 16px;
+  --lh-13: 18px;
+  --lh-14: 20px;
+  --lh-16: 24px;
+  --lh-20: 28px;
+  --lh-28: 34px;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+
+  --dur-fast: 120ms;
+  --dur: 160ms;
+  --dur-slow: 180ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --paper: #191816;
+    --surface: #1f1e1b;
+    --raised: #272623;
+    --sunken: #151412;
+    --line: #2f2e2a;
+    --line-strong: #44423d;
+
+    --ink: #eceae4;
+    --ink-2: #bebbb3;
+    --ink-3: #9e9b93;
+
+    --accent: #58b6c0;
+    --accent-hover: #72c5ce;
+    --accent-ink: #0d1a1b;
+
+    --lading: #92a7f2;
+    --lading-wash: #232a40;
+    --fefo: #a6a299;
+    --fefo-wash: #2a2926;
+
+    --good: #5fc48c;
+    --good-wash: #1b2c21;
+    --bad: #f27f73;
+    --bad-wash: #3a211e;
+    --warn: #e8b04d;
+    --warn-wash: #33291a;
+
+    --ramp-0: #4c4639;
+    --ramp-1: #7c6532;
+    --ramp-2: #b4812b;
+    --ramp-3: #dea441;
+    --ramp-4: #f6ca72;
+
+    --highlight: #33312d;
+    --scrim: rgba(0, 0, 0, 0.4);
+    --shadow-overlay: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #191816;
+  --surface: #1f1e1b;
+  --raised: #272623;
+  --sunken: #151412;
+  --line: #2f2e2a;
+  --line-strong: #44423d;
+
+  --ink: #eceae4;
+  --ink-2: #bebbb3;
+  --ink-3: #9e9b93;
+
+  --accent: #58b6c0;
+  --accent-hover: #72c5ce;
+  --accent-ink: #0d1a1b;
+
+  --lading: #92a7f2;
+  --lading-wash: #232a40;
+  --fefo: #a6a299;
+  --fefo-wash: #2a2926;
+
+  --good: #5fc48c;
+  --good-wash: #1b2c21;
+  --bad: #f27f73;
+  --bad-wash: #3a211e;
+  --warn: #e8b04d;
+  --warn-wash: #33291a;
+
+  --ramp-0: #4c4639;
+  --ramp-1: #7c6532;
+  --ramp-2: #b4812b;
+  --ramp-3: #dea441;
+  --ramp-4: #f6ca72;
+
+  --highlight: #33312d;
+  --scrim: rgba(0, 0, 0, 0.4);
+  --shadow-overlay: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+    --dur-slow: 0ms;
+  }
+}
