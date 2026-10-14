@@ -68,9 +68,10 @@ def assemble(
     legs: list[Leg],
     discounts: dict[Cell, float],
     solver: SolverInfo | None = None,
-    locked: set[str] | None = None,
+    locked: set[tuple[str, str, str]] | None = None,
 ) -> Plan:
-    """`discounts` maps (market, commodity) to the discount the arm chose. Cells without one sell at list."""
+    """`discounts` maps (market, commodity) to the discount the arm chose. Cells without one sell at list.
+    `locked` holds the (batch, market, slot) legs the arm wasn't free to move."""
     locked = locked or set()
     commodity_of = {b.id: b.commodity_id for b in scenario.batches}
     slot_index = {s.id: s.index for s in scenario.slots}
@@ -84,7 +85,7 @@ def assemble(
             slot_id=s,
             kg=round(kg, 6),
             discount=discounts.get((m, commodity_of[bid]), 0.0),
-            locked=bid in locked,
+            locked=(bid, m, s) in locked,
         )
         for (bid, m, s), kg in sorted(merged.items(), key=lambda kv: (kv[0][0], slot_index[kv[0][2]], kv[0][1]))
     ]

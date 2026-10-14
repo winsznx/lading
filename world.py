@@ -61,6 +61,16 @@ class World:
     def sells(self, batch: Batch, market: Market) -> bool:
         return self.scenario.offer(market.id, batch.commodity_id) is not None
 
+    def dispatched_kg(self, batch: Batch) -> float:
+        return sum(leg.kg for leg in self.scenario.controls.dispatched if leg.batch_id == batch.id)
+
+    def on_hand_kg(self, batch: Batch) -> float:
+        return max(batch.kg - self.dispatched_kg(batch), 0.0)
+
+    def committed_market(self, batch: Batch) -> str | None:
+        """A batch that has partly left follows its first load: the rest goes to the same market or stays."""
+        return next((leg.market_id for leg in self.scenario.controls.dispatched if leg.batch_id == batch.id), None)
+
     def expires_in_horizon(self, batch: Batch) -> bool:
         return self.shelf_h(batch) <= self.scenario.policy.horizon_h
 

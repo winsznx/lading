@@ -53,49 +53,60 @@ def plan_fefo(scenario: Scenario) -> Plan:
         assert offer is not None
         return cost_model.demand_cap_kg(offer.demand_kg, commodity[cid].elasticity, d) - shipped[(m.id, cid)]
 
-    def value(b: Batch, m: Market, d: float) -> float:
+    def value(b: Batch, m: Market, d: float, qty: float) -> float:
         cid = b.commodity_id
-        sold = min(b.kg, max(room_left(m, cid, d), 0.0))
+        sold = min(qty, max(room_left(m, cid, d), 0.0))
         unit_sale = cost_model.sale_inr_per_kg(scenario.list_price(m.id, cid), d)
         unit_route = cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
         unit_loss = cost_model.spoilage_inr_per_kg(commodity[cid].purchase_inr_per_kg)
-        return sold * unit_sale - b.kg * unit_route - (b.kg - sold) * unit_loss
+        return sold * unit_sale - qty * unit_route - (qty - sold) * unit_loss
 
     def place(b: Batch, m: Market, parts: list[tuple[Slot, float]]) -> None:
         fleet.take(parts)
         legs.extend(Leg(b.id, m.id, s.id, kg) for s, kg in parts)
-        shipped[(m.id, b.commodity_id)] += b.kg
+        shipped[(m.id, b.commodity_id)] += sum(kg for _, kg in parts)
         placed.add(b.id)
+
+    for leg in scenario.controls.dispatched:
+        b, m, s = scenario.batch(leg.batch_id), scenario.market(leg.market_id), scenario.slot(leg.slot_id)
+        legs.append(Leg(b.id, m.id, s.id, leg.kg))
+        if world.sale_h(m, s) <= b.shelf_life_h:
+            shipped[(m.id, b.commodity_id)] += leg.kg
 
     for lock in scenario.controls.locks:
         b, m, s = scenario.batch(lock.batch_id), scenario.market(lock.market_id), scenario.slot(lock.slot_id)
-        parts = fleet.fit([s], b.kg)
+        parts = fleet.fit([s], world.on_hand_kg(b))
         if parts is not None:
             place(b, m, parts)
 
     for b in sorted(scenario.batches, key=lambda b: (world.shelf_h(b), -b.kg, b.id)):
-        if b.id in placed:
+        qty = world.on_hand_kg(b)
+        if b.id in placed or qty <= 1e-9:
             continue
         purchase = commodity[b.commodity_id].purchase_inr_per_kg
-        hold = -b.kg * cost_model.spoilage_inr_per_kg(purchase) if world.expires_in_horizon(b) else 0.0
-        markets = [m for m in scenario.markets if world.sells(b, m) and (b.id, m.id) not in vetoed]
+        hold = -qty * cost_model.spoilage_inr_per_kg(purchase) if world.expires_in_horizon(b) else 0.0
+        committed = world.committed_market(b)
+        markets = [
+            m for m in scenario.markets
+            if world.sells(b, m) and (b.id, m.id) not in vetoed and (committed is None or m.id == committed)
+        ]
 
         best: Option | None = None
         for m in markets:
             d = discount[(m.id, b.commodity_id)]
             if room_left(m, b.commodity_id, d) <= 0:
                 continue
-            parts = fleet.fit(world.fresh_slots(b, m), b.kg)
+            parts = fleet.fit(world.fresh_slots(b, m), qty)
             if parts is None:
                 continue
-            option: Option = (value(b, m, d), -parts[0][0].index, m.id, m, parts)
+            option: Option = (value(b, m, d, qty), -parts[0][0].index, m.id, m, parts)
             if best is None or option[:3] > best[:3]:
                 best = option
 
         unsold_at_best = 0.0
         if best is not None:
             m = best[3]
-            unsold_at_best = b.kg - min(b.kg, room_left(m, b.commodity_id, discount[(m.id, b.commodity_id)]))
+            unsold_at_best = qty - min(qty, room_left(m, b.commodity_id, discount[(m.id, b.commodity_id)]))
         would_expire_unsold = unsold_at_best > 1e-9 or (best is None and world.expires_in_horizon(b))
 
         markdown: Option | None = None
@@ -104,12 +115,12 @@ def plan_fefo(scenario: Scenario) -> Plan:
                 cell = (m.id, b.commodity_id)
                 if discount[cell] >= deepest or room_left(m, b.commodity_id, deepest) <= 0:
                     continue
-                parts = fleet.fit(world.fresh_slots(b, m), b.kg)
+                parts = fleet.fit(world.fresh_slots(b, m), qty)
                 if parts is None:
                     continue
                 selling_now = min(shipped[cell], room_left(m, b.commodity_id, discount[cell]) + shipped[cell])
                 price_cut = selling_now * scenario.list_price(m.id, b.commodity_id) * (deepest - discount[cell])
-                option = (value(b, m, deepest) - price_cut, -parts[0][0].index, m.id, m, parts)
+                option = (value(b, m, deepest, qty) - price_cut, -parts[0][0].index, m.id, m, parts)
                 if markdown is None or option[:3] > markdown[:3]:
                     markdown = option
 
@@ -119,4 +130,10 @@ def plan_fefo(scenario: Scenario) -> Plan:
         elif best is not None and best[0] > hold:
             place(b, best[3], best[4])
 
-    return assemble(scenario, "fefo", "point", legs, dict(discount))
+    return assemble(scenario, "fefo", "point", legs, dict(discount), locked=_locked(scenario, legs))
+
+
+def _locked(scenario: Scenario, legs: list[Leg]) -> set[tuple[str, str, str]]:
+    fixed = {(d.batch_id, d.market_id, d.slot_id) for d in scenario.controls.dispatched}
+    locks = {(lk.batch_id, lk.market_id, lk.slot_id) for lk in scenario.controls.locks}
+    return fixed | {(leg.batch_id, leg.market_id, leg.slot_id) for leg in legs if (leg.batch_id, leg.market_id, leg.slot_id) in locks}

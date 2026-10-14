@@ -143,11 +143,21 @@ class Veto(Strict):
     market_id: Id
 
 
+class Dispatched(Strict):
+    """Stock that has already left on a past slot. A replan keeps it as a fact, not a decision."""
+
+    batch_id: Id
+    market_id: Id
+    slot_id: Id
+    kg: PosFloat
+
+
 class Controls(Strict):
     """Dispatcher overrides. Locks force an assignment, vetoes forbid a batch-market pair."""
 
     locks: list[Lock] = Field(default_factory=list)
     vetoes: list[Veto] = Field(default_factory=list)
+    dispatched: list[Dispatched] = Field(default_factory=list)
 
 
 class CostModelRef(Strict):

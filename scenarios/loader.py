@@ -109,6 +109,12 @@ def check_references(s: Scenario) -> None:
             raise _invalid(f"controls.locks[{i}].market_id", f"unknown market '{lock.market_id}'")
         if lock.slot_id not in slot_ids:
             raise _invalid(f"controls.locks[{i}].slot_id", f"unknown slot '{lock.slot_id}'")
+    current = s.policy.current_slot
+    for i, leg in enumerate(s.controls.dispatched):
+        if leg.batch_id not in batch_ids or leg.market_id not in market_ids or leg.slot_id not in slot_ids:
+            raise _invalid(f"controls.dispatched[{i}]", "unknown batch, market or slot")
+        if s.slot(leg.slot_id).index >= current:
+            raise _invalid(f"controls.dispatched[{i}].slot_id", "dispatched stock must have left before current_slot")
     for i, veto in enumerate(s.controls.vetoes):
         if veto.batch_id not in batch_ids:
             raise _invalid(f"controls.vetoes[{i}].batch_id", f"unknown batch '{veto.batch_id}'")

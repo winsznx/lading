@@ -104,6 +104,7 @@ class Arc:
     market: Market
     deadline: Slot
     locked_slot: Slot | None
+    kg: float
 
 
 def build_arcs(scenario: Scenario, world: World, hard_shelf: bool = True) -> list[Arc]:
@@ -113,6 +114,10 @@ def build_arcs(scenario: Scenario, world: World, hard_shelf: bool = True) -> lis
     locks = {lk.batch_id: lk for lk in scenario.controls.locks}
     arcs = []
     for b in scenario.batches:
+        kg = world.on_hand_kg(b)
+        if kg <= 1e-9:
+            continue
+        committed = world.committed_market(b)
         lock = locks.get(b.id)
         if lock is not None:
             m, s = scenario.market(lock.market_id), scenario.slot(lock.slot_id)
@@ -123,22 +128,45 @@ def build_arcs(scenario: Scenario, world: World, hard_shelf: bool = True) -> lis
                     f"{point.sale_h(m, s):.1f} h and must be by {b.shelf_life_h - scenario.policy.safety_margin_h:.1f} h.",
                     path="controls.locks",
                 )
-            arcs.append(Arc(b, m, s, s))
+            arcs.append(Arc(b, m, s, s, kg))
             continue
         for m in scenario.markets:
-            if not world.sells(b, m) or (b.id, m.id) in vetoed:
+            if not world.sells(b, m) or (b.id, m.id) in vetoed or (committed and m.id != committed):
                 continue
             fresh = world.fresh_slots(b, m)
             if fresh:
-                arcs.append(Arc(b, m, fresh[-1], None))
+                arcs.append(Arc(b, m, fresh[-1], None, kg))
             elif not hard_shelf and world.open_slots:
-                arcs.append(Arc(b, m, world.open_slots[-1], None))
+                arcs.append(Arc(b, m, world.open_slots[-1], None, kg))
     return arcs
 
 
+def in_transit(scenario: Scenario) -> tuple[dict[tuple[str, str], float], float]:
+    """Stock already on the road: kg arriving fresh per (market, commodity) on the forecast, and the
+    fixed INR it has already cost (freight, handling, and purchase value of anything now arriving late)."""
+    point = World(scenario, "point")
+    arriving: dict[tuple[str, str], float] = defaultdict(float)
+    fixed = 0.0
+    for leg in scenario.controls.dispatched:
+        b, m, s = scenario.batch(leg.batch_id), scenario.market(leg.market_id), scenario.slot(leg.slot_id)
+        fixed -= leg.kg * cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
+        late = point.sale_h(m, s) > b.shelf_life_h or (m.deliver_by_h is not None and point.sale_h(m, s) > m.deliver_by_h)
+        if late:
+            fixed -= leg.kg * cost_model.spoilage_inr_per_kg(scenario.commodity(b.commodity_id).purchase_inr_per_kg)
+        else:
+            arriving[(m.id, b.commodity_id)] += leg.kg
+    return arriving, fixed
+
+
 def plan_lading(
-    scenario: Scenario, arm: str = "lading-robust", time_limit_s: float | None = None, mip_rel_gap: float | None = None
+    scenario: Scenario,
+    arm: str = "lading-robust",
+    time_limit_s: float | None = None,
+    mip_rel_gap: float | None = None,
+    previous: Plan | None = None,
 ) -> Plan:
+    """Solve one arm. With `previous` (a replan), keeping a batch's market or a cell's price earns a small
+    stability bonus, so the new plan only moves what the disruption forces it to move."""
     variant = VARIANTS[arm]
     cfg = dict(config())
     if mip_rel_gap is not None:
@@ -149,24 +177,32 @@ def plan_lading(
     model = _Model()
 
     arcs = build_arcs(scenario, world, variant.hard_shelf)
+    arriving, fixed_inr = in_transit(scenario)
+    kept_market = {sh.batch_id: sh.market_id for sh in previous.shipments} if previous else {}
+    kept_price = {(p.market_id, p.commodity_id): p.discount for p in previous.prices} if previous else {}
+    stick_kg = cfg["replan_stability_inr_per_kg"] if previous else 0.0
+    stick_cell = cfg["replan_stability_inr_per_price"] if previous else 0.0
+    bonus: dict[int, float] = {}
     x: dict[tuple[str, str], int] = {}
     for arc in arcs:
-        b, m = arc.batch, arc.market
+        b, m, kg = arc.batch, arc.market, arc.kg
         purchase = commodity[b.commodity_id].purchase_inr_per_kg
         hub_loss = cost_model.spoilage_inr_per_kg(purchase) if world.expires_in_horizon(b) else 0.0
         unit = cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
         penalty = 0.0
         if not variant.hard_shelf and arc.locked_slot is None and not world.fresh_slots(b, m):
             late_h = world.sale_h(m, world.open_slots[0]) - (world.shelf_h(b) - pol.safety_margin_h)
-            penalty = cfg["soft_shelf_penalty_inr_per_kg_h"] * late_h * b.kg
-        coef = -b.kg * unit - b.kg * cost_model.spoilage_inr_per_kg(purchase) + b.kg * hub_loss - penalty
+            penalty = cfg["soft_shelf_penalty_inr_per_kg_h"] * late_h * kg
+        coef = -kg * unit - kg * cost_model.spoilage_inr_per_kg(purchase) + kg * hub_loss - penalty
         locked = arc.locked_slot is not None
-        x[(b.id, m.id)] = model.col(coef, 1.0, True, lower=1.0 if locked else 0.0)
+        stick = stick_kg * kg if kept_market.get(b.id) == m.id else 0.0
+        x[(b.id, m.id)] = model.col(coef + stick, 1.0, True, lower=1.0 if locked else 0.0)
+        bonus[x[(b.id, m.id)]] = stick
 
     levels = pol.discount_levels if variant.discounts else [0.0]
     pick: dict[tuple[str, str, float], int] = {}
     sold: dict[tuple[str, str, float], int] = {}
-    cells = sorted({(arc.market.id, arc.batch.commodity_id) for arc in arcs})
+    cells = sorted({(arc.market.id, arc.batch.commodity_id) for arc in arcs} | set(arriving))
     for mid, cid in cells:
         offer = scenario.offer(mid, cid)
         assert offer is not None
@@ -176,7 +212,9 @@ def plan_lading(
             unit = cost_model.sale_inr_per_kg(offer.price_inr_per_kg, d) + cost_model.spoilage_inr_per_kg(
                 c.purchase_inr_per_kg
             )
-            pick[(mid, cid, d)] = model.col(0.0, 1.0, True)
+            stick = stick_cell if kept_price.get((mid, cid)) == d else 0.0
+            pick[(mid, cid, d)] = model.col(stick, 1.0, True)
+            bonus[pick[(mid, cid, d)]] = stick
             sold[(mid, cid, d)] = model.col(unit, cap, False)
 
     by_batch: dict[str, list[int]] = defaultdict(list)
@@ -184,14 +222,16 @@ def plan_lading(
     for arc in arcs:
         j = x[(arc.batch.id, arc.market.id)]
         by_batch[arc.batch.id].append(j)
-        by_cell[(arc.market.id, arc.batch.commodity_id)].append((j, arc.batch.kg))
+        by_cell[(arc.market.id, arc.batch.commodity_id)].append((j, arc.kg))
     for cols in by_batch.values():
         model.row(cols, [1.0] * len(cols), 0.0, 1.0)
 
     for mid, cid in cells:
         cols = [sold[(mid, cid, d)] for d in levels]
         shipped = by_cell[(mid, cid)]
-        model.row(cols + [j for j, _ in shipped], [1.0] * len(cols) + [-kg for _, kg in shipped], -np.inf, 0.0)
+        model.row(
+            cols + [j for j, _ in shipped], [1.0] * len(cols) + [-kg for _, kg in shipped], -np.inf, arriving.get((mid, cid), 0.0)
+        )
         picks = [pick[(mid, cid, d)] for d in levels]
         model.row(picks, [1.0] * len(picks), 1.0, 1.0)
         offer = scenario.offer(mid, cid)
@@ -205,28 +245,41 @@ def plan_lading(
     for t in world.open_slots:
         cumulative += capacity[t.id]
         due = [arc for arc in arcs if arc.locked_slot is None and arc.deadline.index <= t.index]
-        model.row([x[(a.batch.id, a.market.id)] for a in due], [a.batch.kg for a in due], -np.inf, cumulative)
+        model.row([x[(a.batch.id, a.market.id)] for a in due], [a.kg for a in due], -np.inf, cumulative)
 
-    offset = -sum(
-        b.kg * cost_model.spoilage_inr_per_kg(commodity[b.commodity_id].purchase_inr_per_kg)
+    offset = fixed_inr - sum(
+        world.on_hand_kg(b) * cost_model.spoilage_inr_per_kg(commodity[b.commodity_id].purchase_inr_per_kg)
         for b in scenario.batches
         if world.expires_in_horizon(b)
     )
     limit = time_limit_s if time_limit_s is not None else cfg["live_time_limit_s"]
     values, info = _solve(model, offset, limit, cfg)
+    paid = sum(v for j, v in bonus.items() if v and values[j] > 0.5)
+    if paid:
+        info = info.model_copy(
+            update={"objective_inr": round(info.objective_inr - paid, 2), "bound_inr": round(info.bound_inr - paid, 2)}
+        )
 
     chosen = [arc for arc in arcs if values[x[(arc.batch.id, arc.market.id)]] > 0.5]
     legs = _schedule(world, chosen, capacity)
+    fixed = [Leg(d.batch_id, d.market_id, d.slot_id, d.kg) for d in scenario.controls.dispatched]
     discounts = {(mid, cid): d for (mid, cid, d), j in pick.items() if values[j] > 0.5}
     return assemble(
         scenario,
         variant.arm,
         "robust" if variant.basis == "robust" else "point",
-        legs,
+        fixed + legs,
         discounts,
         solver=info,
-        locked={lk.batch_id for lk in scenario.controls.locks},
+        locked=locked_legs(scenario, legs),
     )
+
+
+def locked_legs(scenario: Scenario, legs: list[Leg]) -> set[tuple[str, str, str]]:
+    """Legs the planner may not move: stock already on the road and the dispatcher's locks."""
+    out = {(d.batch_id, d.market_id, d.slot_id) for d in scenario.controls.dispatched}
+    lock_of = {(lk.batch_id, lk.market_id, lk.slot_id) for lk in scenario.controls.locks}
+    return out | {(leg.batch_id, leg.market_id, leg.slot_id) for leg in legs if (leg.batch_id, leg.market_id, leg.slot_id) in lock_of}
 
 
 def _free_capacity(world: World, arcs: list[Arc]) -> dict[str, float]:
@@ -234,7 +287,7 @@ def _free_capacity(world: World, arcs: list[Arc]) -> dict[str, float]:
     capacity = {s.id: world.slot_capacity_kg(s) for s in world.open_slots}
     for arc in arcs:
         if arc.locked_slot is not None and arc.locked_slot.id in capacity:
-            capacity[arc.locked_slot.id] -= arc.batch.kg
+            capacity[arc.locked_slot.id] -= arc.kg
             if capacity[arc.locked_slot.id] < -1e-9:
                 raise LadingError(
                     State.LOCK_INFEASIBLE,
@@ -247,13 +300,13 @@ def _free_capacity(world: World, arcs: list[Arc]) -> dict[str, float]:
 def _schedule(world: World, chosen: list[Arc], capacity: dict[str, float]) -> list[Leg]:
     """Earliest deadline first: each batch fills the earliest slots with room, up to its deadline."""
     room = dict(capacity)
-    legs = [Leg(a.batch.id, a.market.id, a.locked_slot.id, a.batch.kg) for a in chosen if a.locked_slot is not None]
+    legs = [Leg(a.batch.id, a.market.id, a.locked_slot.id, a.kg) for a in chosen if a.locked_slot is not None]
     queue = sorted(
         (a for a in chosen if a.locked_slot is None),
         key=lambda a: (a.deadline.index, world.shelf_h(a.batch), a.batch.id),
     )
     for arc in queue:
-        left = arc.batch.kg
+        left = arc.kg
         for s in world.open_slots:
             if s.index > arc.deadline.index or left <= 1e-9:
                 break

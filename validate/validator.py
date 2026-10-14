@@ -50,6 +50,9 @@ def validate(scenario: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
     margin = policy["safety_margin_h"]
     levels = policy["discount_levels"]
     current = policy.get("current_slot", 0)
+    dispatched: dict[tuple[str, str, str], float] = defaultdict(float)
+    for d in scenario.get("controls", {}).get("dispatched", []):
+        dispatched[(d["batch_id"], d["market_id"], d["slot_id"])] += d["kg"]
 
     r.check("plan.scenario", plan["scenario_id"] == scenario["id"], "plan is for another scenario", "scenario_id")
 
@@ -73,12 +76,16 @@ def validate(scenario: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
         shipped_kg[b["id"]] += sh["kg"]
         destinations[b["id"]].add(m["id"])
         shipment_at[(b["id"], m["id"], s["id"])] += sh["kg"]
-        r.check("slot.open", s["index"] >= current or sh.get("locked", False),
-                f"slot {s['id']} has already left", ref)
+        key = (b["id"], m["id"], s["id"])
+        if s["index"] < current:
+            r.check("dispatched.match", abs(dispatched.get(key, 0.0) - sh["kg"]) <= KG_TOL,
+                    f"slot {s['id']} has already left and this isn't what was dispatched on it", ref)
         cell = (m["id"], b["commodity_id"])
         r.check("market.buys", cell in offers, f"{m['id']} doesn't buy {b['commodity_id']}", ref)
         r.check("price.consistent", prices.get(cell, 0.0) == sh["discount"],
                 f"shipment discount {sh['discount']} differs from the market price {prices.get(cell, 0.0)}", ref)
+        if s["index"] < current:
+            continue
         sale_h = s["depart_h"] + m["travel_h"] + m["handling_h"]
         latest = b["shelf_life_h"] - margin
         r.check("shelf_life", sale_h <= latest + 1e-9,
@@ -88,6 +95,9 @@ def validate(scenario: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
             r.check("deliver_by", sale_h <= m["deliver_by_h"] + 1e-9,
                     f"on sale at {sale_h:.1f} h, order deadline {m['deliver_by_h']:.1f} h", ref)
 
+    for key, kg in dispatched.items():
+        r.check("dispatched.match", abs(shipment_at.get(key, 0.0) - kg) <= KG_TOL,
+                f"{kg:.0f} kg already left for {key[1]} at {key[2]} but the plan doesn't carry it", key[0])
     for bid, kg in shipped_kg.items():
         r.check("stock", kg <= batches[bid]["kg"] + KG_TOL, f"ships {kg:.0f} kg of {batches[bid]['kg']:.0f} kg", bid)
         r.check("one_market", len(destinations[bid]) == 1, f"split across markets {sorted(destinations[bid])}", bid)

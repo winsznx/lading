@@ -102,6 +102,13 @@
       "additionalProperties": false,
       "description": "Dispatcher overrides. Locks force an assignment, vetoes forbid a batch-market pair.",
       "properties": {
+        "dispatched": {
+          "items": {
+            "$ref": "#/$defs/Dispatched"
+          },
+          "title": "Dispatched",
+          "type": "array"
+        },
         "locks": {
           "items": {
             "$ref": "#/$defs/Lock"
@@ -156,6 +163,46 @@
         "factor"
       ],
       "title": "DemandShock",
+      "type": "object"
+    },
+    "Dispatched": {
+      "additionalProperties": false,
+      "description": "Stock that has already left on a past slot. A replan keeps it as a fact, not a decision.",
+      "properties": {
+        "batch_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Batch Id",
+          "type": "string"
+        },
+        "kg": {
+          "exclusiveMinimum": 0,
+          "title": "Kg",
+          "type": "number"
+        },
+        "market_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Market Id",
+          "type": "string"
+        },
+        "slot_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Slot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "batch_id",
+        "market_id",
+        "slot_id",
+        "kg"
+      ],
+      "title": "Dispatched",
       "type": "object"
     },
     "Execution": {

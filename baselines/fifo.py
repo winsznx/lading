@@ -30,33 +30,42 @@ def plan_fifo(scenario: Scenario) -> Plan:
         for o in m.offers:
             remaining[(m.id, o.commodity_id)] = o.demand_kg
 
-    legs: list[Leg] = []
+    legs: list[Leg] = [Leg(d.batch_id, d.market_id, d.slot_id, d.kg) for d in scenario.controls.dispatched]
+    for d in scenario.controls.dispatched:
+        remaining[(d.market_id, scenario.batch(d.batch_id).commodity_id)] -= d.kg
     placed: set[str] = set()
     for lock in scenario.controls.locks:
         b, s = scenario.batch(lock.batch_id), scenario.slot(lock.slot_id)
-        parts = fleet.fit([s], b.kg)
+        qty = world.on_hand_kg(b)
+        parts = fleet.fit([s], qty)
         if parts is not None:
             fleet.take(parts)
-            legs.append(Leg(b.id, lock.market_id, s.id, b.kg))
-            remaining[(lock.market_id, b.commodity_id)] -= b.kg
+            legs.append(Leg(b.id, lock.market_id, s.id, qty))
+            remaining[(lock.market_id, b.commodity_id)] -= qty
             placed.add(b.id)
 
     for b in sorted(scenario.batches, key=lambda b: (-b.arrived_h_ago, b.id)):
-        if b.id in placed:
+        qty = world.on_hand_kg(b)
+        if b.id in placed or qty <= 1e-9:
             continue
+        committed = world.committed_market(b)
         markets = [
             m
             for m in scenario.markets
-            if (b.id, m.id) not in vetoed and world.sells(b, m) and remaining[(m.id, b.commodity_id)] > 0
+            if (b.id, m.id) not in vetoed
+            and world.sells(b, m)
+            and remaining[(m.id, b.commodity_id)] > 0
+            and (committed is None or m.id == committed)
         ]
         markets.sort(key=lambda m: (-scenario.list_price(m.id, b.commodity_id), m.id))
         for m in markets:
-            parts = fleet.fit(world.open_slots, b.kg)
+            parts = fleet.fit(world.open_slots, qty)
             if parts is None:
                 continue
             fleet.take(parts)
             legs += [Leg(b.id, m.id, s.id, kg) for s, kg in parts]
-            remaining[(m.id, b.commodity_id)] -= b.kg
+            remaining[(m.id, b.commodity_id)] -= qty
             break
 
-    return assemble(scenario, "fifo", "point", legs, {})
+    fixed = {(d.batch_id, d.market_id, d.slot_id) for d in scenario.controls.dispatched}
+    return assemble(scenario, "fifo", "point", legs, {}, locked=fixed)

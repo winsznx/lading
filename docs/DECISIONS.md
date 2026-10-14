@@ -21,3 +21,7 @@ Stock delivered to a market but not sold within its demand is booked as spoiled 
 ## D5. MILP gap 0.5% and deterministic termination (2026-10-14)
 
 `mip_rel_gap` is 0.005 and HiGHS runs single-threaded with a fixed seed, so evaluation solves end on the gap, not on the clock, and replays are byte-identical. The live API keeps the 10 s budget and labels any plan that hits it as SOLVER_TIMEOUT with its gap.
+
+## D6. Replans are anchored on the previous plan (2026-10-15)
+
+A replan freezes stock that already left as `controls.dispatched` and re-solves the open slots. A cold re-solve at a 0.5% gap reshuffled batches the disruption never touched (a no-op disruption on held-out seed 1007 changed 3 batches), which would make the diff lie about cause and effect. The replan pays a stability bonus of INR 2/kg for keeping a batch's market and INR 2,000 for keeping a cell's price (`planner/config.json`), so the plan moves only what is worth more than that to move. The bonus is removed from the reported objective. A no-op disruption now changes nothing (test_replan.py).
