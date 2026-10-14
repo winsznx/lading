@@ -36,3 +36,19 @@ Run at freeze commit `d90cef8` (with uncommitted deploy files present, so that m
 ## Clean held-out rerun (2026-10-15 00:16 WAT)
 
 Rerun on a clean tree at eval-code commit `105fb6e` (same planner config hash as the freeze). `heldout.json`, `ablations.json`, `stress.json`, `sensitivity.json`, `canonical.json` and `verdict.json` came out byte-identical to the first run. P3 passes under the corrected independent check (16 unreachable batches over 5 days, 15 injected and 1 natural, all flagged and held by both arms). P2 still fails its rule, as above. Verdict: HOLDS.
+
+## Cold audit and re-freeze (2026-10-15 00:35 WAT)
+
+A fresh agent with no build context audited the backend adversarially. It found no leak into the validator, no silent fallback and no information-parity breach. It did find these, all fixed in commit `b6ccec4`:
+
+1. **FEFO was handicapped on discounts.** It could only mark down to the deepest step (30%) while Lading picks any step of the 0/10/20/30% ladder. FEFO now prices every deeper step on the whole cell. This strengthens the baseline.
+2. **The validator accepted negative-kg lines and ignored vetoes and locks.** It now fails all three. No planner-produced plan was affected.
+3. **The freeze covered only `planner/config.json`.** It now hashes every file that can move a number, and the held-out run refuses to start if any changed.
+4. Replan objectives were overstated by the purchase value of in-transit stock (reported number only, decisions unaffected).
+5. TRUCK_FULL and CARRY_OVER reasons claimed causes the planner never checked; now they state only what the numbers show.
+6. API hardening: X-Forwarded-For keyed on the proxy-appended entry, bucket purge on every path, `/validate` rate limited and typed, caps on controls and offers, `solver_state: SOLVER_TIMEOUT` on budget hits.
+7. The falsifier now also withdraws the headline on any validator violation and lists failed controls; git failure reports `dirty: unknown`.
+
+Noted, not changed: pooled per-slot trucks let one truck carry loads for two markets in a slot (disclosed in D1, same for every arm); truck-loss stress outcomes depend on the shared packer loading the biggest truck first (same packer for every arm, stress reported separately).
+
+Because items 1 and 3 change the baseline and the evaluation code after held-out numbers had been seen, the planner was **re-frozen**: tuning rerun with the stronger FEFO (Lading-point now +INR 46,328 median net vs FEFO, 20/20 days, was +INR 76,247; spoiled -620 kg, 18/20; Lading-robust +INR 24,338, 16/20). The tuning rule still picks Lading-point. No planner setting changed. The previous held-out results stay in git history at commit `d404c53` (+INR 58,942 median, 50/50) and are superseded by the rerun below; the README quotes only the rerun.
