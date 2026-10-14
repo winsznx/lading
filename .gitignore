@@ -20,3 +20,4 @@ web/.vercel/
 .env
 .env.*
 !.env.example
+.ci-results/

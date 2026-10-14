@@ -1,0 +1,6 @@
+# Overlay for a host whose ports 80/443 already belong to another Caddy. The API joins that proxy's
+# Docker network instead of starting its own. EDGE_NETWORK names it.
+networks:
+  edge:
+    name: ${EDGE_NETWORK:?set EDGE_NETWORK to the existing proxy network}
+    external: true

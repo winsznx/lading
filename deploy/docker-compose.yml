@@ -1,0 +1,57 @@
+# Lading backend: the API, plus Caddy for automatic TLS.
+#
+# Standalone host (ports 80/443 free):
+#   API_DOMAIN=api.example.com ALLOWED_ORIGINS=https://lading.vercel.app \
+#   docker compose -f deploy/docker-compose.yml --profile standalone up -d --build
+#
+# Host that already runs a Caddy on 80/443 (see docs/SETUP.md): add compose.shared-edge.yml so the API
+# joins that proxy's network and deploy-api.sh adds a site block to it.
+name: lading
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+      args:
+        LADING_COMMIT: ${LADING_COMMIT:-unknown}
+    image: lading-api:${LADING_COMMIT:-latest}
+    restart: unless-stopped
+    environment:
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?set ALLOWED_ORIGINS to the Vercel URL and http://localhost:5173}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-172.16.0.0/12}
+      LADING_RATE_PER_MIN: ${LADING_RATE_PER_MIN:-20}
+      LADING_RATE_BURST: ${LADING_RATE_BURST:-6}
+      LADING_MAX_CONCURRENT_SOLVES: ${LADING_MAX_CONCURRENT_SOLVES:-2}
+    networks:
+      edge:
+        aliases: [lading-api]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    deploy:
+      resources:
+        limits: { cpus: "3", memory: 1g }
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  caddy:
+    profiles: [standalone]
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?set API_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+    networks: [edge]
+    depends_on: [api]
+
+networks:
+  edge:
+    name: lading_edge
+
+volumes:
+  caddydata:

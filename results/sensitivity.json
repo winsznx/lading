@@ -1,0 +1,148 @@
+{
+  "arm": "lading-point",
+  "factors": [
+    0.5,
+    0.75,
+    1.0,
+    1.25,
+    1.5
+  ],
+  "note": "Plans are fixed; realized elasticity = disclosed elasticity x factor. Deltas are arm minus FEFO.",
+  "points": [
+    {
+      "demand_filled_pct": {
+        "losses": 3,
+        "median": 2.23,
+        "n": 50,
+        "q1": 1.14,
+        "q3": 3.28,
+        "wins": 47
+      },
+      "factor": 0.5,
+      "net_inr": {
+        "losses": 3,
+        "median": 55151.23,
+        "n": 50,
+        "q1": 26896.87,
+        "q3": 98720.12,
+        "wins": 47
+      },
+      "spoiled_kg": {
+        "losses": 8,
+        "median": -757.26,
+        "n": 50,
+        "q1": -1141.08,
+        "q3": -337.79,
+        "wins": 42
+      }
+    },
+    {
+      "demand_filled_pct": {
+        "losses": 3,
+        "median": 2.23,
+        "n": 50,
+        "q1": 1.14,
+        "q3": 3.28,
+        "wins": 47
+      },
+      "factor": 0.75,
+      "net_inr": {
+        "losses": 1,
+        "median": 58185.02,
+        "n": 50,
+        "q1": 33905.08,
+        "q3": 89604.02,
+        "wins": 49
+      },
+      "spoiled_kg": {
+        "losses": 9,
+        "median": -717.34,
+        "n": 50,
+        "q1": -1138.6,
+        "q3": -250.43,
+        "wins": 41
+      }
+    },
+    {
+      "demand_filled_pct": {
+        "losses": 3,
+        "median": 2.23,
+        "n": 50,
+        "q1": 1.14,
+        "q3": 3.28,
+        "wins": 47
+      },
+      "factor": 1.0,
+      "net_inr": {
+        "losses": 0,
+        "median": 58941.56,
+        "n": 50,
+        "q1": 41124.33,
+        "q3": 88320.14,
+        "wins": 50
+      },
+      "spoiled_kg": {
+        "losses": 10,
+        "median": -653.66,
+        "n": 50,
+        "q1": -1153.65,
+        "q3": -288.96,
+        "wins": 40
+      }
+    },
+    {
+      "demand_filled_pct": {
+        "losses": 3,
+        "median": 2.23,
+        "n": 50,
+        "q1": 1.14,
+        "q3": 3.28,
+        "wins": 47
+      },
+      "factor": 1.25,
+      "net_inr": {
+        "losses": 0,
+        "median": 62574.54,
+        "n": 50,
+        "q1": 48473.61,
+        "q3": 92146.7,
+        "wins": 50
+      },
+      "spoiled_kg": {
+        "losses": 9,
+        "median": -658.42,
+        "n": 50,
+        "q1": -1308.98,
+        "q3": -215.49,
+        "wins": 41
+      }
+    },
+    {
+      "demand_filled_pct": {
+        "losses": 3,
+        "median": 2.23,
+        "n": 50,
+        "q1": 1.14,
+        "q3": 3.28,
+        "wins": 47
+      },
+      "factor": 1.5,
+      "net_inr": {
+        "losses": 0,
+        "median": 69066.51,
+        "n": 50,
+        "q1": 50837.13,
+        "q3": 97233.4,
+        "wins": 50
+      },
+      "spoiled_kg": {
+        "losses": 7,
+        "median": -672.92,
+        "n": 50,
+        "q1": -1408.42,
+        "q3": -119.23,
+        "wins": 43
+      }
+    }
+  ]
+}

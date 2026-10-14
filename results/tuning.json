@@ -1688,16 +1688,16 @@
   },
   "timings": {
     "lading-point": {
-      "max_s": 14.832,
-      "median_s": 0.843,
+      "max_s": 15.745,
+      "median_s": 0.855,
       "n": 20,
-      "p90_s": 4.415
+      "p90_s": 5.078
     },
     "lading-robust": {
-      "max_s": 8.456,
-      "median_s": 1.043,
+      "max_s": 8.597,
+      "median_s": 1.022,
       "n": 20,
-      "p90_s": 3.137
+      "p90_s": 4.18
     }
   }
 }

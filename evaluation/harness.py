@@ -282,6 +282,18 @@ def _check_freeze(out: Path) -> dict[str, Any]:
     return record
 
 
+def _unreachable(s: Scenario, batch_id: str) -> bool:
+    b = next(x for x in s.batches if x.id == batch_id)
+    first = next(sl for sl in s.slots if sl.index >= s.policy.current_slot)
+    limit = b.shelf_life_h - s.policy.safety_margin_h
+    return not any(
+        first.depart_h + m.travel_h + m.handling_h <= limit
+        and (m.deliver_by_h is None or first.depart_h + m.travel_h + m.handling_h <= m.deliver_by_h)
+        for m in s.markets
+        if any(o.commodity_id == b.commodity_id for o in m.offers)
+    )
+
+
 def controls(draws: int, small: bool) -> dict[str, Any]:
     out: dict[str, Any] = {}
     headline = str(config()["headline_arm"])
@@ -295,8 +307,13 @@ def controls(draws: int, small: bool) -> dict[str, Any]:
         abs(r["arms"][headline]["net_inr"] - r["arms"]["fefo"]["net_inr"]) / r["arms"]["fefo"]["net_inr"]
         for r in rows
     )
+    breakdown = {
+        part: round(sum(r["arms"][a][part] for r in rows for a in ("fefo", headline)), 2)
+        for part in ("expired_in_transit_kg", "hub_spoiled_kg", "unsold_kg")
+    }
     out["p2_healthy"] = {
         "passed": bool(spoil_share < 0.02 and net_gap < 0.03),
+        "spoilage_breakdown_kg": breakdown,
         "rule": "ample shelf life, trucks and demand: both arms spoil < 2% of stock and net INR within 3% of each other",
         "max_spoiled_share": round(spoil_share, 4),
         "max_net_gap_share": round(net_gap, 4),
@@ -307,30 +324,36 @@ def controls(draws: int, small: bool) -> dict[str, Any]:
     infeasible = [generate(s, "infeasible") for s in (INFEASIBLE[:2] if small else INFEASIBLE)]
     p3: list[dict[str, Any]] = []
     for s in infeasible:
-        stuck = {b.id for b in s.batches if b.shelf_life_h <= 3.0}
+        injected = {b.id for b in s.batches if b.shelf_life_h <= 3.0}
+        unreachable = {b.id for b in s.batches if _unreachable(s, b.id)}
         plans = {arm: plan_arm(s, arm) for arm in ("fefo", headline)}
         flagged = {arm: sorted(p.infeasible) for arm, p in plans.items()}
-        shipped = {arm: sorted({sh.batch_id for sh in p.shipments} & stuck) for arm, p in plans.items()}
+        shipped = {arm: sorted({sh.batch_id for sh in p.shipments} & unreachable) for arm, p in plans.items()}
         p3.append(
             {
                 "scenario_id": s.id,
-                "stuck": sorted(stuck),
+                "injected": sorted(injected),
+                "unreachable_independent": sorted(unreachable),
                 "flagged": flagged,
                 "shipped_anyway": shipped,
-                "stuck_kg": sum(b.kg for b in s.batches if b.id in stuck),
+                "unreachable_kg": sum(b.kg for b in s.batches if b.id in unreachable),
             }
         )
     ok = all(
-        set(r["flagged"][a]) == set(r["stuck"]) and not r["shipped_anyway"][a]
+        set(r["injected"]) <= set(r["unreachable_independent"])
+        and set(r["flagged"][a]) == set(r["unreachable_independent"])
+        and not r["shipped_anyway"][a]
         for r in p3
         for a in ("fefo", headline)
     )
     out["p3_infeasible"] = {
         "passed": ok,
-        "rule": "batches no market can receive fresh are flagged INFEASIBLE_DEMAND, never shipped, and spoil equally in every arm",
-        "detail": f"{sum(len(r['stuck']) for r in p3)} stuck batches over {len(p3)} days, all flagged and held by both arms"
+        "rule": "every batch no market can receive fresh (recomputed here, independently of world.py) is flagged "
+        "INFEASIBLE_DEMAND by every arm and never shipped, so it spoils equally in every arm",
+        "detail": f"{sum(len(r['unreachable_independent']) for r in p3)} unreachable batches over {len(p3)} days "
+        f"({sum(len(r['injected']) for r in p3)} injected), all flagged and held by both arms"
         if ok
-        else "a stuck batch was missed or shipped",
+        else "an unreachable batch was missed, wrongly flagged or shipped",
         "rows": p3,
     }
 

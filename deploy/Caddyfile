@@ -1,0 +1,11 @@
+# TLS for the Lading API. Caddy gets and renews the certificate once $API_DOMAIN points at this host.
+# With no domain, use <ip-with-dashes>.sslip.io so a real certificate is still issued.
+{$API_DOMAIN} {
+	encode gzip
+	reverse_proxy lading-api:8000
+	header {
+		-Server
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+	}
+}

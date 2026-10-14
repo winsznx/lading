@@ -1,0 +1,599 @@
+{
+  "no_op": {
+    "detail": "30 scenario-draws checked",
+    "passed": true,
+    "rows": [
+      {
+        "draw": 0,
+        "independent_kg": 26300.0,
+        "seed": 1000,
+        "sim_spoiled_kg": 26300.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 25250.0,
+        "seed": 1000,
+        "sim_spoiled_kg": 25250.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 26150.0,
+        "seed": 1000,
+        "sim_spoiled_kg": 26150.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 16300.0,
+        "seed": 1001,
+        "sim_spoiled_kg": 16300.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 15050.0,
+        "seed": 1001,
+        "sim_spoiled_kg": 15050.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 15050.0,
+        "seed": 1001,
+        "sim_spoiled_kg": 15050.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 35200.0,
+        "seed": 1002,
+        "sim_spoiled_kg": 35200.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 33800.0,
+        "seed": 1002,
+        "sim_spoiled_kg": 33800.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 34600.0,
+        "seed": 1002,
+        "sim_spoiled_kg": 34600.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 7700.0,
+        "seed": 1003,
+        "sim_spoiled_kg": 7700.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 7100.0,
+        "seed": 1003,
+        "sim_spoiled_kg": 7100.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 8350.0,
+        "seed": 1003,
+        "sim_spoiled_kg": 8350.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 3350.0,
+        "seed": 1004,
+        "sim_spoiled_kg": 3350.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 4200.0,
+        "seed": 1004,
+        "sim_spoiled_kg": 4200.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 4200.0,
+        "seed": 1004,
+        "sim_spoiled_kg": 4200.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 18800.0,
+        "seed": 1005,
+        "sim_spoiled_kg": 18800.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 18350.0,
+        "seed": 1005,
+        "sim_spoiled_kg": 18350.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 19000.0,
+        "seed": 1005,
+        "sim_spoiled_kg": 19000.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 15100.0,
+        "seed": 1006,
+        "sim_spoiled_kg": 15100.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 15350.0,
+        "seed": 1006,
+        "sim_spoiled_kg": 15350.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 15350.0,
+        "seed": 1006,
+        "sim_spoiled_kg": 15350.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 23350.0,
+        "seed": 1007,
+        "sim_spoiled_kg": 23350.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 22200.0,
+        "seed": 1007,
+        "sim_spoiled_kg": 22200.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 21450.0,
+        "seed": 1007,
+        "sim_spoiled_kg": 21450.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 22600.0,
+        "seed": 1008,
+        "sim_spoiled_kg": 22600.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 19350.0,
+        "seed": 1008,
+        "sim_spoiled_kg": 19350.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 21700.0,
+        "seed": 1008,
+        "sim_spoiled_kg": 21700.0
+      },
+      {
+        "draw": 0,
+        "independent_kg": 5750.0,
+        "seed": 1009,
+        "sim_spoiled_kg": 5750.0
+      },
+      {
+        "draw": 1,
+        "independent_kg": 5750.0,
+        "seed": 1009,
+        "sim_spoiled_kg": 5750.0
+      },
+      {
+        "draw": 2,
+        "independent_kg": 5750.0,
+        "seed": 1009,
+        "sim_spoiled_kg": 5750.0
+      }
+    ],
+    "rule": "dispatch nothing: simulated spoilage equals the kg whose realized shelf life ends inside the horizon, counted independently"
+  },
+  "p2_healthy": {
+    "detail": "max spoilage 7.2% of stock, max net gap 1.0% across 5 healthy days",
+    "max_net_gap_share": 0.0105,
+    "max_spoiled_share": 0.0716,
+    "passed": false,
+    "rows": [
+      {
+        "arms": {
+          "fefo": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 56.05,
+            "expired_in_transit_kg": 0.0,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 1240326.14,
+            "spoiled_kg": 1236.29,
+            "unmet_demand_kg": 24502.98,
+            "unsold_kg": 1236.29,
+            "validator": "PASS",
+            "violations": 0
+          },
+          "lading-point": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 55.88,
+            "expired_in_transit_kg": 0.0,
+            "gap": 0.000235,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 1244940.21,
+            "solver_status": "OPTIMAL",
+            "spoiled_kg": 1326.4,
+            "unmet_demand_kg": 24593.1,
+            "unsold_kg": 1326.4,
+            "validator": "PASS",
+            "violations": 0
+          }
+        },
+        "batches": 31,
+        "hub": "Nashik aggregation hub",
+        "infeasible_batches": 0,
+        "scenario_id": "gen-healthy-3000",
+        "seed": 3000,
+        "stock_kg": 32350.0
+      },
+      {
+        "arms": {
+          "fefo": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 56.37,
+            "expired_in_transit_kg": 0.0,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 1767997.74,
+            "spoiled_kg": 2671.11,
+            "unmet_demand_kg": 39303.41,
+            "unsold_kg": 2671.11,
+            "validator": "PASS",
+            "violations": 0
+          },
+          "lading-point": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 55.93,
+            "expired_in_transit_kg": 0.0,
+            "gap": 0.001373,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 1750014.5,
+            "solver_status": "OPTIMAL",
+            "spoiled_kg": 3065.68,
+            "unmet_demand_kg": 39697.99,
+            "unsold_kg": 3065.68,
+            "validator": "PASS",
+            "violations": 0
+          }
+        },
+        "batches": 53,
+        "hub": "Kolar aggregation hub",
+        "infeasible_batches": 0,
+        "scenario_id": "gen-healthy-3001",
+        "seed": 3001,
+        "stock_kg": 53550.0
+      },
+      {
+        "arms": {
+          "fefo": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 54.18,
+            "expired_in_transit_kg": 0.0,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 928890.86,
+            "spoiled_kg": 1831.28,
+            "unmet_demand_kg": 20911.85,
+            "unsold_kg": 1831.28,
+            "validator": "PASS",
+            "violations": 0
+          },
+          "lading-point": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 53.95,
+            "expired_in_transit_kg": 0.0,
+            "gap": 0.001437,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 938618.05,
+            "solver_status": "OPTIMAL",
+            "spoiled_kg": 1936.41,
+            "unmet_demand_kg": 21013.28,
+            "unsold_kg": 1936.41,
+            "validator": "PASS",
+            "violations": 0
+          }
+        },
+        "batches": 27,
+        "hub": "Kolar aggregation hub",
+        "infeasible_batches": 0,
+        "scenario_id": "gen-healthy-3002",
+        "seed": 3002,
+        "stock_kg": 27050.0
+      },
+      {
+        "arms": {
+          "fefo": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 55.17,
+            "expired_in_transit_kg": 0.0,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 2806298.31,
+            "spoiled_kg": 4132.09,
+            "unmet_demand_kg": 54526.71,
+            "unsold_kg": 4132.09,
+            "validator": "PASS",
+            "violations": 0
+          },
+          "lading-point": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 54.83,
+            "expired_in_transit_kg": 0.0,
+            "gap": 0.001616,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 2780081.93,
+            "solver_status": "OPTIMAL",
+            "spoiled_kg": 4525.95,
+            "unmet_demand_kg": 54920.57,
+            "unsold_kg": 4525.95,
+            "validator": "PASS",
+            "violations": 0
+          }
+        },
+        "batches": 60,
+        "hub": "Kolar aggregation hub",
+        "infeasible_batches": 0,
+        "scenario_id": "gen-healthy-3003",
+        "seed": 3003,
+        "stock_kg": 71100.0
+      },
+      {
+        "arms": {
+          "fefo": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 55.48,
+            "expired_in_transit_kg": 0.0,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 1858476.51,
+            "spoiled_kg": 3213.23,
+            "unmet_demand_kg": 37061.28,
+            "unsold_kg": 3213.23,
+            "validator": "PASS",
+            "violations": 0
+          },
+          "lading-point": {
+            "carry_over_kg": 0.0,
+            "demand_filled_pct": 55.58,
+            "expired_in_transit_kg": 0.0,
+            "gap": 0.002034,
+            "hub_spoiled_kg": 0.0,
+            "net_inr": 1867233.74,
+            "solver_status": "OPTIMAL",
+            "spoiled_kg": 3125.06,
+            "unmet_demand_kg": 36973.1,
+            "unsold_kg": 3125.06,
+            "validator": "PASS",
+            "violations": 0
+          }
+        },
+        "batches": 46,
+        "hub": "Nashik aggregation hub",
+        "infeasible_batches": 0,
+        "scenario_id": "gen-healthy-3004",
+        "seed": 3004,
+        "stock_kg": 49300.0
+      }
+    ],
+    "rule": "ample shelf life, trucks and demand: both arms spoil < 2% of stock and net INR within 3% of each other"
+  },
+  "p3_infeasible": {
+    "detail": "a stuck batch was missed or shipped",
+    "passed": false,
+    "rows": [
+      {
+        "flagged": {
+          "fefo": [
+            "b46",
+            "b47",
+            "b48"
+          ],
+          "lading-point": [
+            "b46",
+            "b47",
+            "b48"
+          ]
+        },
+        "scenario_id": "gen-infeasible-3100",
+        "shipped_anyway": {
+          "fefo": [],
+          "lading-point": []
+        },
+        "stuck": [
+          "b46",
+          "b47",
+          "b48"
+        ],
+        "stuck_kg": 1500.0
+      },
+      {
+        "flagged": {
+          "fefo": [
+            "b06",
+            "b51",
+            "b52",
+            "b53"
+          ],
+          "lading-point": [
+            "b06",
+            "b51",
+            "b52",
+            "b53"
+          ]
+        },
+        "scenario_id": "gen-infeasible-3101",
+        "shipped_anyway": {
+          "fefo": [],
+          "lading-point": []
+        },
+        "stuck": [
+          "b51",
+          "b52",
+          "b53"
+        ],
+        "stuck_kg": 1500.0
+      },
+      {
+        "flagged": {
+          "fefo": [
+            "b27",
+            "b28",
+            "b29"
+          ],
+          "lading-point": [
+            "b27",
+            "b28",
+            "b29"
+          ]
+        },
+        "scenario_id": "gen-infeasible-3102",
+        "shipped_anyway": {
+          "fefo": [],
+          "lading-point": []
+        },
+        "stuck": [
+          "b27",
+          "b28",
+          "b29"
+        ],
+        "stuck_kg": 1500.0
+      },
+      {
+        "flagged": {
+          "fefo": [
+            "b39",
+            "b40",
+            "b41"
+          ],
+          "lading-point": [
+            "b39",
+            "b40",
+            "b41"
+          ]
+        },
+        "scenario_id": "gen-infeasible-3103",
+        "shipped_anyway": {
+          "fefo": [],
+          "lading-point": []
+        },
+        "stuck": [
+          "b39",
+          "b40",
+          "b41"
+        ],
+        "stuck_kg": 1500.0
+      },
+      {
+        "flagged": {
+          "fefo": [
+            "b56",
+            "b57",
+            "b58"
+          ],
+          "lading-point": [
+            "b56",
+            "b57",
+            "b58"
+          ]
+        },
+        "scenario_id": "gen-infeasible-3104",
+        "shipped_anyway": {
+          "fefo": [],
+          "lading-point": []
+        },
+        "stuck": [
+          "b56",
+          "b57",
+          "b58"
+        ],
+        "stuck_kg": 1500.0
+      }
+    ],
+    "rule": "batches no market can receive fresh are flagged INFEASIBLE_DEMAND, never shipped, and spoil equally in every arm"
+  },
+  "p4_harmful": {
+    "arms": {
+      "fefo": {
+        "carry_over_kg": 0.0,
+        "demand_filled_pct": 53.47,
+        "expired_in_transit_kg": 373.33,
+        "hub_spoiled_kg": 0.0,
+        "net_inr": 308551.24,
+        "spoiled_kg": 1192.29,
+        "unmet_demand_kg": 9883.27,
+        "unsold_kg": 818.95,
+        "validator": "PASS",
+        "violations": 0
+      },
+      "fifo": {
+        "carry_over_kg": 0.0,
+        "demand_filled_pct": 34.77,
+        "expired_in_transit_kg": 4510.0,
+        "hub_spoiled_kg": 0.0,
+        "net_inr": 100530.54,
+        "spoiled_kg": 5144.9,
+        "unmet_demand_kg": 13835.89,
+        "unsold_kg": 634.9,
+        "validator": "FAIL",
+        "violations": 5
+      },
+      "lading-point": {
+        "carry_over_kg": 0.0,
+        "demand_filled_pct": 55.83,
+        "expired_in_transit_kg": 373.33,
+        "gap": 0.000217,
+        "hub_spoiled_kg": 0.0,
+        "net_inr": 324546.03,
+        "solver_status": "OPTIMAL",
+        "spoiled_kg": 644.4,
+        "unmet_demand_kg": 9394.35,
+        "unsold_kg": 271.06,
+        "validator": "PASS",
+        "violations": 0
+      }
+    },
+    "can_reach_far_market_fresh": [
+      "b03",
+      "b04",
+      "b07",
+      "b08",
+      "b09"
+    ],
+    "detail": "lading-point sends 4 batches to Delhi, all able to arrive fresh; FIFO sends 9 and loses 4,510 kg in transit",
+    "passed": true,
+    "rule": "the highest-price market is too far for short-life stock: Lading refuses it, FIFO falls for it and spoils",
+    "sent_to_far_market": {
+      "fefo": [
+        "b03",
+        "b04",
+        "b07",
+        "b08",
+        "b09"
+      ],
+      "fifo": [
+        "b01",
+        "b02",
+        "b03",
+        "b05",
+        "b06",
+        "b07",
+        "b08",
+        "b09",
+        "b10"
+      ],
+      "lading-point": [
+        "b03",
+        "b04",
+        "b07",
+        "b08"
+      ]
+    }
+  },
+  "p6_replay": {
+    "detail": "identical",
+    "passed": true,
+    "rule": "same seed twice gives a byte-identical plan (solve time excluded) and identical outcomes",
+    "sha256": [
+      "f56d159a9e51362c1be773ccabc4a2828cfa3e4f5b2509b91a9a3e536a0925f3",
+      "f56d159a9e51362c1be773ccabc4a2828cfa3e4f5b2509b91a9a3e536a0925f3"
+    ]
+  }
+}

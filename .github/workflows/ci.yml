@@ -1,0 +1,52 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.8.13"
+      - run: uv python install 3.11
+      - run: uv sync --frozen
+      - name: lint
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: typecheck
+        run: uv run mypy .
+      - name: tests
+        run: uv run pytest -q
+      - name: small reproduce
+        run: uv run python -m evaluation.harness reproduce --small --out .ci-results
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ci-results
+          path: .ci-results/
+
+  web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+        env:
+          VITE_API_URL: https://example.invalid

@@ -1,0 +1,57 @@
+{
+  "heldout": {
+    "ablation-no-discount": {
+      "max_s": 5.355,
+      "median_s": 1.096,
+      "n": 50,
+      "p90_s": 3.529
+    },
+    "ablation-soft-shelf": {
+      "max_s": 23.68,
+      "median_s": 1.384,
+      "n": 50,
+      "p90_s": 3.903
+    },
+    "lading-point": {
+      "max_s": 16.056,
+      "median_s": 1.213,
+      "n": 50,
+      "p90_s": 4.645
+    },
+    "lading-robust": {
+      "max_s": 18.241,
+      "median_s": 1.002,
+      "n": 50,
+      "p90_s": 9.522
+    }
+  },
+  "note": "Wall-clock solve times on the machine that ran make reproduce. Excluded from the byte-identical replay check.",
+  "stress": {
+    "lading-point": {
+      "max_s": 8.342,
+      "median_s": 0.75,
+      "n": 40,
+      "p90_s": 4.354
+    },
+    "lading-robust": {
+      "max_s": 16.807,
+      "median_s": 0.646,
+      "n": 40,
+      "p90_s": 2.519
+    }
+  },
+  "tuning": {
+    "lading-point": {
+      "max_s": 15.745,
+      "median_s": 0.855,
+      "n": 20,
+      "p90_s": 5.078
+    },
+    "lading-robust": {
+      "max_s": 8.597,
+      "median_s": 1.022,
+      "n": 20,
+      "p90_s": 4.18
+    }
+  }
+}

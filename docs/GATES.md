@@ -21,3 +21,13 @@ Logged before the freeze so it can't be hidden later. While building the replan 
 - Execution: 30 realized draws per scenario on stream `SeedSequence([seed, 202, draw, kind])`, shared by every arm.
 - Headline arm: `lading-point`, picked by the rule written into `results/tuning.json` before the freeze ("the Lading arm with the higher median paired net INR gain vs FEFO on the tuning seeds"). The PRD pre-registered Lading-robust; on tuning it gained INR 35,423 median vs INR 76,247 for Lading-point, so the claim moves to Lading-point and Lading-robust is still reported in every table.
 - Freeze: `planner/config.json` sha256 recorded in `results/freeze.json`, frozen at code commit `d90cef8758458bcd877c27f994cbc98598b66259`. `make reproduce` refuses to run the held-out set if the config hash changes.
+
+## First held-out run (2026-10-15 00:25 WAT)
+
+Run at freeze commit `d90cef8` (with uncommitted deploy files present, so that manifest said `dirty: true`; it is superseded by the clean rerun below, which used the same planner config hash).
+
+- Held-out, Lading-point vs FEFO, 50 days x 30 draws: median paired net gain INR 58,942 (IQR 41,124 to 88,320, wins 50/50), spoiled kg -654 (IQR -1,154 to -289, fewer on 40/50), demand filled +2.24 pp (47/50), 0 validator violations. Falsifier not triggered.
+- Lading-robust: net +INR 60,791 median (40/50), spoiled -448 kg (32/50). Its median net is slightly above Lading-point's on held-out but it wins far less often; the headline arm stays the one the tuning rule picked.
+- **P2 healthy control FAILED its pre-registered rule.** Both arms spoil up to 7.2% of stock on healthy days. All of it is delivered-but-unsold consignment when realized demand comes in below forecast (0 kg expired in transit, 0 kg at the hub); net INR converges within 1.0%. Under the unsold-is-lost accounting (DECISIONS D4) "spoilage ~ 0" can't hold while demand is noisy. The rule is not changed. The control stays failed and the console and README say so.
+- **P3 infeasible control FAILED because of a harness bug, not a product bug.** The check required the flagged set to equal the 3 injected batches; on seed 3101 batch b06 is also naturally unreachable (no market gets it on sale before expiry minus margin) and both arms correctly flagged and held it. The check now recomputes unreachability independently of `world.py` and requires flagged == unreachable, injected within it, and nothing unreachable shipped. Fix committed before the rerun.
+- P4, P6 replay and the no-op check passed.
