@@ -1,0 +1,739 @@
+{
+  "$defs": {
+    "Batch": {
+      "additionalProperties": false,
+      "properties": {
+        "arrived_h_ago": {
+          "description": "Hours since the batch reached the hub. FIFO sorts on this.",
+          "minimum": 0,
+          "title": "Arrived H Ago",
+          "type": "number"
+        },
+        "commodity_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Commodity Id",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kg": {
+          "exclusiveMinimum": 0,
+          "title": "Kg",
+          "type": "number"
+        },
+        "origin": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Origin",
+          "type": "string"
+        },
+        "shelf_life_h": {
+          "description": "Estimated hours until the batch is no longer saleable, from t=0.",
+          "exclusiveMinimum": 0,
+          "title": "Shelf Life H",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "commodity_id",
+        "kg",
+        "shelf_life_h",
+        "arrived_h_ago",
+        "origin"
+      ],
+      "title": "Batch",
+      "type": "object"
+    },
+    "Commodity": {
+      "additionalProperties": false,
+      "properties": {
+        "elasticity": {
+          "description": "Demand uplift = base demand x (1 + elasticity x discount).",
+          "minimum": 0,
+          "title": "Elasticity",
+          "type": "number"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "purchase_inr_per_kg": {
+          "description": "What the hub paid per kg. Spoiled kg cost this much.",
+          "exclusiveMinimum": 0,
+          "title": "Purchase Inr Per Kg",
+          "type": "number"
+        },
+        "shelf_life_sigma": {
+          "description": "Relative std-dev of realized shelf life around the batch estimate.",
+          "maximum": 0.5,
+          "minimum": 0,
+          "title": "Shelf Life Sigma",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "purchase_inr_per_kg",
+        "elasticity",
+        "shelf_life_sigma"
+      ],
+      "title": "Commodity",
+      "type": "object"
+    },
+    "Controls": {
+      "additionalProperties": false,
+      "description": "Dispatcher overrides. Locks force an assignment, vetoes forbid a batch-market pair.",
+      "properties": {
+        "locks": {
+          "items": {
+            "$ref": "#/$defs/Lock"
+          },
+          "title": "Locks",
+          "type": "array"
+        },
+        "vetoes": {
+          "items": {
+            "$ref": "#/$defs/Veto"
+          },
+          "title": "Vetoes",
+          "type": "array"
+        }
+      },
+      "title": "Controls",
+      "type": "object"
+    },
+    "CostModelRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "const": "lading-cost-v1",
+          "title": "Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "CostModelRef",
+      "type": "object"
+    },
+    "DemandShock": {
+      "additionalProperties": false,
+      "properties": {
+        "factor": {
+          "minimum": 0,
+          "title": "Factor",
+          "type": "number"
+        },
+        "market_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Market Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "market_id",
+        "factor"
+      ],
+      "title": "DemandShock",
+      "type": "object"
+    },
+    "Execution": {
+      "additionalProperties": false,
+      "description": "Shocks that happen in the realized world. Only `sim/` reads this block.",
+      "properties": {
+        "demand_shock": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DemandShock"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "elasticity_factor": {
+          "default": 1.0,
+          "description": "Realized elasticity = disclosed elasticity x this factor (sensitivity sweep).",
+          "exclusiveMinimum": 0,
+          "title": "Elasticity Factor",
+          "type": "number"
+        },
+        "route_delay": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RouteShock"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "truck_loss": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TruckLoss"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "Execution",
+      "type": "object"
+    },
+    "Hub": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Hub",
+      "type": "object"
+    },
+    "Lock": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Batch Id",
+          "type": "string"
+        },
+        "market_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Market Id",
+          "type": "string"
+        },
+        "slot_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Slot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "batch_id",
+        "market_id",
+        "slot_id"
+      ],
+      "title": "Lock",
+      "type": "object"
+    },
+    "Market": {
+      "additionalProperties": false,
+      "properties": {
+        "deliver_by_h": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional hard deadline (sale-ready time) for order-type destinations.",
+          "title": "Deliver By H"
+        },
+        "handling_h": {
+          "description": "Unloading and auction time before stock is on sale.",
+          "minimum": 0,
+          "title": "Handling H",
+          "type": "number"
+        },
+        "handling_inr_per_kg": {
+          "minimum": 0,
+          "title": "Handling Inr Per Kg",
+          "type": "number"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "offers": {
+          "items": {
+            "$ref": "#/$defs/Offer"
+          },
+          "minItems": 1,
+          "title": "Offers",
+          "type": "array"
+        },
+        "transport_inr_per_kg": {
+          "minimum": 0,
+          "title": "Transport Inr Per Kg",
+          "type": "number"
+        },
+        "travel_h": {
+          "description": "Forecast hub-to-market travel time.",
+          "exclusiveMinimum": 0,
+          "title": "Travel H",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "travel_h",
+        "transport_inr_per_kg",
+        "handling_h",
+        "handling_inr_per_kg",
+        "offers"
+      ],
+      "title": "Market",
+      "type": "object"
+    },
+    "Offer": {
+      "additionalProperties": false,
+      "properties": {
+        "commodity_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Commodity Id",
+          "type": "string"
+        },
+        "demand_kg": {
+          "description": "Forecast demand at list price over the planning window.",
+          "minimum": 0,
+          "title": "Demand Kg",
+          "type": "number"
+        },
+        "price_inr_per_kg": {
+          "exclusiveMinimum": 0,
+          "title": "Price Inr Per Kg",
+          "type": "number"
+        }
+      },
+      "required": [
+        "commodity_id",
+        "price_inr_per_kg",
+        "demand_kg"
+      ],
+      "title": "Offer",
+      "type": "object"
+    },
+    "Policy": {
+      "additionalProperties": false,
+      "properties": {
+        "current_slot": {
+          "default": 0,
+          "description": "First slot that can still dispatch. Earlier slots have left (replans).",
+          "minimum": 0,
+          "title": "Current Slot",
+          "type": "integer"
+        },
+        "discount_levels": {
+          "items": {
+            "exclusiveMaximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 8,
+          "minItems": 1,
+          "title": "Discount Levels",
+          "type": "array"
+        },
+        "horizon_h": {
+          "description": "Undispatched stock that expires before this is spoiled at the hub.",
+          "exclusiveMinimum": 0,
+          "title": "Horizon H",
+          "type": "number"
+        },
+        "safety_margin_h": {
+          "description": "Sale-ready time must be at least this far before expiry.",
+          "minimum": 0,
+          "title": "Safety Margin H",
+          "type": "number"
+        },
+        "turnaround_buffer_h": {
+          "description": "Load and unload time added to a truck's round trip.",
+          "minimum": 0,
+          "title": "Turnaround Buffer H",
+          "type": "number"
+        }
+      },
+      "required": [
+        "horizon_h",
+        "safety_margin_h",
+        "turnaround_buffer_h",
+        "discount_levels"
+      ],
+      "title": "Policy",
+      "type": "object"
+    },
+    "RouteShock": {
+      "additionalProperties": false,
+      "properties": {
+        "extra_h": {
+          "exclusiveMinimum": 0,
+          "title": "Extra H",
+          "type": "number"
+        },
+        "market_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Market Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "market_id",
+        "extra_h"
+      ],
+      "title": "RouteShock",
+      "type": "object"
+    },
+    "Slot": {
+      "additionalProperties": false,
+      "properties": {
+        "depart_h": {
+          "minimum": 0,
+          "title": "Depart H",
+          "type": "number"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "label": {
+          "description": "Clock label shown to the dispatcher.",
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "index",
+        "depart_h",
+        "label"
+      ],
+      "title": "Slot",
+      "type": "object"
+    },
+    "TravelDelay": {
+      "additionalProperties": false,
+      "properties": {
+        "median_frac": {
+          "description": "Median realized delay as a fraction of forecast travel time.",
+          "minimum": 0,
+          "title": "Median Frac",
+          "type": "number"
+        },
+        "sigma_log": {
+          "description": "Log-space std-dev of the delay fraction (right-skewed).",
+          "minimum": 0,
+          "title": "Sigma Log",
+          "type": "number"
+        }
+      },
+      "required": [
+        "median_frac",
+        "sigma_log"
+      ],
+      "title": "TravelDelay",
+      "type": "object"
+    },
+    "Truck": {
+      "additionalProperties": false,
+      "properties": {
+        "capacity_kg": {
+          "exclusiveMinimum": 0,
+          "title": "Capacity Kg",
+          "type": "number"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "unavailable_from_slot": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Known at plan time: the truck can't take trips from this slot index on.",
+          "title": "Unavailable From Slot"
+        }
+      },
+      "required": [
+        "id",
+        "capacity_kg"
+      ],
+      "title": "Truck",
+      "type": "object"
+    },
+    "TruckLoss": {
+      "additionalProperties": false,
+      "properties": {
+        "from_slot": {
+          "minimum": 0,
+          "title": "From Slot",
+          "type": "integer"
+        },
+        "truck_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Truck Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "truck_id",
+        "from_slot"
+      ],
+      "title": "TruckLoss",
+      "type": "object"
+    },
+    "Uncertainty": {
+      "additionalProperties": false,
+      "properties": {
+        "demand_sigma": {
+          "description": "Relative std-dev of realized demand.",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Demand Sigma",
+          "type": "number"
+        },
+        "travel_delay": {
+          "$ref": "#/$defs/TravelDelay"
+        }
+      },
+      "required": [
+        "demand_sigma",
+        "travel_delay"
+      ],
+      "title": "Uncertainty",
+      "type": "object"
+    },
+    "Veto": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Batch Id",
+          "type": "string"
+        },
+        "market_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+          "title": "Market Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "batch_id",
+        "market_id"
+      ],
+      "title": "Veto",
+      "type": "object"
+    }
+  },
+  "$id": "https://lading.dev/schemas/scenario.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "batches": {
+      "items": {
+        "$ref": "#/$defs/Batch"
+      },
+      "minItems": 1,
+      "title": "Batches",
+      "type": "array"
+    },
+    "commodities": {
+      "items": {
+        "$ref": "#/$defs/Commodity"
+      },
+      "minItems": 1,
+      "title": "Commodities",
+      "type": "array"
+    },
+    "controls": {
+      "$ref": "#/$defs/Controls"
+    },
+    "cost_model": {
+      "$ref": "#/$defs/CostModelRef"
+    },
+    "execution": {
+      "$ref": "#/$defs/Execution"
+    },
+    "family": {
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Family",
+      "type": "string"
+    },
+    "hub": {
+      "$ref": "#/$defs/Hub"
+    },
+    "id": {
+      "maxLength": 64,
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9_\\-]*$",
+      "title": "Id",
+      "type": "string"
+    },
+    "label": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Label",
+      "type": "string"
+    },
+    "markets": {
+      "items": {
+        "$ref": "#/$defs/Market"
+      },
+      "minItems": 1,
+      "title": "Markets",
+      "type": "array"
+    },
+    "policy": {
+      "$ref": "#/$defs/Policy"
+    },
+    "schema_version": {
+      "const": "lading-scenario-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
+    },
+    "slots": {
+      "items": {
+        "$ref": "#/$defs/Slot"
+      },
+      "minItems": 1,
+      "title": "Slots",
+      "type": "array"
+    },
+    "source": {
+      "enum": [
+        "generator",
+        "organizer",
+        "curated"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "trucks": {
+      "items": {
+        "$ref": "#/$defs/Truck"
+      },
+      "minItems": 1,
+      "title": "Trucks",
+      "type": "array"
+    },
+    "uncertainty": {
+      "$ref": "#/$defs/Uncertainty"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "label",
+    "source",
+    "synthetic",
+    "family",
+    "hub",
+    "cost_model",
+    "commodities",
+    "batches",
+    "markets",
+    "trucks",
+    "slots",
+    "policy",
+    "uncertainty"
+  ],
+  "title": "Scenario",
+  "type": "object"
+}

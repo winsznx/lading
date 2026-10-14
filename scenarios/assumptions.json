@@ -1,0 +1,120 @@
+{
+  "version": "lading-assumptions-v1",
+  "note": "Every value here is a synthetic, disclosed assumption, not a measured fact. Mirrored with units in docs/ASSUMPTIONS.md.",
+  "horizon_h": 48,
+  "slot_interval_h": 6,
+  "n_slots": 8,
+  "safety_margin_h": 2,
+  "turnaround_buffer_h": 2,
+  "discount_levels": [0, 0.1, 0.2, 0.3],
+  "batch_count": [25, 60],
+  "batch_kg": [200, 2000],
+  "batch_kg_step": 50,
+  "arrived_h_ago": [0, 36],
+  "market_count": [4, 6],
+  "truck_count": [2, 4],
+  "truck_capacities_kg": [5000, 7500, 10000],
+  "demand_to_stock_ratio": [0.7, 1.1],
+  "offer_drop_probability": 0.1,
+  "demand_sigma": 0.2,
+  "travel_delay_median_frac": 0.08,
+  "travel_delay_sigma_log": 0.6,
+  "transport_inr_per_kg_base": 0.3,
+  "transport_inr_per_kg_per_h": 0.2,
+  "handling_h": [1, 4],
+  "handling_inr_per_kg": [0.6, 1.2],
+  "price_jitter": 0.08,
+  "commodities": {
+    "leafy_greens": {
+      "name": "Leafy greens",
+      "share": 0.2,
+      "shelf_life_h": [8, 40],
+      "shelf_life_sigma": 0.15,
+      "purchase_inr_per_kg": 18,
+      "base_price_inr_per_kg": 32,
+      "elasticity": 1.2
+    },
+    "tomato": {
+      "name": "Tomato",
+      "share": 0.3,
+      "shelf_life_h": [16, 110],
+      "shelf_life_sigma": 0.12,
+      "purchase_inr_per_kg": 14,
+      "base_price_inr_per_kg": 24,
+      "elasticity": 1.5
+    },
+    "banana": {
+      "name": "Banana",
+      "share": 0.2,
+      "shelf_life_h": [30, 140],
+      "shelf_life_sigma": 0.1,
+      "purchase_inr_per_kg": 20,
+      "base_price_inr_per_kg": 32,
+      "elasticity": 1.0
+    },
+    "mango": {
+      "name": "Mango",
+      "share": 0.15,
+      "shelf_life_h": [40, 190],
+      "shelf_life_sigma": 0.1,
+      "purchase_inr_per_kg": 48,
+      "base_price_inr_per_kg": 78,
+      "elasticity": 1.8
+    },
+    "onion": {
+      "name": "Onion",
+      "share": 0.15,
+      "shelf_life_h": [200, 900],
+      "shelf_life_sigma": 0.05,
+      "purchase_inr_per_kg": 16,
+      "base_price_inr_per_kg": 24,
+      "elasticity": 0.6
+    }
+  },
+  "hubs": [
+    {
+      "id": "nashik",
+      "name": "Nashik aggregation hub",
+      "origins": ["Niphad FPO", "Dindori FPO", "Sinnar collection centre", "Pimpalgaon FPO", "Igatpuri farmers group"],
+      "markets": [
+        {"id": "mumbai_vashi", "name": "Mumbai (Vashi APMC)", "travel_h": 5, "price_factor": 1.3, "demand_weight": 1.6},
+        {"id": "pune_gultekdi", "name": "Pune (Gultekdi)", "travel_h": 5, "price_factor": 1.2, "demand_weight": 1.2},
+        {"id": "surat_apmc", "name": "Surat APMC", "travel_h": 6, "price_factor": 1.15, "demand_weight": 0.9},
+        {"id": "indore_ahilya", "name": "Indore (Devi Ahilya mandi)", "travel_h": 8, "price_factor": 1.1, "demand_weight": 0.8},
+        {"id": "ahmedabad_jamalpur", "name": "Ahmedabad (Jamalpur)", "travel_h": 10, "price_factor": 1.22, "demand_weight": 1.0},
+        {"id": "nagpur_kalamna", "name": "Nagpur (Kalamna)", "travel_h": 12, "price_factor": 1.08, "demand_weight": 0.7},
+        {"id": "hyderabad_bowenpally", "name": "Hyderabad (Bowenpally)", "travel_h": 13, "price_factor": 1.28, "demand_weight": 1.1},
+        {"id": "delhi_azadpur", "name": "Delhi (Azadpur)", "travel_h": 22, "price_factor": 1.45, "demand_weight": 1.5}
+      ]
+    },
+    {
+      "id": "kolar",
+      "name": "Kolar aggregation hub",
+      "origins": ["Chintamani FPO", "Srinivaspur FPO", "Malur collection centre", "Bangarpet farmers group", "Mulbagal FPO"],
+      "markets": [
+        {"id": "bengaluru_kr", "name": "Bengaluru (KR Market)", "travel_h": 2, "price_factor": 1.15, "demand_weight": 1.6},
+        {"id": "mysuru_apmc", "name": "Mysuru APMC", "travel_h": 4, "price_factor": 1.05, "demand_weight": 0.7},
+        {"id": "chennai_koyambedu", "name": "Chennai (Koyambedu)", "travel_h": 5, "price_factor": 1.28, "demand_weight": 1.5},
+        {"id": "coimbatore_mgr", "name": "Coimbatore (MGR market)", "travel_h": 6, "price_factor": 1.12, "demand_weight": 0.8},
+        {"id": "hyderabad_bowenpally", "name": "Hyderabad (Bowenpally)", "travel_h": 9, "price_factor": 1.25, "demand_weight": 1.2},
+        {"id": "kochi_ernakulam", "name": "Kochi (Ernakulam market)", "travel_h": 11, "price_factor": 1.35, "demand_weight": 0.9},
+        {"id": "mumbai_vashi", "name": "Mumbai (Vashi APMC)", "travel_h": 16, "price_factor": 1.45, "demand_weight": 1.4}
+      ]
+    }
+  ],
+  "families": {
+    "base": "No shock. Realized world drawn from the disclosed distributions.",
+    "demand_shock": "Realized demand at the highest-paying market falls to 50% of forecast. Unknown at plan time.",
+    "route_delay": "One route takes 8 extra hours on every trip. Unknown at plan time.",
+    "truck_loss": "The largest truck breaks down from slot 2 onward. Unknown at plan time.",
+    "wide_shelf": "Shelf-life uncertainty is 2.5x wider. Disclosed to every arm.",
+    "healthy": "Control P2: ample shelf life, trucks and demand everywhere.",
+    "infeasible": "Control P3: three leafy-green batches that can't reach any market fresh."
+  },
+  "shocks": {
+    "demand_shock_factor": 0.5,
+    "route_delay_extra_h": 8,
+    "truck_loss_from_slot": 2,
+    "wide_shelf_sigma_factor": 2.5
+  }
+}
