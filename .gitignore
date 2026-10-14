@@ -1,0 +1,22 @@
+# Private strategy notes, PRD and prompts never reach the public repo.
+internal/
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.DS_Store
+
+# Generated scenario files are rebuilt by `make reproduce` from seeds.
+scenarios/generated/
+
+web/node_modules/
+web/dist/
+.vercel/
+web/.vercel/
+
+.env
+.env.*
+!.env.example
