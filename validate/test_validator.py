@@ -1,0 +1,77 @@
+import copy
+import json
+
+import pytest
+
+from baselines.fefo import plan_fefo
+from baselines.fifo import plan_fifo
+from baselines.test_baselines import far_market_trap
+from scenarios.scenario_gen import generate
+from validate.validator import validate
+
+
+def as_json(model):
+    return json.loads(model.model_dump_json())
+
+
+@pytest.fixture(scope="module")
+def case():
+    scenario = generate(7)
+    return as_json(scenario), as_json(plan_fefo(scenario))
+
+
+def test_fefo_plan_passes(case):
+    scenario, plan = case
+    report = validate(scenario, plan)
+    assert report["status"] == "PASS", report["violations"]
+    assert report["checks"]["shelf_life"] == len(plan["shipments"])
+
+
+@pytest.mark.parametrize(
+    ("tamper", "check"),
+    [
+        (lambda p: p["trips"][0]["manifest"][0].__setitem__("kg", p["trips"][0]["manifest"][0]["kg"] + 50), "trip.load"),
+        (lambda p: p["shipments"][0].__setitem__("kg", p["shipments"][0]["kg"] + 50), "stock"),
+        (lambda p: p["expected"].__setitem__("net_inr", p["expected"]["net_inr"] + 500), "total.net_inr"),
+        (lambda p: p["shipments"][0].__setitem__("discount", 0.2), "price.consistent"),
+        (lambda p: p["prices"][0].__setitem__("discount", 0.15), "price.level"),
+    ],
+)
+def test_tampering_with_one_value_fails(case, tamper, check):
+    scenario, plan = case
+    bad = copy.deepcopy(plan)
+    tamper(bad)
+    report = validate(scenario, bad)
+    assert report["status"] == "FAIL"
+    assert check in {v["check"] for v in report["violations"]}
+
+
+def test_overloaded_truck_fails(case):
+    scenario, plan = case
+    bad = copy.deepcopy(plan)
+    trip = bad["trips"][0]
+    cap = next(t["capacity_kg"] for t in scenario["trucks"] if t["id"] == trip["truck_id"])
+    extra = cap - trip["load_kg"] + 100
+    trip["manifest"][0]["kg"] += extra
+    trip["load_kg"] += extra
+    report = validate(scenario, bad)
+    assert "truck.capacity" in {v["check"] for v in report["violations"]}
+
+
+def test_truck_double_booked_fails(case):
+    scenario, plan = case
+    bad = copy.deepcopy(plan)
+    first = bad["trips"][0]
+    clash = copy.deepcopy(first)
+    clash["manifest"] = []
+    clash["load_kg"] = 0
+    bad["trips"].append(clash)
+    report = validate(scenario, bad)
+    assert "truck.turnaround" in {v["check"] for v in report["violations"]}
+
+
+def test_fifo_expiry_violation_is_caught():
+    scenario = far_market_trap()
+    report = validate(as_json(scenario), as_json(plan_fifo(scenario)))
+    assert report["status"] == "FAIL"
+    assert [v["check"] for v in report["violations"]] == ["shelf_life"]
