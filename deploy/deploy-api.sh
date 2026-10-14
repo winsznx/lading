@@ -29,7 +29,7 @@ ssh_opts=(-o BatchMode=yes -o ConnectTimeout=10)
 [[ -n "${LADING_SSH_KEY:-}" ]] && ssh_opts+=(-i "$LADING_SSH_KEY" -o IdentitiesOnly=yes)
 remote() { ssh "${ssh_opts[@]}" "$LADING_SSH" "$@"; }
 
-if [[ -n "$(git status --porcelain -- . ':(exclude)scenarios/curated/index.json')" ]]; then
+if [[ -n "$(git status --porcelain -- . ':(exclude)scenarios/curated/index.json' ':(exclude)web')" ]]; then
   echo "refusing to deploy a dirty tree; commit first" >&2
   exit 1
 fi
