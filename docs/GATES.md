@@ -7,6 +7,7 @@ Dated log of checkpoints, pre-registered splits, freezes, failures and withdrawn
 | When (WAT) | Product h | Proof h | Docs h | Hours left | Note |
 |---|---|---|---|---|---|
 | 2026-10-14 23:20 | 0.0 | 0.0 | 0.1 | 20.1 | Repo scaffolded, build contract written |
+| 2026-10-15 00:12 | 0.7 | 0.25 | 0.15 | 19.3 | Steps 1-10 done. API live at https://vps-api-host.invalid. Held-out measured, falsifier not triggered. Console in progress. |
 
 ## Held-out exposure during development (2026-10-15 00:00 WAT)
 
@@ -22,7 +23,7 @@ Logged before the freeze so it can't be hidden later. While building the replan 
 - Headline arm: `lading-point`, picked by the rule written into `results/tuning.json` before the freeze ("the Lading arm with the higher median paired net INR gain vs FEFO on the tuning seeds"). The PRD pre-registered Lading-robust; on tuning it gained INR 35,423 median vs INR 76,247 for Lading-point, so the claim moves to Lading-point and Lading-robust is still reported in every table.
 - Freeze: `planner/config.json` sha256 recorded in `results/freeze.json`, frozen at code commit `d90cef8758458bcd877c27f994cbc98598b66259`. `make reproduce` refuses to run the held-out set if the config hash changes.
 
-## First held-out run (2026-10-15 00:25 WAT)
+## First held-out run (2026-10-15 00:05 WAT)
 
 Run at freeze commit `d90cef8` (with uncommitted deploy files present, so that manifest said `dirty: true`; it is superseded by the clean rerun below, which used the same planner config hash).
 
@@ -31,3 +32,7 @@ Run at freeze commit `d90cef8` (with uncommitted deploy files present, so that m
 - **P2 healthy control FAILED its pre-registered rule.** Both arms spoil up to 7.2% of stock on healthy days. All of it is delivered-but-unsold consignment when realized demand comes in below forecast (0 kg expired in transit, 0 kg at the hub); net INR converges within 1.0%. Under the unsold-is-lost accounting (DECISIONS D4) "spoilage ~ 0" can't hold while demand is noisy. The rule is not changed. The control stays failed and the console and README say so.
 - **P3 infeasible control FAILED because of a harness bug, not a product bug.** The check required the flagged set to equal the 3 injected batches; on seed 3101 batch b06 is also naturally unreachable (no market gets it on sale before expiry minus margin) and both arms correctly flagged and held it. The check now recomputes unreachability independently of `world.py` and requires flagged == unreachable, injected within it, and nothing unreachable shipped. Fix committed before the rerun.
 - P4, P6 replay and the no-op check passed.
+
+## Clean held-out rerun (2026-10-15 00:16 WAT)
+
+Rerun on a clean tree at eval-code commit `105fb6e` (same planner config hash as the freeze). `heldout.json`, `ablations.json`, `stress.json`, `sensitivity.json`, `canonical.json` and `verdict.json` came out byte-identical to the first run. P3 passes under the corrected independent check (16 unreachable batches over 5 days, 15 injected and 1 natural, all flagged and held by both arms). P2 still fails its rule, as above. Verdict: HOLDS.

@@ -373,11 +373,16 @@
         "stock_kg": 49300.0
       }
     ],
-    "rule": "ample shelf life, trucks and demand: both arms spoil < 2% of stock and net INR within 3% of each other"
+    "rule": "ample shelf life, trucks and demand: both arms spoil < 2% of stock and net INR within 3% of each other",
+    "spoilage_breakdown_kg": {
+      "expired_in_transit_kg": 0.0,
+      "hub_spoiled_kg": 0.0,
+      "unsold_kg": 27063.5
+    }
   },
   "p3_infeasible": {
-    "detail": "a stuck batch was missed or shipped",
-    "passed": false,
+    "detail": "16 unreachable batches over 5 days (15 injected), all flagged and held by both arms",
+    "passed": true,
     "rows": [
       {
         "flagged": {
@@ -392,17 +397,22 @@
             "b48"
           ]
         },
+        "injected": [
+          "b46",
+          "b47",
+          "b48"
+        ],
         "scenario_id": "gen-infeasible-3100",
         "shipped_anyway": {
           "fefo": [],
           "lading-point": []
         },
-        "stuck": [
+        "unreachable_independent": [
           "b46",
           "b47",
           "b48"
         ],
-        "stuck_kg": 1500.0
+        "unreachable_kg": 1500.0
       },
       {
         "flagged": {
@@ -419,17 +429,23 @@
             "b53"
           ]
         },
+        "injected": [
+          "b51",
+          "b52",
+          "b53"
+        ],
         "scenario_id": "gen-infeasible-3101",
         "shipped_anyway": {
           "fefo": [],
           "lading-point": []
         },
-        "stuck": [
+        "unreachable_independent": [
+          "b06",
           "b51",
           "b52",
           "b53"
         ],
-        "stuck_kg": 1500.0
+        "unreachable_kg": 2950.0
       },
       {
         "flagged": {
@@ -444,17 +460,22 @@
             "b29"
           ]
         },
+        "injected": [
+          "b27",
+          "b28",
+          "b29"
+        ],
         "scenario_id": "gen-infeasible-3102",
         "shipped_anyway": {
           "fefo": [],
           "lading-point": []
         },
-        "stuck": [
+        "unreachable_independent": [
           "b27",
           "b28",
           "b29"
         ],
-        "stuck_kg": 1500.0
+        "unreachable_kg": 1500.0
       },
       {
         "flagged": {
@@ -469,17 +490,22 @@
             "b41"
           ]
         },
+        "injected": [
+          "b39",
+          "b40",
+          "b41"
+        ],
         "scenario_id": "gen-infeasible-3103",
         "shipped_anyway": {
           "fefo": [],
           "lading-point": []
         },
-        "stuck": [
+        "unreachable_independent": [
           "b39",
           "b40",
           "b41"
         ],
-        "stuck_kg": 1500.0
+        "unreachable_kg": 1500.0
       },
       {
         "flagged": {
@@ -494,20 +520,25 @@
             "b58"
           ]
         },
+        "injected": [
+          "b56",
+          "b57",
+          "b58"
+        ],
         "scenario_id": "gen-infeasible-3104",
         "shipped_anyway": {
           "fefo": [],
           "lading-point": []
         },
-        "stuck": [
+        "unreachable_independent": [
           "b56",
           "b57",
           "b58"
         ],
-        "stuck_kg": 1500.0
+        "unreachable_kg": 1500.0
       }
     ],
-    "rule": "batches no market can receive fresh are flagged INFEASIBLE_DEMAND, never shipped, and spoil equally in every arm"
+    "rule": "every batch no market can receive fresh (recomputed here, independently of world.py) is flagged INFEASIBLE_DEMAND by every arm and never shipped, so it spoils equally in every arm"
   },
   "p4_harmful": {
     "arms": {

@@ -1685,19 +1685,5 @@
         "wins": 11
       }
     }
-  },
-  "timings": {
-    "lading-point": {
-      "max_s": 15.745,
-      "median_s": 0.855,
-      "n": 20,
-      "p90_s": 5.078
-    },
-    "lading-robust": {
-      "max_s": 8.597,
-      "median_s": 1.022,
-      "n": 20,
-      "p90_s": 4.18
-    }
   }
 }
