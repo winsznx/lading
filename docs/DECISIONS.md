@@ -25,3 +25,15 @@ Stock delivered to a market but not sold within its demand is booked as spoiled 
 ## D6. Replans are anchored on the previous plan (2026-10-15)
 
 A replan freezes stock that already left as `controls.dispatched` and re-solves the open slots. A cold re-solve at a 0.5% gap reshuffled batches the disruption never touched (a no-op disruption on held-out seed 1007 changed 3 batches), which would make the diff lie about cause and effect. The replan pays a stability bonus of INR 5/kg for keeping a batch's market and INR 5,000 for keeping a cell's price (INR 2/kg still let a no-op at slot 0 move 2 batches on seed 1007) (`planner/config.json`), so the plan moves only what is worth more than that to move. The bonus is removed from the reported objective. A no-op disruption now changes nothing (test_replan.py).
+
+## D7. Headline arm picked by a tuning-set rule (2026-10-15)
+
+The PRD pre-registered Lading-robust (P10 shelf life, P90 travel) as the headline arm. Before the freeze, `results/tuning.json` recorded a rule: the headline is whichever Lading arm has the higher median paired net INR gain vs FEFO on tuning seeds 0-19. Lading-point won (+INR 76,247 vs +INR 35,423), so `planner/config.json` names it and the freeze hash covers that choice. Lading-robust is still planned, validated and reported on every held-out, stress and tuning day. Ablations A1 and A2 take the headline arm's basis so they ablate the arm being claimed.
+
+## D8. Sharing the VPS's existing Caddy (2026-10-15)
+
+The VPS already runs another project's Caddy on ports 80 and 443, so the bundled Caddy can't bind them and can't pass an ACME challenge on other ports. `deploy/deploy-api.sh` has a `shared` mode: the API joins that proxy's Docker network as `lading-api`, and one marked site block for the API hostname is appended to that proxy's Caddyfile, checked with `caddy validate` (the original is restored on failure) and applied with a zero-downtime `caddy reload`. The other project's site block and certificate are untouched (verified: its health endpoint answered 200 after the reload). The `standalone` profile with Lading's own Caddy remains the default for a clean host.
+
+## D9. Results identity excludes wall-clock time (2026-10-15)
+
+Solve times can't be byte-identical across runs, so they live only in `results/timings.json`, which the replay and clean-room checks skip. The manifest's `commit` is the last commit touching code or data the results depend on (`EVAL_PATHS` in the harness), so later docs or deploy commits don't invalidate a clean-room diff.

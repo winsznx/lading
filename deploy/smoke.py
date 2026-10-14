@@ -25,9 +25,13 @@ from typing import Any
 INDEX = Path(__file__).resolve().parent.parent / "scenarios" / "curated" / "index.json"
 
 
-def _request(method: str, url: str, body: Any = None, headers: dict[str, str] | None = None) -> tuple[int, Any, dict[str, str]]:
+def _request(
+    method: str, url: str, body: Any = None, headers: dict[str, str] | None = None
+) -> tuple[int, Any, dict[str, str]]:
     data = json.dumps(body).encode() if body is not None else None
-    req = urllib.request.Request(url, data=data, method=method, headers={"content-type": "application/json", **(headers or {})})
+    req = urllib.request.Request(
+        url, data=data, method=method, headers={"content-type": "application/json", **(headers or {})}
+    )
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             raw = resp.read()
@@ -53,13 +57,18 @@ def main() -> None:
     status, body, _ = _request("GET", f"{api}/health")
     results.append(check("api /health", status == 200 and body.get("status") == "ok", str(body)[:120]))
     status, scenarios, _ = _request("GET", f"{api}/scenarios")
-    results.append(check("api /scenarios", status == 200 and len(scenarios) >= 1, f"{len(scenarios)} curated"))
+    results.append(
+        check("api /scenarios", status == 200 and len(scenarios) >= 1, f"{len(scenarios)} curated")
+    )
     started = time.perf_counter()
     status, plan, _ = _request("POST", f"{api}/plan", {"scenario_id": scenarios[0]["id"]})
-    results.append(check(
-        "api /plan", status == 200 and plan["lading"]["validation"]["status"] == "PASS",
-        f"{scenarios[0]['id']} in {time.perf_counter() - started:.1f}s",
-    ))
+    results.append(
+        check(
+            "api /plan",
+            status == 200 and plan["lading"]["validation"]["status"] == "PASS",
+            f"{scenarios[0]['id']} in {time.perf_counter() - started:.1f}s",
+        )
+    )
 
     status, html, _ = _request("GET", f"{web}/")
     bundle = re.search(r'src="(/assets/[^"]+\.js)"', html) if isinstance(html, str) else None
@@ -67,7 +76,9 @@ def main() -> None:
     if bundle:
         _, js, _ = _request("GET", f"{web}{bundle.group(1)}")
         results.append(check("web bundle targets the live API", isinstance(js, str) and api in js))
-    status, _, headers = _request("OPTIONS", f"{api}/plan", headers={"origin": web, "access-control-request-method": "POST"})
+    status, _, headers = _request(
+        "OPTIONS", f"{api}/plan", headers={"origin": web, "access-control-request-method": "POST"}
+    )
     allowed = {k.lower(): v for k, v in headers.items()}.get("access-control-allow-origin")
     results.append(check("api CORS allows the web origin", allowed == web, f"allow-origin={allowed}"))
 
@@ -87,7 +98,13 @@ def main() -> None:
                 replans.append(time.perf_counter() - t0)
                 ok = ok and status == 200 and rp["lading"]["validation"]["status"] == "PASS"
                 time.sleep(3.5)
-            results.append(check(f"live verify {sid}", ok, f"plan {elapsed:.1f}s, replans {', '.join(f'{x:.1f}s' for x in replans)}"))
+            results.append(
+                check(
+                    f"live verify {sid}",
+                    ok,
+                    f"plan {elapsed:.1f}s, replans {', '.join(f'{x:.1f}s' for x in replans)}",
+                )
+            )
             if ok:
                 entry["live_verified"] = today
                 entry["expected_solve_s"] = round(elapsed, 1)
