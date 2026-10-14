@@ -1,5 +1,6 @@
 {
   "version": "planner-v1",
+  "headline_arm": "lading-point",
   "robust_shelf_quantile": "P10",
   "robust_travel_quantile": "P90",
   "mip_rel_gap": 0.005,
@@ -8,6 +9,6 @@
   "threads": 1,
   "random_seed": 0,
   "soft_shelf_penalty_inr_per_kg_h": 1.0,
-  "replan_stability_inr_per_kg": 2.0,
-  "replan_stability_inr_per_price": 2000
+  "replan_stability_inr_per_kg": 5.0,
+  "replan_stability_inr_per_price": 5000
 }

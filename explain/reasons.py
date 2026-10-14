@@ -98,11 +98,15 @@ def headline(decision: Decision) -> str:
     if alt is None:
         line = f"{chosen}: the only market buying {decision.commodity_name.lower()} it can reach fresh."
     elif alt.code == "EXPIRED_ON_ARRIVAL":
-        assert alt.sale_h is not None
-        line = (
-            f"{chosen}, not {other}: {other} arrival {hours(alt.sale_h)} vs "
-            f"{hours(decision.plan_shelf_h)} shelf life left."
-        )
+        assert alt.sale_h is not None and alt.limit_h is not None
+        if alt.sale_h > decision.plan_shelf_h:
+            line = f"{chosen}, not {other}: {other} arrival {hours(alt.sale_h)} vs {hours(decision.plan_shelf_h)} shelf life left."
+        else:
+            margin = decision.plan_shelf_h - alt.limit_h
+            line = (
+                f"{chosen}, not {other}: {other} arrival {hours(alt.sale_h)} is inside the {hours(margin)} safety margin "
+                f"of its {hours(decision.plan_shelf_h)} shelf life."
+            )
     elif alt.code == "DEADLINE":
         line = f"{chosen}, not {other}: {other}'s order closes before it can arrive."
     elif alt.code == "TRUCK_FULL":

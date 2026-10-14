@@ -44,7 +44,7 @@ def test_route_delay_moves_a_batch_that_no_longer_arrives_fresh():
     change = next(c for c in delayed.changes if c.batch_id == "b1")
     assert change.kind == "moved" and change.after.startswith("Near")
     assert "must be on sale by" in change.reason
-    assert delayed.effect.startswith("Delay to mid +6h → 1 tomato batch no longer reach Mid fresh → moved to Near")
+    assert delayed.effect.startswith("Delay to mid +6h → 1 tomato batch no longer reaches Mid fresh → moved to Near")
 
 
 def test_truck_loss_is_respected_and_still_valid():

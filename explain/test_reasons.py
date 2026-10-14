@@ -65,6 +65,11 @@ def test_headline_expired_matches_the_prd_example():
     assert headline(d) == "Pune, not Mumbai: Mumbai arrival 31h vs 26h shelf life left."
 
 
+def test_headline_expired_inside_the_margin():
+    d = decision(alternatives=[alt("EXPIRED_ON_ARRIVAL", sale_h=25, limit_h=24)])
+    assert headline(d) == "Pune, not Mumbai: Mumbai arrival 25h is inside the 2h safety margin of its 26h shelf life."
+
+
 def test_headline_with_discount_and_lock():
     d = decision(discount=0.2, locked=True, alternatives=[alt("LOWER_NET", net_inr=21_000, delta_inr=3_600)])
     assert headline(d) == "Locked by the dispatcher. Pune, not Mumbai: ₹3,600 more net here. 20% off at Pune lifts demand to sell it."

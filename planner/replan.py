@@ -181,7 +181,8 @@ def effect_line(disruption: Disruption, new_scenario: Scenario, changes: list[Ch
         commodities = Counter(by_batch[c.batch_id].commodity_name.lower() for c in expired)
         what = ", ".join(f"{n} {name}" for name, n in commodities.most_common())
         target = Counter(c.before.split(" at ")[0] for c in expired).most_common(1)[0][0]
-        parts.append(f"{what} batch{'es' if len(expired) > 1 else ''} no longer reach {target} fresh")
+        verb = "no longer reach" if len(expired) > 1 else "no longer reaches"
+        parts.append(f"{what} batch{'es' if len(expired) > 1 else ''} {verb} {target} fresh")
     if moved:
         dest = Counter(c.after.split(" at ")[0] for c in moved).most_common(2)
         parts.append("moved to " + " and ".join(name for name, _ in dest))
@@ -190,7 +191,9 @@ def effect_line(disruption: Disruption, new_scenario: Scenario, changes: list[Ch
         parts.append(f"{len(rediscounted)} re-priced")
     added = [c for c in changes if c.kind == "added"]
     if added:
-        parts.append(f"{len(added)} held batch{'es' if len(added) > 1 else ''} now ship")
+        dest = Counter(c.after.split(" at ")[0] for c in added).most_common(1)[0][0]
+        parts.append(f"{len(added)} held batch{'es' if len(added) > 1 else ''} now ship, mostly to {dest}" if len(added) > 1
+                     else f"1 held batch now ships to {dest}")
     dropped = [c for c in changes if c.kind == "dropped"]
     if dropped:
         parts.append(f"{len(dropped)} now held")

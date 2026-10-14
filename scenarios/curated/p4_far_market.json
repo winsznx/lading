@@ -1,0 +1,303 @@
+{
+  "batches": [
+    {
+      "arrived_h_ago": 30.0,
+      "commodity_id": "tomato",
+      "id": "b01",
+      "kg": 1500.0,
+      "origin": "Niphad FPO",
+      "shelf_life_h": 22.0
+    },
+    {
+      "arrived_h_ago": 28.0,
+      "commodity_id": "tomato",
+      "id": "b02",
+      "kg": 1200.0,
+      "origin": "Dindori FPO",
+      "shelf_life_h": 26.0
+    },
+    {
+      "arrived_h_ago": 6.0,
+      "commodity_id": "tomato",
+      "id": "b03",
+      "kg": 1800.0,
+      "origin": "Sinnar collection centre",
+      "shelf_life_h": 44.0
+    },
+    {
+      "arrived_h_ago": 2.0,
+      "commodity_id": "tomato",
+      "id": "b04",
+      "kg": 1000.0,
+      "origin": "Pimpalgaon FPO",
+      "shelf_life_h": 60.0
+    },
+    {
+      "arrived_h_ago": 20.0,
+      "commodity_id": "leafy_greens",
+      "id": "b05",
+      "kg": 800.0,
+      "origin": "Igatpuri farmers group",
+      "shelf_life_h": 14.0
+    },
+    {
+      "arrived_h_ago": 4.0,
+      "commodity_id": "leafy_greens",
+      "id": "b06",
+      "kg": 600.0,
+      "origin": "Niphad FPO",
+      "shelf_life_h": 18.0
+    },
+    {
+      "arrived_h_ago": 24.0,
+      "commodity_id": "tomato",
+      "id": "b07",
+      "kg": 1400.0,
+      "origin": "Dindori FPO",
+      "shelf_life_h": 30.0
+    },
+    {
+      "arrived_h_ago": 36.0,
+      "commodity_id": "onion",
+      "id": "b08",
+      "kg": 2000.0,
+      "origin": "Pimpalgaon FPO",
+      "shelf_life_h": 600.0
+    },
+    {
+      "arrived_h_ago": 12.0,
+      "commodity_id": "onion",
+      "id": "b09",
+      "kg": 1500.0,
+      "origin": "Sinnar collection centre",
+      "shelf_life_h": 500.0
+    },
+    {
+      "arrived_h_ago": 1.0,
+      "commodity_id": "leafy_greens",
+      "id": "b10",
+      "kg": 700.0,
+      "origin": "Igatpuri farmers group",
+      "shelf_life_h": 9.0
+    }
+  ],
+  "commodities": [
+    {
+      "elasticity": 1.2,
+      "id": "leafy_greens",
+      "name": "Leafy greens",
+      "purchase_inr_per_kg": 18.0,
+      "shelf_life_sigma": 0.15
+    },
+    {
+      "elasticity": 0.6,
+      "id": "onion",
+      "name": "Onion",
+      "purchase_inr_per_kg": 16.0,
+      "shelf_life_sigma": 0.05
+    },
+    {
+      "elasticity": 1.5,
+      "id": "tomato",
+      "name": "Tomato",
+      "purchase_inr_per_kg": 14.0,
+      "shelf_life_sigma": 0.12
+    }
+  ],
+  "controls": {
+    "dispatched": [],
+    "locks": [],
+    "vetoes": []
+  },
+  "cost_model": {
+    "id": "lading-cost-v1"
+  },
+  "execution": {
+    "elasticity_factor": 1.0
+  },
+  "family": "p4",
+  "hub": {
+    "id": "nashik",
+    "name": "Nashik aggregation hub"
+  },
+  "id": "p4-far-market",
+  "label": "P4: the best price is too far",
+  "markets": [
+    {
+      "handling_h": 2.0,
+      "handling_inr_per_kg": 0.8,
+      "id": "pune_gultekdi",
+      "name": "Pune (Gultekdi)",
+      "offers": [
+        {
+          "commodity_id": "tomato",
+          "demand_kg": 2600.0,
+          "price_inr_per_kg": 27.5
+        },
+        {
+          "commodity_id": "leafy_greens",
+          "demand_kg": 900.0,
+          "price_inr_per_kg": 36.0
+        },
+        {
+          "commodity_id": "onion",
+          "demand_kg": 1500.0,
+          "price_inr_per_kg": 22.0
+        }
+      ],
+      "transport_inr_per_kg": 1.3,
+      "travel_h": 5.0
+    },
+    {
+      "handling_h": 3.0,
+      "handling_inr_per_kg": 0.9,
+      "id": "mumbai_vashi",
+      "name": "Mumbai (Vashi APMC)",
+      "offers": [
+        {
+          "commodity_id": "tomato",
+          "demand_kg": 2400.0,
+          "price_inr_per_kg": 30.0
+        },
+        {
+          "commodity_id": "leafy_greens",
+          "demand_kg": 700.0,
+          "price_inr_per_kg": 39.0
+        },
+        {
+          "commodity_id": "onion",
+          "demand_kg": 1200.0,
+          "price_inr_per_kg": 24.0
+        }
+      ],
+      "transport_inr_per_kg": 1.3,
+      "travel_h": 5.0
+    },
+    {
+      "handling_h": 2.0,
+      "handling_inr_per_kg": 0.7,
+      "id": "surat_apmc",
+      "name": "Surat APMC",
+      "offers": [
+        {
+          "commodity_id": "tomato",
+          "demand_kg": 1800.0,
+          "price_inr_per_kg": 27.0
+        },
+        {
+          "commodity_id": "leafy_greens",
+          "demand_kg": 600.0,
+          "price_inr_per_kg": 35.0
+        }
+      ],
+      "transport_inr_per_kg": 1.5,
+      "travel_h": 6.0
+    },
+    {
+      "handling_h": 3.0,
+      "handling_inr_per_kg": 1.1,
+      "id": "delhi_azadpur",
+      "name": "Delhi (Azadpur)",
+      "offers": [
+        {
+          "commodity_id": "tomato",
+          "demand_kg": 5000.0,
+          "price_inr_per_kg": 38.0
+        },
+        {
+          "commodity_id": "leafy_greens",
+          "demand_kg": 1500.0,
+          "price_inr_per_kg": 46.0
+        },
+        {
+          "commodity_id": "onion",
+          "demand_kg": 3000.0,
+          "price_inr_per_kg": 31.0
+        }
+      ],
+      "transport_inr_per_kg": 4.7,
+      "travel_h": 22.0
+    }
+  ],
+  "policy": {
+    "current_slot": 0,
+    "discount_levels": [
+      0.0,
+      0.1,
+      0.2,
+      0.3
+    ],
+    "horizon_h": 48.0,
+    "safety_margin_h": 2.0
+  },
+  "schema_version": "lading-scenario-v1",
+  "slots": [
+    {
+      "depart_h": 0.0,
+      "id": "s0",
+      "index": 0,
+      "label": "D1 06:00"
+    },
+    {
+      "depart_h": 6.0,
+      "id": "s1",
+      "index": 1,
+      "label": "D1 12:00"
+    },
+    {
+      "depart_h": 12.0,
+      "id": "s2",
+      "index": 2,
+      "label": "D1 18:00"
+    },
+    {
+      "depart_h": 18.0,
+      "id": "s3",
+      "index": 3,
+      "label": "D2 00:00"
+    },
+    {
+      "depart_h": 24.0,
+      "id": "s4",
+      "index": 4,
+      "label": "D2 06:00"
+    },
+    {
+      "depart_h": 30.0,
+      "id": "s5",
+      "index": 5,
+      "label": "D2 12:00"
+    },
+    {
+      "depart_h": 36.0,
+      "id": "s6",
+      "index": 6,
+      "label": "D2 18:00"
+    },
+    {
+      "depart_h": 42.0,
+      "id": "s7",
+      "index": 7,
+      "label": "D3 00:00"
+    }
+  ],
+  "source": "curated",
+  "synthetic": true,
+  "trucks": [
+    {
+      "capacity_kg": 7500.0,
+      "id": "t1"
+    },
+    {
+      "capacity_kg": 5000.0,
+      "id": "t2"
+    }
+  ],
+  "uncertainty": {
+    "demand_sigma": 0.2,
+    "travel_delay": {
+      "median_frac": 0.08,
+      "sigma_log": 0.6
+    }
+  }
+}
