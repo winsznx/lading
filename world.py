@@ -11,6 +11,7 @@ import math
 from dataclasses import dataclass
 from functools import cached_property
 
+from errors import LadingError, State
 from scenarios.model import Batch, Market, Scenario, Slot
 
 Z90 = 1.2815515655446004
@@ -53,6 +54,12 @@ class World:
             return False
         return sale <= self.shelf_h(batch) - self.scenario.policy.safety_margin_h
 
+    def arrives_before_expiry(self, batch: Batch, market: Market, slot: Slot) -> bool:
+        """Physically saleable on arrival: on sale before expiry and inside any order deadline. No margin.
+        Used for stock that has already left, where the margin no longer matters."""
+        sale = self.sale_h(market, slot)
+        return sale <= self.shelf_h(batch) and (market.deliver_by_h is None or sale <= market.deliver_by_h)
+
     def fresh_slots(self, batch: Batch, market: Market) -> list[Slot]:
         """Open slots from which the batch still arrives fresh. Later slots only get later, so this is
         always a prefix of the open slots."""
@@ -94,3 +101,18 @@ def infeasible_batches(scenario: Scenario) -> list[str]:
         for b in scenario.batches
         if not any(world.sells(b, m) and world.fresh_slots(b, m) for m in scenario.markets)
     ]
+
+
+def check_locks(scenario: Scenario) -> None:
+    """A dispatcher lock must sell to a market that buys the batch and arrive fresh on the forecast.
+    Every arm applies the same check, so a lock can't help or hurt one arm alone."""
+    point = World(scenario, "point")
+    for lock in scenario.controls.locks:
+        b, m, s = scenario.batch(lock.batch_id), scenario.market(lock.market_id), scenario.slot(lock.slot_id)
+        if not point.sells(b, m) or not point.fresh_on_sale(b, m, s):
+            raise LadingError(
+                State.LOCK_INFEASIBLE,
+                f"Lock {b.id} to {m.name} at {s.label} can't hold: it would be on sale at "
+                f"{point.sale_h(m, s):.1f} h and must be by {b.shelf_life_h - scenario.policy.safety_margin_h:.1f} h.",
+                path="controls.locks",
+            )

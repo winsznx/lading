@@ -16,9 +16,10 @@ Decision rule:
    size is fixed, so this ranks markets exactly as per-kg margin does. The best-scoring market wins
    (ties: earlier slot, then market id).
 5. If the batch would otherwise expire unsold (no market can take it before it expires inside the
-   horizon, or the best market can't sell all of it), FEFO also prices a markdown to the deepest
-   discount at each market, counting the price cut on stock already headed there, and takes it
-   when it beats the best undiscounted option.
+   horizon, or the best market can't sell all of it), FEFO also prices every deeper step of the
+   discount ladder at each market. Each step is scored on the whole cell: the price cut on stock
+   already headed there, the extra demand it unlocks for that stock and for this batch. It takes the
+   best step when that beats the best option at the current price.
 6. The batch only ships if the chosen option beats leaving it at the hub, where a batch that expires
    inside the horizon is a total loss and one that outlives it carries over.
 """
@@ -29,19 +30,20 @@ from collections import defaultdict
 
 import cost_model
 from baselines.fleet import Fleet
+from errors import LadingError, State
 from plan_assembly import Leg, assemble
 from plan_model import Plan
 from scenarios.model import Batch, Market, Scenario, Slot
-from world import World
+from world import World, check_locks
 
-Option = tuple[float, int, str, Market, list[tuple[Slot, float]]]
+Option = tuple[float, int, str, Market, list[tuple[Slot, float]], float]
 
 
 def plan_fefo(scenario: Scenario) -> Plan:
     world = World(scenario, "point")
     fleet = Fleet(world)
     vetoed = {(v.batch_id, v.market_id) for v in scenario.controls.vetoes}
-    deepest = max(scenario.policy.discount_levels)
+    ladder = scenario.policy.discount_levels
     discount: dict[tuple[str, str], float] = defaultdict(float)
     shipped: dict[tuple[str, str], float] = defaultdict(float)
     legs: list[Leg] = []
@@ -53,13 +55,21 @@ def plan_fefo(scenario: Scenario) -> Plan:
         assert offer is not None
         return cost_model.demand_cap_kg(offer.demand_kg, commodity[cid].elasticity, d) - shipped[(m.id, cid)]
 
-    def value(b: Batch, m: Market, d: float, qty: float) -> float:
-        cid = b.commodity_id
-        sold = min(qty, max(room_left(m, cid, d), 0.0))
-        unit_sale = cost_model.sale_inr_per_kg(scenario.list_price(m.id, cid), d)
-        unit_route = cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
+    def cell_value(m: Market, cid: str, d: float, extra: float) -> float:
+        offer = scenario.offer(m.id, cid)
+        assert offer is not None
+        supply = shipped[(m.id, cid)] + extra
+        sold = min(supply, cost_model.demand_cap_kg(offer.demand_kg, commodity[cid].elasticity, d))
+        unit_sale = cost_model.sale_inr_per_kg(offer.price_inr_per_kg, d)
         unit_loss = cost_model.spoilage_inr_per_kg(commodity[cid].purchase_inr_per_kg)
-        return sold * unit_sale - qty * unit_route - (qty - sold) * unit_loss
+        return sold * unit_sale - (supply - sold) * unit_loss
+
+    def gain(b: Batch, m: Market, d: float, qty: float) -> float:
+        """Change in the cell's forecast net from shipping `qty` of b there at price level d."""
+        cid = b.commodity_id
+        unit_route = cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
+        before = cell_value(m, cid, discount[(m.id, cid)], 0.0)
+        return cell_value(m, cid, d, qty) - before - qty * unit_route
 
     def place(b: Batch, m: Market, parts: list[tuple[Slot, float]]) -> None:
         fleet.take(parts)
@@ -70,14 +80,20 @@ def plan_fefo(scenario: Scenario) -> Plan:
     for leg in scenario.controls.dispatched:
         b, m, s = scenario.batch(leg.batch_id), scenario.market(leg.market_id), scenario.slot(leg.slot_id)
         legs.append(Leg(b.id, m.id, s.id, leg.kg))
-        if world.sale_h(m, s) <= b.shelf_life_h:
+        if world.arrives_before_expiry(b, m, s):
             shipped[(m.id, b.commodity_id)] += leg.kg
 
+    check_locks(scenario)
     for lock in scenario.controls.locks:
         b, m, s = scenario.batch(lock.batch_id), scenario.market(lock.market_id), scenario.slot(lock.slot_id)
         parts = fleet.fit([s], world.on_hand_kg(b))
-        if parts is not None:
-            place(b, m, parts)
+        if parts is None:
+            raise LadingError(
+                State.LOCK_INFEASIBLE,
+                f"Locks at {s.label} need more truck room than the slot has.",
+                path="controls.locks",
+            )
+        place(b, m, parts)
 
     for b in sorted(scenario.batches, key=lambda b: (world.shelf_h(b), -b.kg, b.id)):
         qty = world.on_hand_kg(b)
@@ -100,7 +116,7 @@ def plan_fefo(scenario: Scenario) -> Plan:
             parts = fleet.fit(world.fresh_slots(b, m), qty)
             if parts is None:
                 continue
-            option: Option = (value(b, m, d, qty), -parts[0][0].index, m.id, m, parts)
+            option: Option = (gain(b, m, d, qty), -parts[0][0].index, m.id, m, parts, d)
             if best is None or option[:3] > best[:3]:
                 best = option
 
@@ -114,24 +130,22 @@ def plan_fefo(scenario: Scenario) -> Plan:
         if would_expire_unsold:
             for m in markets:
                 cell = (m.id, b.commodity_id)
-                if discount[cell] >= deepest or room_left(m, b.commodity_id, deepest) <= 0:
-                    continue
                 parts = fleet.fit(world.fresh_slots(b, m), qty)
                 if parts is None:
                     continue
-                selling_now = min(shipped[cell], room_left(m, b.commodity_id, discount[cell]) + shipped[cell])
-                price_cut = (
-                    selling_now * scenario.list_price(m.id, b.commodity_id) * (deepest - discount[cell])
-                )
-                option = (value(b, m, deepest, qty) - price_cut, -parts[0][0].index, m.id, m, parts)
-                if markdown is None or option[:3] > markdown[:3]:
-                    markdown = option
+                for level in (x for x in ladder if x > discount[cell]):
+                    if room_left(m, b.commodity_id, level) <= 0:
+                        continue
+                    option = (gain(b, m, level, qty), -parts[0][0].index, m.id, m, parts, level)
+                    if markdown is None or option[:3] > markdown[:3]:
+                        markdown = option
 
-        if markdown is not None and markdown[0] > hold and (best is None or markdown[0] > best[0]):
-            discount[(markdown[3].id, b.commodity_id)] = deepest
-            place(b, markdown[3], markdown[4])
-        elif best is not None and best[0] > hold:
-            place(b, best[3], best[4])
+        pick = best
+        if markdown is not None and (best is None or markdown[0] > best[0]):
+            pick = markdown
+        if pick is not None and pick[0] > hold:
+            discount[(pick[3].id, b.commodity_id)] = pick[5]
+            place(b, pick[3], pick[4])
 
     return assemble(scenario, "fefo", "point", legs, dict(discount), locked=_locked(scenario, legs))
 

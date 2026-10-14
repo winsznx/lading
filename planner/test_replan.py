@@ -105,3 +105,17 @@ def test_apply_freezes_departed_stock_and_drops_past_locks():
         (sh.batch_id, sh.slot_id) for sh in plan.shipments if sh.slot_id == "s0"
     }
     assert next(t for t in after.trucks if t.id == "t2").unavailable_from_slot == 1
+
+
+def test_replan_objective_equals_forecast_net_with_stock_on_the_road():
+    s = generate(1003)
+    plan = plan_lading(s, "lading-point")
+    first = next(sh for sh in plan.shipments if sh.slot_id == "s0")
+    result = replan(
+        s,
+        plan,
+        Disruption(kind="route_delay", label="delay", at_slot=1, market_id=first.market_id, extra_h=4),
+    )
+    assert result.scenario["controls"]["dispatched"]
+    assert result.plan.solver is not None
+    assert result.plan.solver.objective_inr == pytest.approx(result.plan.expected.net_inr, abs=0.05)

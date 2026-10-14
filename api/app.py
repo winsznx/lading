@@ -12,7 +12,7 @@ import os
 import threading
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -62,7 +62,7 @@ TRUSTED_PROXIES = [c.strip() for c in os.environ.get("TRUSTED_PROXIES", "127.0.0
 COMMIT = os.environ.get("LADING_COMMIT", "dev")
 HEADLINE_ARM = str(planner_config()["headline_arm"])
 
-MAX_BATCHES, MAX_MARKETS, MAX_SLOTS, MAX_TRUCKS = 80, 10, 12, 10
+MAX_BATCHES, MAX_MARKETS, MAX_SLOTS, MAX_TRUCKS, MAX_CONTROLS, MAX_OFFERS = 80, 10, 12, 10, 200, 12
 _solve_slots = threading.BoundedSemaphore(int(os.environ.get("LADING_MAX_CONCURRENT_SOLVES", "2")))
 limiter = RateLimiter(
     per_minute=float(os.environ.get("LADING_RATE_PER_MIN", "20")),
@@ -130,11 +130,15 @@ def _rate_limit(request: Request) -> None:
 
 
 def _check_size(s: Scenario) -> None:
+    c = s.controls
     for name, n, cap in (
         ("batches", len(s.batches), MAX_BATCHES),
         ("markets", len(s.markets), MAX_MARKETS),
         ("slots", len(s.slots), MAX_SLOTS),
         ("trucks", len(s.trucks), MAX_TRUCKS),
+        ("commodities", len(s.commodities), MAX_OFFERS),
+        ("offers", max(len(m.offers) for m in s.markets), MAX_OFFERS),
+        ("controls", len(c.locks) + len(c.vetoes) + len(c.dispatched), MAX_CONTROLS),
     ):
         if n > cap:
             raise LadingError(
@@ -184,6 +188,12 @@ def _reasons(decisions: list[Decision]) -> dict[str, Reason]:
         )
         for d in decisions
     }
+
+
+def _solver_state(plan: Plan) -> Literal["OPTIMAL", "SOLVER_TIMEOUT"]:
+    """A plan that hit the live time budget is the best incumbent, not a proven 0.5%-gap plan."""
+    assert plan.solver is not None
+    return "SOLVER_TIMEOUT" if plan.solver.status == "TIME_LIMIT" else "OPTIMAL"
 
 
 def _guard_valid(arm: ArmResult) -> None:
@@ -258,6 +268,7 @@ def plan(req: PlanRequest, request: Request) -> PlanResponse:
     decisions = build_decisions(s, lading.plan)
     assert lading.plan.solver is not None
     return PlanResponse(
+        solver_state=_solver_state(lading.plan),
         scenario=_as_json(s),
         lading=lading,
         fefo=fefo,
@@ -308,6 +319,7 @@ def replan(req: ReplanRequest, request: Request) -> ReplanResponse:
     changes = diff(s, previous, after, new_plan, decisions)
     assert new_plan.solver is not None
     return ReplanResponse(
+        solver_state=_solver_state(new_plan),
         scenario=_as_json(after),
         lading=lading,
         fefo=fefo,
@@ -323,13 +335,19 @@ def replan(req: ReplanRequest, request: Request) -> ReplanResponse:
 
 
 @app.post("/validate")
-def validate_plan(req: ValidateRequest) -> dict[str, Any]:
-    parse(req.scenario)
-    try:
-        return validate(req.scenario, req.plan)
-    except (KeyError, TypeError) as exc:
+def validate_plan(req: ValidateRequest, request: Request) -> dict[str, Any]:
+    _rate_limit(request)
+    s = parse(req.scenario)
+    _check_size(s)
+    if len(req.plan.shipments) + len(req.plan.trips) > 4 * MAX_BATCHES * MAX_SLOTS:
         raise LadingError(
-            State.SCHEMA_INVALID, f"plan is missing or mistyped field {exc}", path="plan"
+            State.SCENARIO_TOO_LARGE, "The plan has more lines than any scenario allows.", path="plan"
+        )
+    try:
+        return validate(_as_json(s), _as_json(req.plan))
+    except (KeyError, TypeError, ValueError, AttributeError) as exc:
+        raise LadingError(
+            State.SCHEMA_INVALID, f"The plan doesn't match the scenario: {exc}", path="plan"
         ) from exc
 
 

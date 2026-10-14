@@ -7,7 +7,8 @@ Two blocks deserve care:
 
 * ``uncertainty`` is disclosed to every arm. Lading-robust derives its conservative inputs from it.
 * ``execution`` holds shocks that only the simulator reads (a route delay or a truck breakdown nobody
-  saw coming). No planner or baseline may read it; `planner/test_information_parity.py` enforces that.
+  saw coming). No planner or baseline may read it; `test_execution_shocks_never_reach_any_arm` in
+  `planner/test_planner.py` enforces that for every arm.
 """
 
 from __future__ import annotations

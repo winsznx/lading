@@ -23,7 +23,7 @@ class Shipment(Strict):
     batch_id: str
     market_id: str
     slot_id: str
-    kg: float
+    kg: float = Field(gt=0)
     discount: float
     locked: bool = False
 
@@ -31,7 +31,7 @@ class Shipment(Strict):
 class TripLoad(Strict):
     batch_id: str
     market_id: str
-    kg: float
+    kg: float = Field(gt=0)
 
 
 class Trip(Strict):
@@ -39,7 +39,7 @@ class Trip(Strict):
 
     truck_id: str
     slot_id: str
-    load_kg: float
+    load_kg: float = Field(ge=0)
     manifest: list[TripLoad]
 
 

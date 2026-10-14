@@ -137,7 +137,18 @@ def hold_sentence(decision: Decision) -> str:
             f"though the forecast ({hours(decision.shelf_h)}) says one might."
         )
     if code == "CARRY_OVER":
-        return f"Kept for tomorrow: {hours(decision.shelf_h)} of shelf life left, and today's truck room earns more on shorter-life stock."
+        line = f"Kept for tomorrow: {hours(decision.shelf_h)} of shelf life left, so it doesn't spoil by waiting."
+        priced = [a for a in decision.alternatives if a.market_id is not None and a.net_inr is not None]
+        if not priced:
+            return line + " No market it can reach fresh has truck room or demand left today."
+        top = max(priced, key=lambda a: a.net_inr or 0.0)
+        assert top.net_inr is not None
+        if top.net_inr <= 0:
+            return line + f" Shipping it today nets {inr(top.net_inr)} at best ({short(top.market_name)})."
+        return line + (
+            f" Shipping it to {short(top.market_name)} would net {inr(top.net_inr)} on its own; the solver stopped "
+            "within its optimality gap without taking it."
+        )
     if code == "NO_ROOM":
         return "Held: no truck room or demand left at any market it can reach fresh."
     best = max(

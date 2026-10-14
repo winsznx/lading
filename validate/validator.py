@@ -50,8 +50,10 @@ def validate(scenario: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
     margin = policy["safety_margin_h"]
     levels = policy["discount_levels"]
     current = policy.get("current_slot", 0)
+    controls = scenario.get("controls", {})
+    vetoed = {(v["batch_id"], v["market_id"]) for v in controls.get("vetoes", [])}
     dispatched: dict[tuple[str, str, str], float] = defaultdict(float)
-    for d in scenario.get("controls", {}).get("dispatched", []):
+    for d in controls.get("dispatched", []):
         dispatched[(d["batch_id"], d["market_id"], d["slot_id"])] += d["kg"]
 
     r.check(
@@ -85,6 +87,13 @@ def validate(scenario: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
         )
         if b is None or m is None or s is None:
             continue
+        r.check("kg.positive", sh["kg"] > 0, f"ships {sh['kg']} kg", ref)
+        r.check(
+            "veto",
+            (b["id"], m["id"]) not in vetoed,
+            f"the dispatcher vetoed {b['id']} going to {m['id']}",
+            ref,
+        )
         shipped_kg[b["id"]] += sh["kg"]
         destinations[b["id"]].add(m["id"])
         shipment_at[(b["id"], m["id"], s["id"])] += sh["kg"]
@@ -122,6 +131,19 @@ def validate(scenario: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
                 ref,
             )
 
+    for lock in controls.get("locks", []):
+        b = batches.get(lock["batch_id"])
+        if b is None:
+            continue
+        on_hand = b["kg"] - sum(kg for (bid, _, _), kg in dispatched.items() if bid == b["id"])
+        key = (lock["batch_id"], lock["market_id"], lock["slot_id"])
+        r.check(
+            "lock",
+            abs(shipment_at.get(key, 0.0) - on_hand) <= KG_TOL,
+            f"the dispatcher locked {b['id']} to {lock['market_id']} at {lock['slot_id']}; "
+            f"the plan ships {shipment_at.get(key, 0.0):.0f} of {on_hand:.0f} kg there",
+            lock["batch_id"],
+        )
     for key, kg in dispatched.items():
         r.check(
             "dispatched.match",
@@ -160,6 +182,12 @@ def validate(scenario: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
         r.check("ref.exists", t is not None and s is not None, "unknown truck or slot", ref)
         if t is None or s is None:
             continue
+        r.check(
+            "kg.positive",
+            all(x["kg"] > 0 for x in trip["manifest"]),
+            "a manifest line has no positive kg",
+            ref,
+        )
         load = sum(x["kg"] for x in trip["manifest"])
         r.check(
             "trip.load",

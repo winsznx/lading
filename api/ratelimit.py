@@ -28,7 +28,8 @@ class RateLimiter:
         peer = request.client.host if request.client else "unknown"
         forwarded = request.headers.get("x-forwarded-for")
         if forwarded and self._is_trusted(peer):
-            return forwarded.split(",")[0].strip()
+            # The trusted proxy appends the address it saw last; anything left of it is client-supplied.
+            return forwarded.split(",")[-1].strip()
         return peer
 
     def _is_trusted(self, host: str) -> bool:
@@ -42,14 +43,14 @@ class RateLimiter:
         """Take one token for `key`. Returns (allowed, seconds until the next token)."""
         now = time.monotonic()
         with self._lock:
+            if len(self._buckets) > 10_000:
+                full = self.burst / self.rate
+                self._buckets = {k: v for k, v in self._buckets.items() if now - v.stamp < full}
             bucket = self._buckets.get(key) or _Bucket(self.burst, now)
             bucket.tokens = min(self.burst, bucket.tokens + (now - bucket.stamp) * self.rate)
             bucket.stamp = now
+            self._buckets[key] = bucket
             if bucket.tokens >= 1.0:
                 bucket.tokens -= 1.0
-                self._buckets[key] = bucket
                 return True, 0.0
-            self._buckets[key] = bucket
-            if len(self._buckets) > 10_000:
-                self._buckets = {k: v for k, v in self._buckets.items() if now - v.stamp < 600}
             return False, (1.0 - bucket.tokens) / self.rate

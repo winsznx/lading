@@ -119,3 +119,30 @@ def test_cors_allows_only_configured_origins():
         "/plan", headers={"origin": "https://evil.example", "access-control-request-method": "POST"}
     )
     assert "access-control-allow-origin" not in bad.headers
+
+
+def test_plan_reports_solver_state():
+    body = client.post("/plan", json={"scenario_id": "p4-far-market", "draws": 1}).json()
+    assert body["solver_state"] == "OPTIMAL"
+
+
+def test_validate_rejects_negative_kg_by_shape():
+    plan = client.post("/plan", json={"scenario_id": "p4-far-market", "draws": 1}).json()
+    scenario, lading = plan["scenario"], plan["lading"]["plan"]
+    ok = client.post("/validate", json={"scenario": scenario, "plan": lading})
+    assert ok.status_code == 200 and ok.json()["status"] == "PASS"
+    lading["shipments"][0]["kg"] = -5
+    bad = client.post("/validate", json={"scenario": scenario, "plan": lading})
+    assert bad.status_code == 422 and bad.json()["state"] == "SCHEMA_INVALID"
+
+
+def test_forwarded_for_uses_the_proxys_entry():
+    from starlette.requests import Request
+
+    limiter = RateLimiter(per_minute=1, burst=1, trusted_proxies=["10.0.0.0/8"])
+    scope = {
+        "type": "http",
+        "headers": [(b"x-forwarded-for", b"6.6.6.6, 203.0.113.9")],
+        "client": ("10.0.0.2", 1234),
+    }
+    assert limiter.client_ip(Request(scope)) == "203.0.113.9"

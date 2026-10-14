@@ -240,9 +240,44 @@ def code_commit() -> str:
     return _git("log", "-1", "--format=%H", "--", *EVAL_PATHS)
 
 
-def code_dirty() -> bool:
+def code_dirty() -> bool | str:
+    """True or False from git, or "unknown" when git can't answer. Never a silent clean."""
     status = _git("status", "--porcelain", "--", *EVAL_PATHS)
-    return bool(status) and status != "unknown"
+    if status == "unknown":
+        return "unknown"
+    return bool(status)
+
+
+FROZEN_CODE = (
+    "scenarios/model.py",
+    "scenarios/loader.py",
+    "scenarios/scenario_gen.py",
+    "scenarios/organizer.py",
+    "scenarios/assumptions.json",
+    "scenarios/curated/p4_far_market.json",
+    "schemas/scenario.json",
+    "baselines/fefo.py",
+    "baselines/fifo.py",
+    "baselines/fleet.py",
+    "planner/milp.py",
+    "planner/config.json",
+    "sim/draws.py",
+    "sim/simulator.py",
+    "validate/validator.py",
+    "evaluation/harness.py",
+    "evaluation/stats.py",
+    "cost_model.py",
+    "world.py",
+    "plan_assembly.py",
+    "plan_model.py",
+    "errors.py",
+)
+
+
+def frozen_code_hashes() -> dict[str, str]:
+    """Every file that can move a number in results/. The held-out run refuses to start if any changed
+    since the freeze, so 'pre-registered' covers the code, not just the config."""
+    return {path: _sha256(ROOT / path) for path in FROZEN_CODE}
 
 
 def freeze(out: Path) -> dict[str, Any]:
@@ -256,6 +291,7 @@ def freeze(out: Path) -> dict[str, Any]:
             f"planner/config.json headline_arm is {headline}, the tuning rule picked {tuning_data['recommended_headline_arm']}"
         )
     record = {
+        "frozen_code_sha256": frozen_code_hashes(),
         "planner_config_sha256": _sha256(CONFIG_PATH),
         "cost_model_sha256": _sha256(ROOT / "cost_model.py"),
         "headline_arm": headline,
@@ -278,6 +314,9 @@ def _check_freeze(out: Path) -> dict[str, Any]:
     record: dict[str, Any] = json.loads(path.read_text())
     if record["planner_config_sha256"] != _sha256(CONFIG_PATH):
         sys.exit("planner/config.json changed after the freeze; the held-out run would not be clean")
+    changed = [p for p, h in frozen_code_hashes().items() if record.get("frozen_code_sha256", {}).get(p) != h]
+    if changed:
+        sys.exit(f"code changed after the freeze, the held-out run would not be clean: {', '.join(changed)}")
     if out != ROOT / "results":
         _write(out, "freeze.json", record)
     return record
@@ -432,6 +471,10 @@ def reproduce(out: Path, small: bool, draws: int) -> None:
     print("[2/6] freeze check", flush=True)
     frozen = _check_freeze(out)
     headline = frozen["headline_arm"]
+    if not small and tuning["recommended_headline_arm"] != headline:
+        sys.exit(
+            f"the tuning rule now picks {tuning['recommended_headline_arm']}, the freeze recorded {headline}"
+        )
 
     print("[3/6] held-out set (generated now, after the freeze)", flush=True)
     seeds = HELDOUT[:5] if small else HELDOUT
@@ -596,7 +639,9 @@ def reproduce(out: Path, small: bool, draws: int) -> None:
     )
     s = summary[headline]
     violations = heldout["validator"][headline]["violations"]
-    triggered = s["net_inr"]["median"] <= 0 or s["spoiled_kg"]["median"] > 0
+    triggered = s["net_inr"]["median"] <= 0 or s["spoiled_kg"]["median"] > 0 or violations > 0
+    controls_data = json.loads((out / "controls.json").read_text())
+    failed_controls = sorted(name for name, c in controls_data.items() if not c["passed"])
     statement = (
         f"On {len(seeds)} held-out days, {headline} vs FEFO: median paired net gain INR {s['net_inr']['median']:,.0f} "
         f"(wins {s['net_inr']['wins']}/{len(seeds)}), median spoiled kg change {s['spoiled_kg']['median']:+,.0f} "
@@ -608,7 +653,9 @@ def reproduce(out: Path, small: bool, draws: int) -> None:
         "verdict.json",
         {
             "headline_arm": headline,
-            "falsifier": "median paired net-revenue gain <= 0, or median spoilage higher than FEFO (PRD section 4)",
+            "falsifier": "median paired net-revenue gain <= 0, or median spoilage higher than FEFO (PRD section 4), "
+            "or any validator violation on the headline arm (the claim includes 0 violations)",
+            "failed_controls": failed_controls,
             "median_net_gain_inr": s["net_inr"]["median"],
             "median_spoiled_delta_kg": s["spoiled_kg"]["median"],
             "median_fill_delta_pp": s["demand_filled_pct"]["median"],
@@ -618,7 +665,12 @@ def reproduce(out: Path, small: bool, draws: int) -> None:
             "statement": (
                 "Falsifier triggered: the 'beats FEFO' headline is withdrawn. " if triggered else ""
             )
-            + statement,
+            + statement
+            + (
+                f" Failed controls: {', '.join(failed_controls)} (see controls.json)."
+                if failed_controls
+                else ""
+            ),
         },
     )
     print(statement, flush=True)

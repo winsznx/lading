@@ -11,12 +11,13 @@ by time on sale, the same rule the simulator uses.
 from __future__ import annotations
 
 from collections import defaultdict
+from itertools import accumulate
 from typing import Literal
 
 from pydantic import BaseModel
 
 import cost_model
-from plan_model import Plan
+from plan_model import Plan, Shipment
 from scenarios.model import Batch, Market, Scenario
 from world import World, infeasible_batches
 
@@ -106,6 +107,47 @@ def _local_net(scenario: Scenario, b: Batch, m: Market, sold_kg: float, discount
     )
 
 
+class _Room:
+    """Truck room as the planner sees it: each planned batch must leave by its deadline, and the plan is
+    feasible while, for every open slot t, the kg due by t fits the capacity of the slots up to t. A
+    batch fits somewhere new only if those rows still hold with it moved there."""
+
+    def __init__(self, scenario: Scenario, world: World, shipments_of: dict[str, list[Shipment]]) -> None:
+        self.index = {s.id: i for i, s in enumerate(world.open_slots)}
+        caps = [world.slot_capacity_kg(s) for s in world.open_slots]
+        self.cum_cap = list(accumulate(caps))
+        locked = {lk.batch_id: lk.slot_id for lk in scenario.controls.locks}
+        self.deadline: dict[str, int] = {}
+        self.kg: dict[str, float] = {}
+        for bid, legs in shipments_of.items():
+            open_legs = [sh for sh in legs if sh.slot_id in self.index]
+            if not open_legs:
+                continue
+            if bid in locked and locked[bid] in self.index:
+                due = self.index[locked[bid]]
+            else:
+                fresh = world.fresh_slots(scenario.batch(bid), scenario.market(open_legs[0].market_id))
+                due = self.index[fresh[-1].id] if fresh else max(self.index[sh.slot_id] for sh in open_legs)
+            self.deadline[bid] = due
+            self.kg[bid] = sum(sh.kg for sh in open_legs)
+        self.due = [0.0] * len(caps)
+        for bid, t in self.deadline.items():
+            self.due[t] += self.kg[bid]
+
+    def fits(self, batch_id: str, kg: float, last_slot_id: str) -> bool:
+        target = self.index[last_slot_id]
+        running = 0.0
+        for t, cap in enumerate(self.cum_cap):
+            running += self.due[t]
+            if self.deadline.get(batch_id) == t:
+                running -= self.kg[batch_id]
+            if t == target:
+                running += kg
+            if running > cap + 1e-6:
+                return False
+        return True
+
+
 def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
     world = World(scenario, plan.basis if plan.basis != "none" else "point")
     margin = scenario.policy.safety_margin_h
@@ -117,15 +159,13 @@ def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
     price = {(p.market_id, p.commodity_id): p.discount for p in plan.prices}
     sold = _sold_by_batch(scenario, plan, world)
 
-    shipments_of: dict[str, list] = defaultdict(list)
+    shipments_of: dict[str, list[Shipment]] = defaultdict(list)
     for sh in plan.shipments:
         shipments_of[sh.batch_id].append(sh)
     shipped_in_cell: dict[tuple[str, str], float] = defaultdict(float)
     for sh in plan.shipments:
         shipped_in_cell[(sh.market_id, scenario.batch(sh.batch_id).commodity_id)] += sh.kg
-    load = {s.id: 0.0 for s in scenario.slots}
-    for sh in plan.shipments:
-        load[sh.slot_id] += sh.kg
+    room = _Room(scenario, world, shipments_of)
 
     decisions = []
     for b in scenario.batches:
@@ -190,9 +230,7 @@ def build_decisions(scenario: Scenario, plan: Plan) -> list[Decision]:
                     Alternative(market_id=m.id, market_name=m.name, code="DEMAND_MET", demand_left_kg=0.0)
                 )
                 continue
-            own_room = sum(sh.kg for sh in mine if slots[sh.slot_id].index <= fresh[-1].index)
-            room = sum(world.slot_capacity_kg(s) - load[s.id] for s in fresh) + own_room
-            if room < b.kg - 1e-6:
+            if not room.fits(b.id, world.on_hand_kg(b), fresh[-1].id):
                 alternatives.append(
                     Alternative(
                         market_id=m.id,

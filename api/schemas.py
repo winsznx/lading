@@ -64,7 +64,7 @@ class ReplanRequest(PlanRequest):
 
 class ValidateRequest(Strict):
     scenario: dict[str, Any]
-    plan: dict[str, Any]
+    plan: Plan
 
 
 class SimulateRequest(Strict):
@@ -86,6 +86,9 @@ class ArmResult(BaseModel):
 
 
 class PlanResponse(BaseModel):
+    solver_state: Literal["OPTIMAL", "SOLVER_TIMEOUT"] = Field(
+        description="SOLVER_TIMEOUT: the live time budget ran out; the plan is the best one found, gap in lading.plan.solver.gap."
+    )
     scenario: dict[str, Any]
     lading: ArmResult
     fefo: ArmResult

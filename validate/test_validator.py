@@ -85,3 +85,35 @@ def test_fifo_expiry_violation_is_caught():
     report = validate(as_json(scenario), as_json(plan_fifo(scenario)))
     assert report["status"] == "FAIL"
     assert [v["check"] for v in report["violations"]] == ["shelf_life"]
+
+
+def test_negative_kg_phantom_line_fails(case):
+    scenario, plan = case
+    bad = copy.deepcopy(plan)
+    sh = copy.deepcopy(bad["shipments"][0])
+    sh["kg"] = -300
+    bad["shipments"].append(sh)
+    trip = copy.deepcopy(bad["trips"][0])
+    trip["manifest"] = [{"batch_id": sh["batch_id"], "market_id": sh["market_id"], "kg": -300}]
+    trip["load_kg"] = -300
+    bad["trips"].append(trip)
+    assert "kg.positive" in {v["check"] for v in validate(scenario, bad)["violations"]}
+
+
+def test_shipping_a_vetoed_pair_fails(case):
+    scenario, plan = case
+    sh = plan["shipments"][0]
+    vetoed = copy.deepcopy(scenario)
+    vetoed["controls"]["vetoes"] = [{"batch_id": sh["batch_id"], "market_id": sh["market_id"]}]
+    assert "veto" in {v["check"] for v in validate(vetoed, plan)["violations"]}
+
+
+def test_breaking_a_lock_fails(case):
+    scenario, plan = case
+    sh = plan["shipments"][0]
+    other = next(s for s in scenario["slots"] if s["id"] != sh["slot_id"])
+    locked = copy.deepcopy(scenario)
+    locked["controls"]["locks"] = [
+        {"batch_id": sh["batch_id"], "market_id": sh["market_id"], "slot_id": other["id"]}
+    ]
+    assert "lock" in {v["check"] for v in validate(locked, plan)["violations"]}

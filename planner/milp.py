@@ -47,7 +47,7 @@ from errors import LadingError, State
 from plan_assembly import Leg, assemble
 from plan_model import Arm, Plan, SolverInfo
 from scenarios.model import Batch, Market, Scenario, Slot
-from world import World
+from world import World, check_locks
 
 CONFIG_PATH = Path(__file__).resolve().parent / "config.json"
 
@@ -120,7 +120,7 @@ class Arc:
 
 def build_arcs(scenario: Scenario, world: World, hard_shelf: bool = True) -> list[Arc]:
     """Every batch-market pair the program may use, with the last slot the batch can leave by."""
-    point = World(scenario, "point")
+    check_locks(scenario)
     vetoed = {(v.batch_id, v.market_id) for v in scenario.controls.vetoes}
     locks = {lk.batch_id: lk for lk in scenario.controls.locks}
     arcs = []
@@ -132,13 +132,6 @@ def build_arcs(scenario: Scenario, world: World, hard_shelf: bool = True) -> lis
         lock = locks.get(b.id)
         if lock is not None:
             m, s = scenario.market(lock.market_id), scenario.slot(lock.slot_id)
-            if not point.sells(b, m) or not point.fresh_on_sale(b, m, s):
-                raise LadingError(
-                    State.LOCK_INFEASIBLE,
-                    f"Lock {b.id} to {m.name} at {s.label} can't hold: it would be on sale at "
-                    f"{point.sale_h(m, s):.1f} h and must be by {b.shelf_life_h - scenario.policy.safety_margin_h:.1f} h.",
-                    path="controls.locks",
-                )
             arcs.append(Arc(b, m, s, s, kg))
             continue
         for m in scenario.markets:
@@ -153,22 +146,19 @@ def build_arcs(scenario: Scenario, world: World, hard_shelf: bool = True) -> lis
 
 
 def in_transit(scenario: Scenario) -> tuple[dict[tuple[str, str], float], float]:
-    """Stock already on the road: kg arriving fresh per (market, commodity) on the forecast, and the
-    fixed INR it has already cost (freight, handling, and purchase value of anything now arriving late)."""
+    """Stock already on the road: kg arriving saleable per (market, commodity) on the forecast, and the
+    fixed INR it contributes before sales. Sold kg carry +purchase in the objective (unsold = shipped -
+    sold is what costs purchase value), so every kg on the road is debited its purchase value here,
+    exactly as a shipping arc is."""
     point = World(scenario, "point")
     arriving: dict[tuple[str, str], float] = defaultdict(float)
     fixed = 0.0
     for leg in scenario.controls.dispatched:
         b, m, s = scenario.batch(leg.batch_id), scenario.market(leg.market_id), scenario.slot(leg.slot_id)
+        purchase = scenario.commodity(b.commodity_id).purchase_inr_per_kg
         fixed -= leg.kg * cost_model.route_inr_per_kg(m.transport_inr_per_kg, m.handling_inr_per_kg)
-        late = point.sale_h(m, s) > b.shelf_life_h or (
-            m.deliver_by_h is not None and point.sale_h(m, s) > m.deliver_by_h
-        )
-        if late:
-            fixed -= leg.kg * cost_model.spoilage_inr_per_kg(
-                scenario.commodity(b.commodity_id).purchase_inr_per_kg
-            )
-        else:
+        fixed -= leg.kg * cost_model.spoilage_inr_per_kg(purchase)
+        if point.arrives_before_expiry(b, m, s):
             arriving[(m.id, b.commodity_id)] += leg.kg
     return arriving, fixed
 

@@ -117,7 +117,8 @@ def test_headline_single_market():
         ),
         (
             "CARRY_OVER",
-            "Kept for tomorrow: 30h of shelf life left, and today's truck room earns more on shorter-life stock.",
+            "Kept for tomorrow: 30h of shelf life left, so it doesn't spoil by waiting. "
+            "No market it can reach fresh has truck room or demand left today.",
         ),
         ("NO_ROOM", "Held: no truck room or demand left at any market it can reach fresh."),
     ],
@@ -127,6 +128,21 @@ def test_hold_sentences(code, expected):
         status="held", market_id=None, market_name=None, discount=None, hold_code=code, net_inr=-16_800
     )
     assert headline(d) == expected
+
+
+def test_carry_over_cites_what_shipping_would_earn():
+    held = dict(
+        status="held", market_id=None, market_name=None, discount=None, hold_code="CARRY_OVER", net_inr=0.0
+    )
+    loss = decision(**held, alternatives=[alt("LOWER_NET", net_inr=-2_300, delta_inr=2_300)])
+    assert (
+        headline(loss)
+        == "Kept for tomorrow: 30h of shelf life left, so it doesn't spoil by waiting. Shipping it today nets -₹2,300 at best (Mumbai)."
+    )
+    gain = decision(**held, alternatives=[alt("PLAN_TRADEOFF", net_inr=1_200, delta_inr=-1_200)])
+    assert headline(gain).endswith(
+        "Shipping it to Mumbai would net ₹1,200 on its own; the solver stopped within its optimality gap without taking it."
+    )
 
 
 def test_not_worth_shipping_cites_best_option():

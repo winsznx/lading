@@ -48,7 +48,11 @@ def test_refuses_far_market_and_says_why():
     assert far.sale_h > far.limit_h
 
 
-def test_execution_shocks_never_reach_the_planner(day):
+@pytest.mark.parametrize("arm", ["fifo", "fefo", "lading-point", "lading-robust"])
+def test_execution_shocks_never_reach_any_arm(day, arm):
+    from baselines.fefo import plan_fefo
+    from baselines.fifo import plan_fifo
+
     raw = as_json(day)
     raw["execution"] = {
         "route_delay": {"market_id": day.markets[0].id, "extra_h": 12},
@@ -57,10 +61,10 @@ def test_execution_shocks_never_reach_the_planner(day):
         "elasticity_factor": 0.2,
     }
     shocked = Scenario.model_validate(raw)
-    clean, blind = (
-        plan_lading(day, "lading-robust", time_limit_s=60),
-        plan_lading(shocked, "lading-robust", time_limit_s=60),
+    run = {"fifo": plan_fifo, "fefo": plan_fefo}.get(arm) or (
+        lambda sc: plan_lading(sc, arm, time_limit_s=60)
     )
+    clean, blind = run(day), run(shocked)
     assert clean.shipments == blind.shipments and clean.prices == blind.prices
 
 
