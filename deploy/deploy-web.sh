@@ -5,7 +5,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 [[ -f deploy/.env.deploy ]] && source deploy/.env.deploy
-: "${VITE_API_URL:?set VITE_API_URL to the API's HTTPS URL}"
+: "${VITE_API_URL:?set VITE_API_URL to the API HTTPS URL}"
 
 cd web
 npm ci --no-audit --no-fund
