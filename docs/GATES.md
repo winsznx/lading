@@ -37,7 +37,7 @@ Run at freeze commit `d90cef8` (with uncommitted deploy files present, so that m
 
 Rerun on a clean tree at eval-code commit `105fb6e` (same planner config hash as the freeze). `heldout.json`, `ablations.json`, `stress.json`, `sensitivity.json`, `canonical.json` and `verdict.json` came out byte-identical to the first run. P3 passes under the corrected independent check (16 unreachable batches over 5 days, 15 injected and 1 natural, all flagged and held by both arms). P2 still fails its rule, as above. Verdict: HOLDS.
 
-## Cold audit and re-freeze (2026-10-15 00:35 WAT)
+## Cold audit and re-freeze (2026-10-15 00:29 WAT)
 
 A fresh agent with no build context audited the backend adversarially. It found no leak into the validator, no silent fallback and no information-parity breach. It did find these, all fixed in commit `b6ccec4`:
 
@@ -52,3 +52,11 @@ A fresh agent with no build context audited the backend adversarially. It found 
 Noted, not changed: pooled per-slot trucks let one truck carry loads for two markets in a slot (disclosed in D1, same for every arm); truck-loss stress outcomes depend on the shared packer loading the biggest truck first (same packer for every arm, stress reported separately).
 
 Because items 1 and 3 change the baseline and the evaluation code after held-out numbers had been seen, the planner was **re-frozen**: tuning rerun with the stronger FEFO (Lading-point now +INR 46,328 median net vs FEFO, 20/20 days, was +INR 76,247; spoiled -620 kg, 18/20; Lading-robust +INR 24,338, 16/20). The tuning rule still picks Lading-point. No planner setting changed. The previous held-out results stay in git history at commit `d404c53` (+INR 58,942 median, 50/50) and are superseded by the rerun below; the README quotes only the rerun.
+
+## Held-out rerun after the re-freeze (2026-10-15 00:38 WAT)
+
+Clean tree, eval commit `b6ccec4`, frozen code hashes matched. Lading-point vs the strengthened FEFO, 50 held-out days x 30 draws: median paired net +INR 46,412 (IQR 31,382 to 78,250, wins 50/50), spoiled -342 kg (IQR -733 to +10, fewer on 37/50), demand filled +1.82 pp (44/50), 0 validator violations. Falsifier not triggered; verdict HOLDS with P2 listed as a failed control. Lading-robust: +INR 47,377 (38/50), -185 kg (29/50). The stronger baseline cut the median net gain by 21% and the spoilage gain by 48% compared with the first run. Ablations are unchanged (they compare Lading variants). The elasticity sweep now slopes down (+INR 61,043 at 0.5x to +INR 38,318 at 1.5x) because FEFO's own markdowns gain from higher elasticity.
+
+| When (WAT) | Product h | Proof h | Docs h | Hours left | Note |
+|---|---|---|---|---|---|
+| 2026-10-15 00:38 | 0.9 | 0.45 | 0.2 | 18.85 | Audit fixed, re-frozen, held-out rerun. Console still building. |

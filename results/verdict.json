@@ -1,10 +1,13 @@
 {
-  "falsifier": "median paired net-revenue gain <= 0, or median spoilage higher than FEFO (PRD section 4)",
+  "failed_controls": [
+    "p2_healthy"
+  ],
+  "falsifier": "median paired net-revenue gain <= 0, or median spoilage higher than FEFO (PRD section 4), or any validator violation on the headline arm (the claim includes 0 violations)",
   "headline_arm": "lading-point",
-  "median_fill_delta_pp": 2.24,
-  "median_net_gain_inr": 58941.56,
-  "median_spoiled_delta_kg": -653.66,
-  "statement": "On 50 held-out days, lading-point vs FEFO: median paired net gain INR 58,942 (wins 50/50), median spoiled kg change -654 (fewer in 40/50), median demand filled change +2.24 pp, 0 validator violations.",
+  "median_fill_delta_pp": 1.82,
+  "median_net_gain_inr": 46411.86,
+  "median_spoiled_delta_kg": -342.49,
+  "statement": "On 50 held-out days, lading-point vs FEFO: median paired net gain INR 46,412 (wins 50/50), median spoiled kg change -342 (fewer in 37/50), median demand filled change +1.82 pp, 0 validator violations. Failed controls: p2_healthy (see controls.json).",
   "triggered": false,
   "validator_violations": 0,
   "verdict": "HOLDS"

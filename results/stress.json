@@ -8,13 +8,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 3350.0,
-              "demand_filled_pct": 87.57,
+              "demand_filled_pct": 87.49,
               "expired_in_transit_kg": 1211.67,
               "hub_spoiled_kg": 1900.0,
-              "net_inr": 815482.22,
-              "spoiled_kg": 9947.48,
-              "unmet_demand_kg": 4484.1,
-              "unsold_kg": 6835.81,
+              "net_inr": 816598.77,
+              "spoiled_kg": 9269.3,
+              "unmet_demand_kg": 4510.63,
+              "unsold_kg": 6157.64,
               "validator": "PASS",
               "violations": 0
             },
@@ -50,14 +50,14 @@
           "batches": 40,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 2.51,
-              "net_inr": 20501.65,
-              "spoiled_kg": -111.01
+              "demand_filled_pct": 2.59,
+              "net_inr": 19385.1,
+              "spoiled_kg": 567.17
             },
             "lading-robust": {
-              "demand_filled_pct": 4.87,
-              "net_inr": 71919.97,
-              "spoiled_kg": -961.33
+              "demand_filled_pct": 4.95,
+              "net_inr": 70803.42,
+              "spoiled_kg": -283.15
             }
           },
           "hub": "Nashik aggregation hub",
@@ -73,10 +73,10 @@
               "demand_filled_pct": 81.09,
               "expired_in_transit_kg": 698.33,
               "hub_spoiled_kg": 3050.0,
-              "net_inr": 526488.15,
-              "spoiled_kg": 12007.63,
+              "net_inr": 528223.19,
+              "spoiled_kg": 11512.18,
               "unmet_demand_kg": 5447.65,
-              "unsold_kg": 8259.3,
+              "unsold_kg": 7763.85,
               "validator": "PASS",
               "violations": 0
             },
@@ -113,13 +113,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 0.12,
-              "net_inr": 1625.46,
-              "spoiled_kg": -316.87
+              "net_inr": -109.58,
+              "spoiled_kg": 178.58
             },
             "lading-robust": {
               "demand_filled_pct": 0.31,
-              "net_inr": 12688.38,
-              "spoiled_kg": -366.25
+              "net_inr": 10953.34,
+              "spoiled_kg": 129.2
             }
           },
           "hub": "Nashik aggregation hub",
@@ -132,13 +132,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 0.0,
-              "demand_filled_pct": 90.14,
+              "demand_filled_pct": 89.99,
               "expired_in_transit_kg": 483.33,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1000014.54,
-              "spoiled_kg": 11678.89,
-              "unmet_demand_kg": 3216.12,
-              "unsold_kg": 11195.55,
+              "net_inr": 1033692.64,
+              "spoiled_kg": 10665.83,
+              "unmet_demand_kg": 3266.52,
+              "unsold_kg": 10182.5,
               "validator": "PASS",
               "violations": 0
             },
@@ -174,14 +174,14 @@
           "batches": 39,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 2.4,
-              "net_inr": 56663.71,
-              "spoiled_kg": -1310.19
+              "demand_filled_pct": 2.55,
+              "net_inr": 22985.61,
+              "spoiled_kg": -297.13
             },
             "lading-robust": {
-              "demand_filled_pct": 2.51,
-              "net_inr": 60358.15,
-              "spoiled_kg": -1304.07
+              "demand_filled_pct": 2.66,
+              "net_inr": 26680.05,
+              "spoiled_kg": -291.01
             }
           },
           "hub": "Nashik aggregation hub",
@@ -194,13 +194,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 1450.0,
-              "demand_filled_pct": 89.9,
+              "demand_filled_pct": 90.02,
               "expired_in_transit_kg": 180.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1049491.64,
-              "spoiled_kg": 9423.73,
-              "unmet_demand_kg": 3868.49,
-              "unsold_kg": 9243.73,
+              "net_inr": 1077151.47,
+              "spoiled_kg": 9048.45,
+              "unmet_demand_kg": 3816.11,
+              "unsold_kg": 8868.45,
               "validator": "PASS",
               "violations": 0
             },
@@ -236,14 +236,14 @@
           "batches": 46,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 1.09,
-              "net_inr": 38374.57,
-              "spoiled_kg": -56.3
+              "demand_filled_pct": 0.97,
+              "net_inr": 10714.74,
+              "spoiled_kg": 318.98
             },
             "lading-robust": {
-              "demand_filled_pct": 0.58,
-              "net_inr": 27291.72,
-              "spoiled_kg": 197.87
+              "demand_filled_pct": 0.46,
+              "net_inr": -368.11,
+              "spoiled_kg": 573.15
             }
           },
           "hub": "Nashik aggregation hub",
@@ -259,10 +259,10 @@
               "demand_filled_pct": 89.85,
               "expired_in_transit_kg": 1340.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1029357.83,
-              "spoiled_kg": 8458.78,
+              "net_inr": 1033558.01,
+              "spoiled_kg": 8463.49,
               "unmet_demand_kg": 3510.44,
-              "unsold_kg": 7118.78,
+              "unsold_kg": 7123.49,
               "validator": "PASS",
               "violations": 0
             },
@@ -299,13 +299,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 1.95,
-              "net_inr": 34713.85,
-              "spoiled_kg": -636.16
+              "net_inr": 30513.67,
+              "spoiled_kg": -640.87
             },
             "lading-robust": {
               "demand_filled_pct": 2.52,
-              "net_inr": 46452.94,
-              "spoiled_kg": -701.75
+              "net_inr": 42252.76,
+              "spoiled_kg": -706.46
             }
           },
           "hub": "Nashik aggregation hub",
@@ -317,14 +317,14 @@
         {
           "arms": {
             "fefo": {
-              "carry_over_kg": 2300.0,
-              "demand_filled_pct": 93.51,
+              "carry_over_kg": 1800.0,
+              "demand_filled_pct": 94.28,
               "expired_in_transit_kg": 246.67,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 799020.66,
-              "spoiled_kg": 7901.12,
-              "unmet_demand_kg": 1679.25,
-              "unsold_kg": 7654.46,
+              "net_inr": 797130.1,
+              "spoiled_kg": 7752.28,
+              "unmet_demand_kg": 1477.86,
+              "unsold_kg": 7505.61,
               "validator": "PASS",
               "violations": 0
             },
@@ -360,14 +360,14 @@
           "batches": 34,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 0.9,
-              "net_inr": 24343.45,
-              "spoiled_kg": 107.16
+              "demand_filled_pct": 0.13,
+              "net_inr": 26234.01,
+              "spoiled_kg": 256.0
             },
             "lading-robust": {
-              "demand_filled_pct": -2.59,
-              "net_inr": -6311.14,
-              "spoiled_kg": 620.67
+              "demand_filled_pct": -3.36,
+              "net_inr": -4420.58,
+              "spoiled_kg": 769.51
             }
           },
           "hub": "Kolar aggregation hub",
@@ -379,14 +379,14 @@
         {
           "arms": {
             "fefo": {
-              "carry_over_kg": 23.33,
-              "demand_filled_pct": 91.66,
+              "carry_over_kg": 950.0,
+              "demand_filled_pct": 91.77,
               "expired_in_transit_kg": 710.0,
-              "hub_spoiled_kg": 326.67,
-              "net_inr": 871820.83,
-              "spoiled_kg": 9448.81,
-              "unmet_demand_kg": 2609.99,
-              "unsold_kg": 8412.14,
+              "hub_spoiled_kg": 0.0,
+              "net_inr": 894242.21,
+              "spoiled_kg": 8142.31,
+              "unmet_demand_kg": 2575.08,
+              "unsold_kg": 7432.31,
               "validator": "PASS",
               "violations": 0
             },
@@ -422,14 +422,14 @@
           "batches": 37,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 4.36,
-              "net_inr": 104613.63,
-              "spoiled_kg": -2999.77
+              "demand_filled_pct": 4.25,
+              "net_inr": 82192.25,
+              "spoiled_kg": -1693.27
             },
             "lading-robust": {
-              "demand_filled_pct": 3.47,
-              "net_inr": 96142.8,
-              "spoiled_kg": -1300.92
+              "demand_filled_pct": 3.36,
+              "net_inr": 73721.42,
+              "spoiled_kg": 5.58
             }
           },
           "hub": "Kolar aggregation hub",
@@ -442,13 +442,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 3900.0,
-              "demand_filled_pct": 90.6,
+              "demand_filled_pct": 89.6,
               "expired_in_transit_kg": 100.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1223642.4,
-              "spoiled_kg": 8941.02,
-              "unmet_demand_kg": 3751.09,
-              "unsold_kg": 8841.02,
+              "net_inr": 1212977.71,
+              "spoiled_kg": 9060.81,
+              "unmet_demand_kg": 4143.56,
+              "unsold_kg": 8960.81,
               "validator": "PASS",
               "violations": 0
             },
@@ -484,14 +484,14 @@
           "batches": 46,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 1.1,
-              "net_inr": -2101.97,
-              "spoiled_kg": 765.05
+              "demand_filled_pct": 2.1,
+              "net_inr": 8562.72,
+              "spoiled_kg": 645.26
             },
             "lading-robust": {
-              "demand_filled_pct": 0.53,
-              "net_inr": -3717.27,
-              "spoiled_kg": 690.07
+              "demand_filled_pct": 1.53,
+              "net_inr": 6947.42,
+              "spoiled_kg": 570.28
             }
           },
           "hub": "Kolar aggregation hub",
@@ -507,10 +507,10 @@
               "demand_filled_pct": 83.98,
               "expired_in_transit_kg": 695.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 830066.0,
-              "spoiled_kg": 7438.84,
+              "net_inr": 832145.29,
+              "spoiled_kg": 7167.24,
               "unmet_demand_kg": 5803.59,
-              "unsold_kg": 6743.84,
+              "unsold_kg": 6472.24,
               "validator": "PASS",
               "violations": 0
             },
@@ -547,13 +547,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 4.48,
-              "net_inr": 75320.3,
-              "spoiled_kg": -730.85
+              "net_inr": 73241.01,
+              "spoiled_kg": -459.25
             },
             "lading-robust": {
               "demand_filled_pct": 4.94,
-              "net_inr": 83171.78,
-              "spoiled_kg": -1025.52
+              "net_inr": 81092.49,
+              "spoiled_kg": -753.92
             }
           },
           "hub": "Kolar aggregation hub",
@@ -565,14 +565,14 @@
         {
           "arms": {
             "fefo": {
-              "carry_over_kg": 2850.0,
-              "demand_filled_pct": 92.04,
+              "carry_over_kg": 2000.0,
+              "demand_filled_pct": 92.97,
               "expired_in_transit_kg": 18.33,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 817910.95,
-              "spoiled_kg": 8928.04,
-              "unmet_demand_kg": 2458.71,
-              "unsold_kg": 8909.71,
+              "net_inr": 832291.84,
+              "spoiled_kg": 8794.3,
+              "unmet_demand_kg": 2162.77,
+              "unsold_kg": 8775.96,
               "validator": "PASS",
               "violations": 0
             },
@@ -608,14 +608,14 @@
           "batches": 37,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 0.13,
-              "net_inr": 43831.59,
-              "spoiled_kg": -1619.88
+              "demand_filled_pct": -0.8,
+              "net_inr": 29450.7,
+              "spoiled_kg": -1486.14
             },
             "lading-robust": {
-              "demand_filled_pct": 0.26,
-              "net_inr": 48436.82,
-              "spoiled_kg": -1482.76
+              "demand_filled_pct": -0.67,
+              "net_inr": 34055.93,
+              "spoiled_kg": -1349.02
             }
           },
           "hub": "Nashik aggregation hub",
@@ -640,54 +640,54 @@
       "summary": {
         "lading-point": {
           "demand_filled_pct": {
-            "losses": 0,
-            "median": 1.52,
+            "losses": 1,
+            "median": 2.02,
             "n": 10,
-            "q1": 0.95,
-            "q3": 2.48,
-            "wins": 10
+            "q1": 0.34,
+            "q3": 2.58,
+            "wins": 9
           },
           "net_inr": {
             "losses": 1,
-            "median": 36544.21,
+            "median": 24609.81,
             "n": 10,
-            "q1": 21462.1,
-            "q3": 53455.68,
+            "q1": 12882.33,
+            "q3": 30247.93,
             "wins": 9
           },
           "spoiled_kg": {
-            "losses": 2,
-            "median": -476.51,
+            "losses": 5,
+            "median": -59.27,
             "n": 10,
-            "q1": -1165.36,
-            "q3": -69.98,
-            "wins": 8
+            "q1": -595.47,
+            "q3": 303.24,
+            "wins": 5
           }
         },
         "lading-robust": {
           "demand_filled_pct": {
-            "losses": 1,
-            "median": 1.54,
+            "losses": 2,
+            "median": 2.02,
             "n": 10,
-            "q1": 0.36,
-            "q3": 3.23,
-            "wins": 9
+            "q1": 0.35,
+            "q3": 3.19,
+            "wins": 8
           },
           "net_inr": {
             "losses": 2,
-            "median": 47444.88,
+            "median": 30367.99,
             "n": 10,
-            "q1": 16339.22,
-            "q3": 69029.51,
+            "q1": 7948.9,
+            "q3": 63665.75,
             "wins": 8
           },
           "spoiled_kg": {
-            "losses": 3,
-            "median": -831.54,
+            "losses": 5,
+            "median": -138.78,
             "n": 10,
-            "q1": -1232.07,
-            "q3": 56.84,
-            "wins": 7
+            "q1": -602.6,
+            "q3": 460.01,
+            "wins": 5
           }
         }
       },
@@ -719,10 +719,10 @@
               "demand_filled_pct": 85.75,
               "expired_in_transit_kg": 1445.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1084219.31,
-              "spoiled_kg": 6786.66,
+              "net_inr": 1090002.41,
+              "spoiled_kg": 5719.63,
               "unmet_demand_kg": 5344.0,
-              "unsold_kg": 5341.66,
+              "unsold_kg": 4274.63,
               "validator": "PASS",
               "violations": 0
             },
@@ -759,13 +759,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 2.03,
-              "net_inr": 94483.5,
-              "spoiled_kg": -1462.51
+              "net_inr": 88700.4,
+              "spoiled_kg": -395.48
             },
             "lading-robust": {
               "demand_filled_pct": -2.63,
-              "net_inr": 591.99,
-              "spoiled_kg": -1097.78
+              "net_inr": -5191.11,
+              "spoiled_kg": -30.75
             }
           },
           "hub": "Nashik aggregation hub",
@@ -778,13 +778,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 1100.0,
-              "demand_filled_pct": 87.92,
+              "demand_filled_pct": 88.17,
               "expired_in_transit_kg": 1176.67,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1912852.39,
-              "spoiled_kg": 5318.83,
-              "unmet_demand_kg": 6672.69,
-              "unsold_kg": 4142.17,
+              "net_inr": 1953717.66,
+              "spoiled_kg": 5287.44,
+              "unmet_demand_kg": 6530.83,
+              "unsold_kg": 4110.77,
               "validator": "PASS",
               "violations": 0
             },
@@ -820,14 +820,14 @@
           "batches": 48,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 0.11,
-              "net_inr": 81441.42,
-              "spoiled_kg": -335.63
+              "demand_filled_pct": -0.14,
+              "net_inr": 40576.15,
+              "spoiled_kg": -304.24
             },
             "lading-robust": {
-              "demand_filled_pct": 1.06,
-              "net_inr": 112534.29,
-              "spoiled_kg": -1119.71
+              "demand_filled_pct": 0.81,
+              "net_inr": 71669.02,
+              "spoiled_kg": -1088.32
             }
           },
           "hub": "Kolar aggregation hub",
@@ -840,13 +840,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 1150.0,
-              "demand_filled_pct": 86.42,
+              "demand_filled_pct": 86.59,
               "expired_in_transit_kg": 2120.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 992517.61,
-              "spoiled_kg": 6940.11,
-              "unmet_demand_kg": 4445.31,
-              "unsold_kg": 4820.11,
+              "net_inr": 999599.23,
+              "spoiled_kg": 6840.93,
+              "unmet_demand_kg": 4385.97,
+              "unsold_kg": 4720.93,
               "validator": "PASS",
               "violations": 0
             },
@@ -882,14 +882,14 @@
           "batches": 30,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 4.06,
-              "net_inr": 95867.78,
-              "spoiled_kg": -1490.94
+              "demand_filled_pct": 3.89,
+              "net_inr": 88786.16,
+              "spoiled_kg": -1391.76
             },
             "lading-robust": {
-              "demand_filled_pct": 1.74,
-              "net_inr": 69761.74,
-              "spoiled_kg": -1470.21
+              "demand_filled_pct": 1.57,
+              "net_inr": 62680.12,
+              "spoiled_kg": -1371.03
             }
           },
           "hub": "Kolar aggregation hub",
@@ -905,10 +905,10 @@
               "demand_filled_pct": 84.86,
               "expired_in_transit_kg": 630.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 676583.11,
-              "spoiled_kg": 5038.64,
+              "net_inr": 681593.89,
+              "spoiled_kg": 4771.37,
               "unmet_demand_kg": 3647.53,
-              "unsold_kg": 4408.64,
+              "unsold_kg": 4141.37,
               "validator": "PASS",
               "violations": 0
             },
@@ -945,13 +945,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 2.61,
-              "net_inr": 31102.83,
-              "spoiled_kg": -1313.89
+              "net_inr": 26092.05,
+              "spoiled_kg": -1046.62
             },
             "lading-robust": {
               "demand_filled_pct": 2.92,
-              "net_inr": 45896.4,
-              "spoiled_kg": -1376.31
+              "net_inr": 40885.62,
+              "spoiled_kg": -1109.04
             }
           },
           "hub": "Kolar aggregation hub",
@@ -967,10 +967,10 @@
               "demand_filled_pct": 87.37,
               "expired_in_transit_kg": 196.67,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1015510.9,
-              "spoiled_kg": 2958.5,
+              "net_inr": 1022330.57,
+              "spoiled_kg": 2581.69,
               "unmet_demand_kg": 3324.88,
-              "unsold_kg": 2761.84,
+              "unsold_kg": 2385.02,
               "validator": "PASS",
               "violations": 0
             },
@@ -1007,13 +1007,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 2.62,
-              "net_inr": 35372.0,
-              "spoiled_kg": -432.04
+              "net_inr": 28552.33,
+              "spoiled_kg": -55.23
             },
             "lading-robust": {
               "demand_filled_pct": -0.58,
-              "net_inr": -9374.59,
-              "spoiled_kg": 1571.81
+              "net_inr": -16194.26,
+              "spoiled_kg": 1948.62
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1029,10 +1029,10 @@
               "demand_filled_pct": 82.89,
               "expired_in_transit_kg": 40.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 817581.26,
-              "spoiled_kg": 3951.95,
+              "net_inr": 820703.14,
+              "spoiled_kg": 3866.78,
               "unmet_demand_kg": 4983.31,
-              "unsold_kg": 3911.95,
+              "unsold_kg": 3826.78,
               "validator": "PASS",
               "violations": 0
             },
@@ -1069,13 +1069,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 2.64,
-              "net_inr": 70180.0,
-              "spoiled_kg": 0.63
+              "net_inr": 67058.12,
+              "spoiled_kg": 85.8
             },
             "lading-robust": {
               "demand_filled_pct": 4.83,
-              "net_inr": 99412.37,
-              "spoiled_kg": -641.3
+              "net_inr": 96290.49,
+              "spoiled_kg": -556.13
             }
           },
           "hub": "Kolar aggregation hub",
@@ -1088,13 +1088,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 1950.0,
-              "demand_filled_pct": 87.13,
+              "demand_filled_pct": 87.77,
               "expired_in_transit_kg": 1411.67,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 799658.06,
-              "spoiled_kg": 3942.3,
-              "unmet_demand_kg": 3141.73,
-              "unsold_kg": 2530.63,
+              "net_inr": 822494.2,
+              "spoiled_kg": 4235.89,
+              "unmet_demand_kg": 2983.57,
+              "unsold_kg": 2824.22,
               "validator": "PASS",
               "violations": 0
             },
@@ -1130,14 +1130,14 @@
           "batches": 26,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 5.18,
-              "net_inr": 93943.79,
-              "spoiled_kg": -152.96
+              "demand_filled_pct": 4.54,
+              "net_inr": 71107.65,
+              "spoiled_kg": -446.55
             },
             "lading-robust": {
-              "demand_filled_pct": 5.37,
-              "net_inr": 106406.77,
-              "spoiled_kg": 64.42
+              "demand_filled_pct": 4.73,
+              "net_inr": 83570.63,
+              "spoiled_kg": -229.17
             }
           },
           "hub": "Kolar aggregation hub",
@@ -1153,10 +1153,10 @@
               "demand_filled_pct": 87.28,
               "expired_in_transit_kg": 0.0,
               "hub_spoiled_kg": 1350.0,
-              "net_inr": 965293.05,
-              "spoiled_kg": 5917.2,
+              "net_inr": 964803.74,
+              "spoiled_kg": 5839.62,
               "unmet_demand_kg": 5369.15,
-              "unsold_kg": 4567.2,
+              "unsold_kg": 4489.62,
               "validator": "PASS",
               "violations": 0
             },
@@ -1193,13 +1193,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 1.53,
-              "net_inr": 30299.93,
-              "spoiled_kg": -576.17
+              "net_inr": 30789.24,
+              "spoiled_kg": -498.59
             },
             "lading-robust": {
               "demand_filled_pct": 1.16,
-              "net_inr": 24736.97,
-              "spoiled_kg": -429.53
+              "net_inr": 25226.28,
+              "spoiled_kg": -351.95
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1215,10 +1215,10 @@
               "demand_filled_pct": 89.9,
               "expired_in_transit_kg": 351.67,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1199379.61,
-              "spoiled_kg": 4707.88,
+              "net_inr": 1228136.76,
+              "spoiled_kg": 4767.22,
               "unmet_demand_kg": 3418.64,
-              "unsold_kg": 4356.21,
+              "unsold_kg": 4415.56,
               "validator": "PASS",
               "violations": 0
             },
@@ -1255,13 +1255,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 3.52,
-              "net_inr": 117470.41,
-              "spoiled_kg": -1483.89
+              "net_inr": 88713.26,
+              "spoiled_kg": -1543.23
             },
             "lading-robust": {
               "demand_filled_pct": 0.21,
-              "net_inr": 60019.51,
-              "spoiled_kg": -52.62
+              "net_inr": 31262.36,
+              "spoiled_kg": -111.96
             }
           },
           "hub": "Kolar aggregation hub",
@@ -1277,10 +1277,10 @@
               "demand_filled_pct": 86.98,
               "expired_in_transit_kg": 163.33,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1436074.27,
-              "spoiled_kg": 3572.44,
+              "net_inr": 1452947.94,
+              "spoiled_kg": 3555.17,
               "unmet_demand_kg": 6226.0,
-              "unsold_kg": 3409.11,
+              "unsold_kg": 3391.84,
               "validator": "PASS",
               "violations": 0
             },
@@ -1317,13 +1317,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": -1.41,
-              "net_inr": -49499.94,
-              "spoiled_kg": 3138.03
+              "net_inr": -66373.61,
+              "spoiled_kg": 3155.3
             },
             "lading-robust": {
               "demand_filled_pct": 4.5,
-              "net_inr": 86010.18,
-              "spoiled_kg": 717.9
+              "net_inr": 69136.51,
+              "spoiled_kg": 735.17
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1348,54 +1348,54 @@
       "summary": {
         "lading-point": {
           "demand_filled_pct": {
-            "losses": 1,
+            "losses": 2,
             "median": 2.62,
             "n": 10,
             "q1": 1.66,
             "q3": 3.3,
-            "wins": 9
+            "wins": 8
           },
           "net_inr": {
             "losses": 1,
-            "median": 75810.71,
+            "median": 53817.13,
             "n": 10,
-            "q1": 32170.12,
-            "q3": 94348.57,
+            "q1": 29111.56,
+            "q3": 84302.21,
             "wins": 9
           },
           "spoiled_kg": {
             "losses": 2,
-            "median": -504.11,
+            "median": -421.01,
             "n": 10,
-            "q1": -1425.36,
-            "q3": -198.63,
+            "q1": -909.61,
+            "q3": -117.48,
             "wins": 8
           }
         },
         "lading-robust": {
           "demand_filled_pct": {
             "losses": 2,
-            "median": 1.45,
+            "median": 1.36,
             "n": 10,
-            "q1": 0.42,
+            "q1": 0.36,
             "q3": 4.11,
             "wins": 8
           },
           "net_inr": {
-            "losses": 1,
-            "median": 64890.62,
+            "losses": 2,
+            "median": 51782.87,
             "n": 10,
-            "q1": 30026.83,
-            "q3": 96061.82,
-            "wins": 9
+            "q1": 26735.3,
+            "q3": 71035.89,
+            "wins": 8
           },
           "spoiled_kg": {
-            "losses": 3,
-            "median": -535.41,
+            "losses": 2,
+            "median": -290.56,
             "n": 10,
-            "q1": -1114.23,
-            "q3": 35.16,
-            "wins": 7
+            "q1": -955.27,
+            "q3": -51.05,
+            "wins": 8
           }
         }
       },
@@ -1427,10 +1427,10 @@
               "demand_filled_pct": 84.39,
               "expired_in_transit_kg": 420.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 875637.43,
-              "spoiled_kg": 3585.94,
+              "net_inr": 878380.93,
+              "spoiled_kg": 3572.84,
               "unmet_demand_kg": 4768.87,
-              "unsold_kg": 3165.94,
+              "unsold_kg": 3152.84,
               "validator": "PASS",
               "violations": 0
             },
@@ -1467,13 +1467,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 4.46,
-              "net_inr": 63411.2,
-              "spoiled_kg": -798.13
+              "net_inr": 60667.7,
+              "spoiled_kg": -785.03
             },
             "lading-robust": {
               "demand_filled_pct": 2.75,
-              "net_inr": 38459.68,
-              "spoiled_kg": 224.75
+              "net_inr": 35716.18,
+              "spoiled_kg": 237.85
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1485,14 +1485,14 @@
         {
           "arms": {
             "fefo": {
-              "carry_over_kg": 2200.0,
-              "demand_filled_pct": 91.68,
+              "carry_over_kg": 1550.0,
+              "demand_filled_pct": 92.03,
               "expired_in_transit_kg": 0.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1294808.32,
-              "spoiled_kg": 4727.69,
-              "unmet_demand_kg": 3647.7,
-              "unsold_kg": 4727.69,
+              "net_inr": 1295281.15,
+              "spoiled_kg": 4895.64,
+              "unmet_demand_kg": 3500.19,
+              "unsold_kg": 4895.64,
               "validator": "PASS",
               "violations": 0
             },
@@ -1528,14 +1528,14 @@
           "batches": 43,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 1.96,
-              "net_inr": 84039.27,
-              "spoiled_kg": -610.3
+              "demand_filled_pct": 1.61,
+              "net_inr": 83566.44,
+              "spoiled_kg": -778.25
             },
             "lading-robust": {
-              "demand_filled_pct": 1.52,
-              "net_inr": 73078.37,
-              "spoiled_kg": 540.55
+              "demand_filled_pct": 1.17,
+              "net_inr": 72605.54,
+              "spoiled_kg": 372.6
             }
           },
           "hub": "Kolar aggregation hub",
@@ -1548,13 +1548,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 7100.0,
-              "demand_filled_pct": 84.44,
+              "demand_filled_pct": 84.79,
               "expired_in_transit_kg": 918.33,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1403023.06,
-              "spoiled_kg": 4726.97,
-              "unmet_demand_kg": 6719.98,
-              "unsold_kg": 3808.64,
+              "net_inr": 1421673.22,
+              "spoiled_kg": 4338.42,
+              "unmet_demand_kg": 6564.79,
+              "unsold_kg": 3420.09,
               "validator": "PASS",
               "violations": 0
             },
@@ -1590,14 +1590,14 @@
           "batches": 41,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 4.02,
-              "net_inr": 101964.43,
-              "spoiled_kg": -220.55
+              "demand_filled_pct": 3.67,
+              "net_inr": 83314.27,
+              "spoiled_kg": 168.0
             },
             "lading-robust": {
-              "demand_filled_pct": 2.44,
-              "net_inr": 27277.46,
-              "spoiled_kg": 1291.52
+              "demand_filled_pct": 2.09,
+              "net_inr": 8627.3,
+              "spoiled_kg": 1680.07
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1613,10 +1613,10 @@
               "demand_filled_pct": 91.35,
               "expired_in_transit_kg": 323.33,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1212820.56,
-              "spoiled_kg": 4683.26,
+              "net_inr": 1207188.58,
+              "spoiled_kg": 4411.7,
               "unmet_demand_kg": 3479.3,
-              "unsold_kg": 4359.92,
+              "unsold_kg": 4088.36,
               "validator": "PASS",
               "violations": 0
             },
@@ -1653,13 +1653,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 1.16,
-              "net_inr": 35330.84,
-              "spoiled_kg": -640.43
+              "net_inr": 40962.82,
+              "spoiled_kg": -368.87
             },
             "lading-robust": {
               "demand_filled_pct": -0.53,
-              "net_inr": -4956.56,
-              "spoiled_kg": 305.5
+              "net_inr": 675.42,
+              "spoiled_kg": 577.06
             }
           },
           "hub": "Kolar aggregation hub",
@@ -1675,10 +1675,10 @@
               "demand_filled_pct": 86.24,
               "expired_in_transit_kg": 145.0,
               "hub_spoiled_kg": 300.0,
-              "net_inr": 1482096.75,
-              "spoiled_kg": 4172.72,
+              "net_inr": 1483089.44,
+              "spoiled_kg": 3833.31,
               "unmet_demand_kg": 5792.93,
-              "unsold_kg": 3727.72,
+              "unsold_kg": 3388.31,
               "validator": "PASS",
               "violations": 0
             },
@@ -1715,13 +1715,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 1.89,
-              "net_inr": 29225.7,
-              "spoiled_kg": -1088.65
+              "net_inr": 28233.01,
+              "spoiled_kg": -749.24
             },
             "lading-robust": {
               "demand_filled_pct": -1.89,
-              "net_inr": -58134.12,
-              "spoiled_kg": 445.45
+              "net_inr": -59126.81,
+              "spoiled_kg": 784.86
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1734,13 +1734,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 6950.0,
-              "demand_filled_pct": 85.51,
+              "demand_filled_pct": 82.78,
               "expired_in_transit_kg": 226.67,
               "hub_spoiled_kg": 1100.0,
-              "net_inr": 2064016.02,
-              "spoiled_kg": 4504.92,
-              "unmet_demand_kg": 8618.01,
-              "unsold_kg": 3178.25,
+              "net_inr": 1994435.1,
+              "spoiled_kg": 4392.4,
+              "unmet_demand_kg": 10216.92,
+              "unsold_kg": 3065.74,
               "validator": "PASS",
               "violations": 0
             },
@@ -1776,14 +1776,14 @@
           "batches": 56,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": -0.12,
-              "net_inr": 5743.11,
-              "spoiled_kg": 509.04
+              "demand_filled_pct": 2.61,
+              "net_inr": 75324.03,
+              "spoiled_kg": 621.56
             },
             "lading-robust": {
-              "demand_filled_pct": -0.08,
-              "net_inr": -66400.36,
-              "spoiled_kg": 4193.84
+              "demand_filled_pct": 2.65,
+              "net_inr": 3180.56,
+              "spoiled_kg": 4306.36
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1796,13 +1796,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 2850.0,
-              "demand_filled_pct": 87.55,
+              "demand_filled_pct": 88.83,
               "expired_in_transit_kg": 1026.67,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1695762.63,
-              "spoiled_kg": 5672.67,
-              "unmet_demand_kg": 5542.24,
-              "unsold_kg": 4646.01,
+              "net_inr": 1735537.22,
+              "spoiled_kg": 5320.61,
+              "unmet_demand_kg": 4968.3,
+              "unsold_kg": 4293.94,
               "validator": "PASS",
               "violations": 0
             },
@@ -1838,14 +1838,14 @@
           "batches": 57,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 5.96,
-              "net_inr": 125772.11,
-              "spoiled_kg": -918.98
+              "demand_filled_pct": 4.68,
+              "net_inr": 85997.52,
+              "spoiled_kg": -566.92
             },
             "lading-robust": {
-              "demand_filled_pct": 5.11,
-              "net_inr": 89644.42,
-              "spoiled_kg": 34.76
+              "demand_filled_pct": 3.83,
+              "net_inr": 49869.83,
+              "spoiled_kg": 386.82
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1858,13 +1858,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 1950.0,
-              "demand_filled_pct": 81.17,
+              "demand_filled_pct": 80.87,
               "expired_in_transit_kg": 15.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 895533.22,
-              "spoiled_kg": 3226.48,
-              "unmet_demand_kg": 4406.72,
-              "unsold_kg": 3211.48,
+              "net_inr": 904320.33,
+              "spoiled_kg": 2984.65,
+              "unmet_demand_kg": 4478.16,
+              "unsold_kg": 2969.65,
               "validator": "PASS",
               "violations": 0
             },
@@ -1900,14 +1900,14 @@
           "batches": 27,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 4.51,
-              "net_inr": 65400.42,
-              "spoiled_kg": -788.56
+              "demand_filled_pct": 4.81,
+              "net_inr": 56613.31,
+              "spoiled_kg": -546.73
             },
             "lading-robust": {
-              "demand_filled_pct": 4.51,
-              "net_inr": 65400.42,
-              "spoiled_kg": -788.56
+              "demand_filled_pct": 4.81,
+              "net_inr": 56613.31,
+              "spoiled_kg": -546.73
             }
           },
           "hub": "Nashik aggregation hub",
@@ -1920,13 +1920,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 14950.0,
-              "demand_filled_pct": 77.17,
+              "demand_filled_pct": 77.16,
               "expired_in_transit_kg": 493.33,
               "hub_spoiled_kg": 1000.0,
-              "net_inr": 1559166.3,
-              "spoiled_kg": 6920.55,
-              "unmet_demand_kg": 13483.02,
-              "unsold_kg": 5427.22,
+              "net_inr": 1563364.24,
+              "spoiled_kg": 5567.14,
+              "unmet_demand_kg": 13489.98,
+              "unsold_kg": 4073.8,
               "validator": "PASS",
               "violations": 0
             },
@@ -1962,14 +1962,14 @@
           "batches": 55,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 2.09,
-              "net_inr": 84734.69,
-              "spoiled_kg": -1858.73
+              "demand_filled_pct": 2.1,
+              "net_inr": 80536.75,
+              "spoiled_kg": -505.32
             },
             "lading-robust": {
-              "demand_filled_pct": -1.82,
-              "net_inr": -32230.34,
-              "spoiled_kg": 585.77
+              "demand_filled_pct": -1.81,
+              "net_inr": -36428.28,
+              "spoiled_kg": 1939.18
             }
           },
           "hub": "Kolar aggregation hub",
@@ -1985,10 +1985,10 @@
               "demand_filled_pct": 78.71,
               "expired_in_transit_kg": 528.33,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1433644.48,
-              "spoiled_kg": 4905.38,
+              "net_inr": 1440680.85,
+              "spoiled_kg": 4811.94,
               "unmet_demand_kg": 11459.2,
-              "unsold_kg": 4377.05,
+              "unsold_kg": 4283.61,
               "validator": "PASS",
               "violations": 0
             },
@@ -2025,13 +2025,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": -0.11,
-              "net_inr": 18270.51,
-              "spoiled_kg": -910.86
+              "net_inr": 11234.14,
+              "spoiled_kg": -817.42
             },
             "lading-robust": {
               "demand_filled_pct": -0.07,
-              "net_inr": 22246.35,
-              "spoiled_kg": -172.63
+              "net_inr": 15209.98,
+              "spoiled_kg": -79.19
             }
           },
           "hub": "Kolar aggregation hub",
@@ -2056,53 +2056,53 @@
       "summary": {
         "lading-point": {
           "demand_filled_pct": {
-            "losses": 2,
-            "median": 2.02,
+            "losses": 1,
+            "median": 2.35,
             "n": 10,
-            "q1": 1.34,
-            "q3": 4.35,
-            "wins": 8
+            "q1": 1.68,
+            "q3": 4.26,
+            "wins": 9
           },
           "net_inr": {
             "losses": 0,
-            "median": 64405.81,
+            "median": 67995.86,
             "n": 10,
-            "q1": 30751.99,
-            "q3": 84560.84,
+            "q1": 44875.44,
+            "q3": 82619.89,
             "wins": 10
           },
           "spoiled_kg": {
-            "losses": 1,
-            "median": -793.35,
+            "losses": 2,
+            "median": -556.83,
             "n": 10,
-            "q1": -916.95,
-            "q3": -617.83,
-            "wins": 9
+            "q1": -771.0,
+            "q3": -402.98,
+            "wins": 8
           }
         },
         "lading-robust": {
           "demand_filled_pct": {
-            "losses": 5,
-            "median": 0.72,
+            "losses": 4,
+            "median": 1.63,
             "n": 10,
             "q1": -0.42,
-            "q3": 2.67,
-            "wins": 5
+            "q3": 2.73,
+            "wins": 6
           },
           "net_inr": {
-            "losses": 4,
-            "median": 24761.9,
+            "losses": 2,
+            "median": 11918.64,
             "n": 10,
-            "q1": -25411.9,
-            "q3": 58665.24,
-            "wins": 6
+            "q1": 1301.7,
+            "q3": 46331.42,
+            "wins": 8
           },
           "spoiled_kg": {
             "losses": 8,
-            "median": 375.48,
+            "median": 481.94,
             "n": 10,
-            "q1": 82.26,
-            "q3": 574.46,
+            "q1": 271.54,
+            "q3": 1456.27,
             "wins": 2
           }
         }
@@ -2135,10 +2135,10 @@
               "demand_filled_pct": 74.33,
               "expired_in_transit_kg": 888.33,
               "hub_spoiled_kg": 366.67,
-              "net_inr": 501826.13,
-              "spoiled_kg": 6444.71,
+              "net_inr": 503860.8,
+              "spoiled_kg": 6330.73,
               "unmet_demand_kg": 5752.21,
-              "unsold_kg": 5189.71,
+              "unsold_kg": 5075.73,
               "validator": "PASS",
               "violations": 0
             },
@@ -2175,13 +2175,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 4.77,
-              "net_inr": 77070.58,
-              "spoiled_kg": -2109.14
+              "net_inr": 75035.91,
+              "spoiled_kg": -1995.16
             },
             "lading-robust": {
               "demand_filled_pct": 4.19,
-              "net_inr": 12118.2,
-              "spoiled_kg": 672.97
+              "net_inr": 10083.53,
+              "spoiled_kg": 786.95
             }
           },
           "hub": "Nashik aggregation hub",
@@ -2197,10 +2197,10 @@
               "demand_filled_pct": 81.83,
               "expired_in_transit_kg": 1125.0,
               "hub_spoiled_kg": 1923.33,
-              "net_inr": 894248.27,
-              "spoiled_kg": 6472.67,
+              "net_inr": 898696.08,
+              "spoiled_kg": 6176.69,
               "unmet_demand_kg": 6147.5,
-              "unsold_kg": 3424.33,
+              "unsold_kg": 3128.35,
               "validator": "PASS",
               "violations": 0
             },
@@ -2237,13 +2237,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 2.85,
-              "net_inr": 92542.72,
-              "spoiled_kg": -544.88
+              "net_inr": 88094.91,
+              "spoiled_kg": -248.9
             },
             "lading-robust": {
               "demand_filled_pct": 1.38,
-              "net_inr": 70642.87,
-              "spoiled_kg": -3.67
+              "net_inr": 66195.06,
+              "spoiled_kg": 292.31
             }
           },
           "hub": "Nashik aggregation hub",
@@ -2255,14 +2255,14 @@
         {
           "arms": {
             "fefo": {
-              "carry_over_kg": 1150.0,
-              "demand_filled_pct": 82.75,
+              "carry_over_kg": 0.0,
+              "demand_filled_pct": 84.23,
               "expired_in_transit_kg": 1155.0,
-              "hub_spoiled_kg": 50.0,
-              "net_inr": 566532.5,
-              "spoiled_kg": 4540.99,
-              "unmet_demand_kg": 4663.85,
-              "unsold_kg": 3335.99,
+              "hub_spoiled_kg": 0.0,
+              "net_inr": 570418.66,
+              "spoiled_kg": 4693.16,
+              "unmet_demand_kg": 4262.17,
+              "unsold_kg": 3538.16,
               "validator": "PASS",
               "violations": 0
             },
@@ -2298,14 +2298,14 @@
           "batches": 26,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 3.65,
-              "net_inr": 37925.85,
-              "spoiled_kg": -480.68
+              "demand_filled_pct": 2.17,
+              "net_inr": 34039.69,
+              "spoiled_kg": -632.85
             },
             "lading-robust": {
-              "demand_filled_pct": 1.03,
-              "net_inr": 2052.16,
-              "spoiled_kg": 646.46
+              "demand_filled_pct": -0.45,
+              "net_inr": -1834.0,
+              "spoiled_kg": 494.29
             }
           },
           "hub": "Kolar aggregation hub",
@@ -2317,14 +2317,14 @@
         {
           "arms": {
             "fefo": {
-              "carry_over_kg": 1260.0,
-              "demand_filled_pct": 87.84,
+              "carry_over_kg": 0.0,
+              "demand_filled_pct": 88.71,
               "expired_in_transit_kg": 1168.33,
-              "hub_spoiled_kg": 90.0,
-              "net_inr": 1336903.99,
-              "spoiled_kg": 5297.31,
-              "unmet_demand_kg": 5026.65,
-              "unsold_kg": 4038.98,
+              "hub_spoiled_kg": 0.0,
+              "net_inr": 1366205.78,
+              "spoiled_kg": 5588.37,
+              "unmet_demand_kg": 4661.26,
+              "unsold_kg": 4420.04,
               "validator": "PASS",
               "violations": 0
             },
@@ -2360,14 +2360,14 @@
           "batches": 42,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 4.66,
-              "net_inr": 125666.08,
-              "spoiled_kg": -470.65
+              "demand_filled_pct": 3.79,
+              "net_inr": 96364.29,
+              "spoiled_kg": -761.71
             },
             "lading-robust": {
-              "demand_filled_pct": 2.7,
-              "net_inr": 84352.91,
-              "spoiled_kg": -277.68
+              "demand_filled_pct": 1.83,
+              "net_inr": 55051.12,
+              "spoiled_kg": -568.74
             }
           },
           "hub": "Kolar aggregation hub",
@@ -2379,14 +2379,14 @@
         {
           "arms": {
             "fefo": {
-              "carry_over_kg": 580.0,
-              "demand_filled_pct": 90.74,
+              "carry_over_kg": 1885.0,
+              "demand_filled_pct": 90.81,
               "expired_in_transit_kg": 1505.0,
-              "hub_spoiled_kg": 20.0,
-              "net_inr": 2196987.77,
-              "spoiled_kg": 7581.01,
-              "unmet_demand_kg": 5316.77,
-              "unsold_kg": 6056.01,
+              "hub_spoiled_kg": 65.0,
+              "net_inr": 2213237.7,
+              "spoiled_kg": 6659.36,
+              "unmet_demand_kg": 5271.39,
+              "unsold_kg": 5089.36,
               "validator": "PASS",
               "violations": 0
             },
@@ -2422,14 +2422,14 @@
           "batches": 56,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 1.84,
-              "net_inr": 61484.14,
-              "spoiled_kg": -850.28
+              "demand_filled_pct": 1.77,
+              "net_inr": 45234.21,
+              "spoiled_kg": 71.37
             },
             "lading-robust": {
-              "demand_filled_pct": -3.19,
-              "net_inr": -79446.32,
-              "spoiled_kg": 1051.17
+              "demand_filled_pct": -3.26,
+              "net_inr": -95696.25,
+              "spoiled_kg": 1972.82
             }
           },
           "hub": "Kolar aggregation hub",
@@ -2445,10 +2445,10 @@
               "demand_filled_pct": 81.03,
               "expired_in_transit_kg": 1445.0,
               "hub_spoiled_kg": 1650.0,
-              "net_inr": 1105386.23,
-              "spoiled_kg": 5470.12,
+              "net_inr": 1121572.18,
+              "spoiled_kg": 5074.4,
               "unmet_demand_kg": 6672.13,
-              "unsold_kg": 2375.12,
+              "unsold_kg": 1979.4,
               "validator": "PASS",
               "violations": 0
             },
@@ -2485,13 +2485,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 1.63,
-              "net_inr": 40781.41,
-              "spoiled_kg": -739.64
+              "net_inr": 24595.46,
+              "spoiled_kg": -343.92
             },
             "lading-robust": {
               "demand_filled_pct": -0.05,
-              "net_inr": 12514.81,
-              "spoiled_kg": -266.78
+              "net_inr": -3671.14,
+              "spoiled_kg": 128.94
             }
           },
           "hub": "Nashik aggregation hub",
@@ -2507,10 +2507,10 @@
               "demand_filled_pct": 87.25,
               "expired_in_transit_kg": 3043.33,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 1879218.3,
-              "spoiled_kg": 7103.9,
+              "net_inr": 1890899.19,
+              "spoiled_kg": 6873.32,
               "unmet_demand_kg": 6912.73,
-              "unsold_kg": 4060.56,
+              "unsold_kg": 3829.99,
               "validator": "PASS",
               "violations": 0
             },
@@ -2547,13 +2547,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 2.41,
-              "net_inr": 114105.41,
-              "spoiled_kg": -452.48
+              "net_inr": 102424.52,
+              "spoiled_kg": -221.9
             },
             "lading-robust": {
               "demand_filled_pct": -2.39,
-              "net_inr": -10407.47,
-              "spoiled_kg": 2130.11
+              "net_inr": -22088.36,
+              "spoiled_kg": 2360.69
             }
           },
           "hub": "Nashik aggregation hub",
@@ -2569,10 +2569,10 @@
               "demand_filled_pct": 79.13,
               "expired_in_transit_kg": 1040.0,
               "hub_spoiled_kg": 0.0,
-              "net_inr": 817636.43,
-              "spoiled_kg": 4956.57,
-              "unmet_demand_kg": 5561.15,
-              "unsold_kg": 3916.57,
+              "net_inr": 817469.46,
+              "spoiled_kg": 4790.5,
+              "unmet_demand_kg": 5561.07,
+              "unsold_kg": 3750.5,
               "validator": "PASS",
               "violations": 0
             },
@@ -2609,13 +2609,13 @@
           "delta": {
             "lading-point": {
               "demand_filled_pct": 3.87,
-              "net_inr": 84664.06,
-              "spoiled_kg": -962.36
+              "net_inr": 84831.03,
+              "spoiled_kg": -796.29
             },
             "lading-robust": {
               "demand_filled_pct": 1.59,
-              "net_inr": 63971.22,
-              "spoiled_kg": -528.23
+              "net_inr": 64138.19,
+              "spoiled_kg": -362.16
             }
           },
           "hub": "Nashik aggregation hub",
@@ -2627,14 +2627,14 @@
         {
           "arms": {
             "fefo": {
-              "carry_over_kg": 163.33,
-              "demand_filled_pct": 84.89,
+              "carry_over_kg": 0.0,
+              "demand_filled_pct": 85.76,
               "expired_in_transit_kg": 843.33,
-              "hub_spoiled_kg": 536.67,
-              "net_inr": 991460.86,
-              "spoiled_kg": 6070.25,
-              "unmet_demand_kg": 5210.65,
-              "unsold_kg": 4690.25,
+              "hub_spoiled_kg": 0.0,
+              "net_inr": 999709.95,
+              "spoiled_kg": 5188.9,
+              "unmet_demand_kg": 4908.86,
+              "unsold_kg": 4345.57,
               "validator": "PASS",
               "violations": 0
             },
@@ -2670,14 +2670,14 @@
           "batches": 32,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 4.8,
-              "net_inr": 80824.12,
-              "spoiled_kg": -2356.99
+              "demand_filled_pct": 3.93,
+              "net_inr": 72575.03,
+              "spoiled_kg": -1475.64
             },
             "lading-robust": {
-              "demand_filled_pct": 2.23,
-              "net_inr": 53526.77,
-              "spoiled_kg": -1884.53
+              "demand_filled_pct": 1.36,
+              "net_inr": 45277.68,
+              "spoiled_kg": -1003.18
             }
           },
           "hub": "Kolar aggregation hub",
@@ -2690,13 +2690,13 @@
           "arms": {
             "fefo": {
               "carry_over_kg": 1630.0,
-              "demand_filled_pct": 85.53,
-              "expired_in_transit_kg": 1750.0,
+              "demand_filled_pct": 86.23,
+              "expired_in_transit_kg": 1693.33,
               "hub_spoiled_kg": 220.0,
-              "net_inr": 931288.52,
-              "spoiled_kg": 5605.11,
-              "unmet_demand_kg": 5073.58,
-              "unsold_kg": 3635.11,
+              "net_inr": 956963.43,
+              "spoiled_kg": 5397.92,
+              "unmet_demand_kg": 4827.93,
+              "unsold_kg": 3484.58,
               "validator": "PASS",
               "violations": 0
             },
@@ -2732,14 +2732,14 @@
           "batches": 39,
           "delta": {
             "lading-point": {
-              "demand_filled_pct": 5.01,
-              "net_inr": 104130.28,
-              "spoiled_kg": -479.63
+              "demand_filled_pct": 4.31,
+              "net_inr": 78455.37,
+              "spoiled_kg": -272.44
             },
             "lading-robust": {
-              "demand_filled_pct": -0.62,
-              "net_inr": -6597.86,
-              "spoiled_kg": 1708.79
+              "demand_filled_pct": -1.32,
+              "net_inr": -32272.77,
+              "spoiled_kg": 1915.98
             }
           },
           "hub": "Kolar aggregation hub",
@@ -2765,53 +2765,53 @@
         "lading-point": {
           "demand_filled_pct": {
             "losses": 0,
-            "median": 3.76,
+            "median": 3.32,
             "n": 10,
-            "q1": 2.52,
-            "q3": 4.74,
+            "q1": 2.23,
+            "q3": 3.92,
             "wins": 10
           },
           "net_inr": {
             "losses": 0,
-            "median": 82744.09,
+            "median": 76745.64,
             "n": 10,
-            "q1": 65380.75,
-            "q3": 101233.39,
+            "q1": 52069.42,
+            "q3": 87278.94,
             "wins": 10
           },
           "spoiled_kg": {
-            "losses": 0,
-            "median": -642.26,
+            "losses": 1,
+            "median": -488.38,
             "n": 10,
-            "q1": -934.34,
-            "q3": -479.89,
-            "wins": 10
+            "q1": -787.64,
+            "q3": -254.78,
+            "wins": 9
           }
         },
         "lading-robust": {
           "demand_filled_pct": {
-            "losses": 4,
-            "median": 1.21,
+            "losses": 5,
+            "median": 0.66,
             "n": 10,
-            "q1": -0.48,
-            "q3": 2.07,
-            "wins": 6
+            "q1": -1.1,
+            "q3": 1.54,
+            "wins": 5
           },
           "net_inr": {
-            "losses": 3,
-            "median": 12316.51,
+            "losses": 5,
+            "median": 4124.77,
             "n": 10,
-            "q1": -4435.35,
-            "q3": 61360.11,
-            "wins": 7
+            "q1": -17484.06,
+            "q3": 52607.76,
+            "wins": 5
           },
           "spoiled_kg": {
-            "losses": 5,
-            "median": 321.4,
+            "losses": 7,
+            "median": 393.3,
             "n": 10,
-            "q1": -274.95,
-            "q3": 956.62,
-            "wins": 5
+            "q1": -239.39,
+            "q3": 1633.72,
+            "wins": 3
           }
         }
       },

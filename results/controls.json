@@ -547,10 +547,10 @@
         "demand_filled_pct": 53.47,
         "expired_in_transit_kg": 373.33,
         "hub_spoiled_kg": 0.0,
-        "net_inr": 308551.24,
-        "spoiled_kg": 1192.29,
+        "net_inr": 309043.33,
+        "spoiled_kg": 1133.32,
         "unmet_demand_kg": 9883.27,
-        "unsold_kg": 818.95,
+        "unsold_kg": 759.99,
         "validator": "PASS",
         "violations": 0
       },
