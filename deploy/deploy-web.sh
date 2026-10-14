@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build the console and push the built folder to Vercel with the CLI. No git integration.
+# Build the console here and push the built output to Vercel with the CLI (--prebuilt), so the API URL
+# is baked in from this machine and Vercel never builds from source. No git integration.
 #   VITE_API_URL   the API's HTTPS URL (required)
 set -euo pipefail
 
@@ -9,5 +10,6 @@ cd "$(dirname "$0")/.."
 
 cd web
 npm ci --no-audit --no-fund
-VITE_API_URL="$VITE_API_URL" npm run build
-vercel deploy --prod --yes
+VITE_API_URL="$VITE_API_URL" vercel build --prod --yes
+grep -rq "$VITE_API_URL" .vercel/output/static/assets || { echo "built bundle doesn't contain $VITE_API_URL" >&2; exit 1; }
+vercel deploy --prebuilt --prod --yes
