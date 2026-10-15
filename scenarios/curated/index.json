@@ -10,7 +10,7 @@
         "family": "base"
       },
       "live_verified": "2026-10-15",
-      "expected_solve_s": 4.2,
+      "expected_solve_s": 5.2,
       "disruptions": [
         {
           "kind": "route_delay",
@@ -59,7 +59,7 @@
       "note": "Hand-built. Delhi pays the most but is 22h away, so short-life tomato and greens can't reach it fresh. FIFO ships them anyway. Also the lock and veto walkthrough. Synthetic data.",
       "file": "p4_far_market.json",
       "live_verified": "2026-10-15",
-      "expected_solve_s": 1.0,
+      "expected_solve_s": 1.8,
       "disruptions": [
         {
           "kind": "route_delay",
