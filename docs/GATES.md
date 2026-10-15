@@ -58,10 +58,10 @@ Because items 1 and 3 change the baseline and the evaluation code after held-out
 
 Clean tree, eval commit `b6ccec4`, frozen code hashes matched. Lading-point vs the strengthened FEFO, 50 held-out days x 30 draws: median paired net +INR 46,412 (IQR 31,382 to 78,250, wins 50/50), spoiled -342 kg (IQR -733 to +10, fewer on 37/50), demand filled +1.82 pp (44/50), 0 validator violations. Falsifier not triggered; verdict HOLDS with P2 listed as a failed control. Lading-robust: +INR 47,377 (38/50), -185 kg (29/50). The stronger baseline cut the median net gain by 21% and the spoilage gain by 48% compared with the first run. Ablations are unchanged (they compare Lading variants). The elasticity sweep now slopes down (+INR 61,043 at 0.5x to +INR 38,318 at 1.5x) because FEFO's own markdowns gain from higher elasticity.
 
-## Second re-freeze: fixed orders (2026-10-15 01:10 WAT)
+## Second re-freeze: fixed orders (2026-10-15 01:02 WAT)
 
 Live testing showed both arms could put a dispatcher's new fixed-price order (a replan disruption) on a discount to "lift demand". Orders now only take the 0% level in the MILP and in FEFO. The generator and P4 never create orders, so no evaluated scenario is affected. `planner/milp.py` and `baselines/fefo.py` are frozen files, so the freeze was redone with the change recorded here; the tuning rule still picks Lading-point.
 
-## Results move to the deploy host (2026-10-15 01:10 WAT)
+## Results move to the deploy host (2026-10-15 01:02 WAT)
 
 The console solves on the VPS (linux/amd64). With the same pinned HiGHS, the same seed and the same 0.5% gap, the VPS stopped at a different plan for seed 1007 than the build Mac (arm64): 5,833 vs 5,850 kg spoiled, INR 17,47,756 vs 17,44,891 net. Both are valid plans within the gap. So that the live canonical run matches `results/canonical.json` exactly, `results/` is now produced on the deploy host by `deploy/reproduce-on-host.sh` (fresh clone in a pinned python:3.11.11 container, `uv sync --frozen`). Runs on other CPU architectures can differ slightly per day; the size of that drift is recorded below once measured.
