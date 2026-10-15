@@ -1,12 +1,12 @@
 {
   "assumptions_sha256": "7151fbe87dfe6d506146610a985ce56a7cc72138b9b9da72cae86f569e261c87",
-  "commit": "b6ccec42d4db3b32099c0bd927f36c48b0036fed",
+  "commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
   "cost_model_sha256": "ed910ec77d18e3a3081664f30f65fa20738894f3b9dfd11f9524a8d19bd2f0bc",
   "dirty": false,
   "draws_per_scenario": 30,
   "exec_seed_stream": "SeedSequence([scenario seed, 202, draw, kind])",
-  "frozen_at_commit": "b6ccec42d4db3b32099c0bd927f36c48b0036fed",
-  "host": "Darwin arm64",
+  "frozen_at_commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
+  "host": "Linux x86_64",
   "libraries": {
     "fastapi": "0.115.14",
     "highspy": "1.11.0",
@@ -15,7 +15,7 @@
     "pydantic": "2.11.7"
   },
   "planner_config_sha256": "97860b7834cd9321a24f82309c9149bc98ff61851458cc31913b9a6c1315c5d3",
-  "python": "3.11.7",
+  "python": "3.11.11",
   "seeds": {
     "canonical": 1007,
     "healthy": [

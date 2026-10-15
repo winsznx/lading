@@ -65,3 +65,9 @@ Live testing showed both arms could put a dispatcher's new fixed-price order (a 
 ## Results move to the deploy host (2026-10-15 01:02 WAT)
 
 The console solves on the VPS (linux/amd64). With the same pinned HiGHS, the same seed and the same 0.5% gap, the VPS stopped at a different plan for seed 1007 than the build Mac (arm64): 5,833 vs 5,850 kg spoiled, INR 17,47,756 vs 17,44,891 net. Both are valid plans within the gap. So that the live canonical run matches `results/canonical.json` exactly, `results/` is now produced on the deploy host by `deploy/reproduce-on-host.sh` (fresh clone in a pinned python:3.11.11 container, `uv sync --frozen`). Runs on other CPU architectures can differ slightly per day; the size of that drift is recorded below once measured.
+
+## Deploy-host results and cross-platform drift (2026-10-15 01:25 WAT)
+
+`deploy/reproduce-on-host.sh adopt` ran the full evaluation on the VPS (linux/amd64, python:3.11.11 container, fresh clone of `04827a0`, eval commit `7b33fe4`). Lading-point vs FEFO: median paired net +INR 48,588 (IQR 30,258 to 80,447, 50/50), spoiled -366 kg (IQR -859 to -27, 39/50), demand filled +1.64 pp (44/50), 0 violations, HOLDS, P2 still failed (6.8%). The live canonical run now equals `results/canonical.json` (5,832.55 kg, INR 17,47,756.49).
+
+Drift against the same code run on the build Mac (arm64): FEFO and FIFO identical on every day; the Lading-point plan matched on 6 of 50 days, median per-day net difference INR 1,590, largest INR 39,301; headline median +INR 48,588 here vs +INR 46,412 on the Mac. Both are honest runs; the README quotes the deploy host's because the console solves there, and discloses the drift.

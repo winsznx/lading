@@ -1,57 +1,57 @@
 {
   "heldout": {
     "ablation-no-discount": {
-      "max_s": 5.017,
-      "median_s": 0.93,
+      "max_s": 8.415,
+      "median_s": 1.648,
       "n": 50,
-      "p90_s": 2.69
+      "p90_s": 4.101
     },
     "ablation-soft-shelf": {
-      "max_s": 20.506,
-      "median_s": 1.208,
+      "max_s": 23.734,
+      "median_s": 1.915,
       "n": 50,
-      "p90_s": 3.716
+      "p90_s": 12.463
     },
     "lading-point": {
-      "max_s": 13.35,
-      "median_s": 1.028,
+      "max_s": 20.564,
+      "median_s": 1.778,
       "n": 50,
-      "p90_s": 4.288
+      "p90_s": 13.797
     },
     "lading-robust": {
-      "max_s": 16.0,
-      "median_s": 0.865,
+      "max_s": 30.466,
+      "median_s": 2.457,
       "n": 50,
-      "p90_s": 7.804
+      "p90_s": 10.83
     }
   },
   "note": "Wall-clock solve times on the machine that ran make reproduce. Excluded from the byte-identical replay check.",
   "stress": {
     "lading-point": {
-      "max_s": 8.029,
-      "median_s": 0.672,
+      "max_s": 48.578,
+      "median_s": 1.517,
       "n": 40,
-      "p90_s": 4.306
+      "p90_s": 6.459
     },
     "lading-robust": {
-      "max_s": 15.98,
-      "median_s": 0.6,
+      "max_s": 11.681,
+      "median_s": 1.28,
       "n": 40,
-      "p90_s": 2.2
+      "p90_s": 6.422
     }
   },
   "tuning": {
     "lading-point": {
-      "max_s": 14.783,
-      "median_s": 0.76,
+      "max_s": 20.239,
+      "median_s": 1.606,
       "n": 20,
-      "p90_s": 4.094
+      "p90_s": 4.379
     },
     "lading-robust": {
-      "max_s": 8.204,
-      "median_s": 0.756,
+      "max_s": 16.879,
+      "median_s": 2.431,
       "n": 20,
-      "p90_s": 3.25
+      "p90_s": 4.213
     }
   }
 }

@@ -20,7 +20,7 @@ Stock delivered to a market but not sold within its demand is booked as spoiled 
 
 ## D5. MILP gap 0.5% and deterministic termination (2026-10-14)
 
-`mip_rel_gap` is 0.005 and HiGHS runs single-threaded with a fixed seed, so evaluation solves end on the gap, not on the clock, and replays are byte-identical. The live API keeps the 10 s budget. A solve that hits it returns its best incumbent with status TIME_LIMIT, the API response carries `solver_state: SOLVER_TIMEOUT` and the gap, and the console shows it; with no incumbent the API returns SOLVER_TIMEOUT and no plan. Evaluation solves get 60 s and none of the 200 held-out Lading solves hit it (every gap is at or below 0.5%). The slowest held-out solve took 13.9 s on the build machine, so a live solve of that day could time out.
+`mip_rel_gap` is 0.005 and HiGHS runs single-threaded with a fixed seed, so evaluation solves end on the gap, not on the clock, and replays are byte-identical. The live API keeps the 10 s budget. A solve that hits it returns its best incumbent with status TIME_LIMIT, the API response carries `solver_state: SOLVER_TIMEOUT` and the gap, and the console shows it; with no incumbent the API returns SOLVER_TIMEOUT and no plan. Evaluation solves get 60 s and none of the 200 held-out Lading solves hit it (every gap is at or below 0.5%). On the deploy host, with four held-out solves running at once, the slowest took 20.6 s and the p90 was 13.8 s, so a live solve of such a day could time out and would be labelled.
 
 ## D6. Replans are anchored on the previous plan (2026-10-15)
 
