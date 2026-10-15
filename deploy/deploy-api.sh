@@ -37,7 +37,7 @@ fi
 echo "→ syncing $COMMIT to $LADING_SSH:$REMOTE_DIR"
 remote "mkdir -p $REMOTE_DIR"
 rsync -az --delete -e "ssh ${ssh_opts[*]}" \
-  --exclude .git --exclude .venv --exclude web --exclude internal --exclude 'scenarios/generated' \
+  --exclude .git --exclude .venv --exclude web --exclude film --exclude internal --exclude 'scenarios/generated' \
   --exclude '.ci-results' --exclude '__pycache__' --exclude '.pytest_cache' --exclude '.mypy_cache' \
   --exclude '.ruff_cache' --exclude 'deploy/.env.deploy' \
   ./ "$LADING_SSH:$REMOTE_DIR/"
