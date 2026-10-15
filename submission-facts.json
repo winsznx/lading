@@ -122,8 +122,8 @@
   "fifo_heldout_validator_fails": 43,
   "solve_time_median_s": 1.778,
   "manifest": {
-    "commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
-    "frozen_at_commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
+    "commit": "974c8ea39c882c0ff1ae58c596644cff22e6a99c",
+    "frozen_at_commit": "974c8ea39c882c0ff1ae58c596644cff22e6a99c",
     "cost_model_sha256": "ed910ec77d18e3a3081664f30f65fa20738894f3b9dfd11f9524a8d19bd2f0bc",
     "planner_config_sha256": "97860b7834cd9321a24f82309c9149bc98ff61851458cc31913b9a6c1315c5d3",
     "host": "Linux x86_64"

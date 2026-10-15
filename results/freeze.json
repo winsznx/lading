@@ -1,6 +1,6 @@
 {
   "cost_model_sha256": "ed910ec77d18e3a3081664f30f65fa20738894f3b9dfd11f9524a8d19bd2f0bc",
-  "frozen_at_commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
+  "frozen_at_commit": "974c8ea39c882c0ff1ae58c596644cff22e6a99c",
   "frozen_code_sha256": {
     "baselines/fefo.py": "e4f4f0d67f499389811f90d10c98c0b45b6e6c5e674d6892583f92829c0a24ea",
     "baselines/fifo.py": "8cc2a568cd9f1c697c2ae61d6603d0db0133579da1ccfcb41ad755052beb9679",

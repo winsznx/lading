@@ -1,11 +1,11 @@
 {
   "assumptions_sha256": "7151fbe87dfe6d506146610a985ce56a7cc72138b9b9da72cae86f569e261c87",
-  "commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
+  "commit": "974c8ea39c882c0ff1ae58c596644cff22e6a99c",
   "cost_model_sha256": "ed910ec77d18e3a3081664f30f65fa20738894f3b9dfd11f9524a8d19bd2f0bc",
   "dirty": false,
   "draws_per_scenario": 30,
   "exec_seed_stream": "SeedSequence([scenario seed, 202, draw, kind])",
-  "frozen_at_commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
+  "frozen_at_commit": "974c8ea39c882c0ff1ae58c596644cff22e6a99c",
   "host": "Linux x86_64",
   "libraries": {
     "fastapi": "0.115.14",

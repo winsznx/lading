@@ -76,3 +76,18 @@ Drift against the same code run on the build Mac (arm64): FEFO and FIFO identica
 ## Clean-room check (2026-10-15 01:25 WAT)
 
 `make clean-room` (`deploy/reproduce-on-host.sh check`): git bundle of `f48d023`, fresh clone in a new python:3.11.11 container on the deploy host, `uv sync --frozen`, full `pytest` (pass), full `make reproduce`, byte diff against the committed `results/`. All ten files identical: ablations, canonical, controls, freeze, heldout, manifest, sensitivity, stress, tuning, verdict (`timings.json` excluded as wall-clock).
+
+## History rewrite before publishing (2026-10-15)
+
+Before the repo went public, the VPS hostname (which embeds its IP) was scrubbed from every commit with `git filter-repo --replace-text`; it appeared only in README.md, docs/GATES.md and web/vercel.json, none of which feed results. Commits from the first such occurrence onward got new hashes. `results/manifest.json` and `results/freeze.json` were re-pointed to the rewritten commits (no result changed). Hashes cited above refer to the history before the rewrite:
+
+| Cited above | Now |
+|---|---|
+| `d90cef8` | `d90cef8` |
+| `d404c53` | `c4bc27b` |
+| `105fb6e` | `105fb6e` |
+| `b6ccec4` | `300385e` |
+| `7b33fe4` | `974c8ea` |
+| `04827a0` | `7598815` |
+| `f48d023` | `4e7ac90` |
+| `e5391d5` | `e5391d5` |
