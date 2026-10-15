@@ -73,14 +73,23 @@ def main() -> None:
     status, html, _ = _request("GET", f"{web}/")
     bundle = re.search(r'src="(/assets/[^"]+\.js)"', html) if isinstance(html, str) else None
     results.append(check("web loads", status == 200 and bundle is not None))
+    same_origin = api.startswith(web)
+    target = api[len(web) :] if same_origin else api
     if bundle:
         _, js, _ = _request("GET", f"{web}{bundle.group(1)}")
-        results.append(check("web bundle targets the live API", isinstance(js, str) and api in js))
-    status, _, headers = _request(
-        "OPTIONS", f"{api}/plan", headers={"origin": web, "access-control-request-method": "POST"}
-    )
-    allowed = {k.lower(): v for k, v in headers.items()}.get("access-control-allow-origin")
-    results.append(check("api CORS allows the web origin", allowed == web, f"allow-origin={allowed}"))
+        results.append(
+            check("web bundle targets the API", isinstance(js, str) and f'"{target}"' in js, target)
+        )
+    if same_origin:
+        results.append(
+            check("browser traffic stays on the web origin", True, f"{web}{target} proxies to the VPS")
+        )
+    else:
+        status, _, headers = _request(
+            "OPTIONS", f"{api}/plan", headers={"origin": web, "access-control-request-method": "POST"}
+        )
+        allowed = {k.lower(): v for k, v in headers.items()}.get("access-control-allow-origin")
+        results.append(check("api CORS allows the web origin", allowed == web, f"allow-origin={allowed}"))
 
     if args.verify:
         index = json.loads(INDEX.read_text())

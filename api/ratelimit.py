@@ -25,6 +25,13 @@ class RateLimiter:
         self._lock = threading.Lock()
 
     def client_ip(self, request: Request) -> str:
+        """The browser's address. Browser traffic arrives through Vercel's rewrite, which names the
+        visitor in x-vercel-forwarded-for; without it every visitor would share Vercel's egress address.
+        A direct caller can forge that header to spread its requests over keys, so the per-worker solve
+        cap, not this limiter, is what protects the CPU."""
+        vercel = request.headers.get("x-vercel-forwarded-for")
+        if vercel:
+            return "vercel:" + vercel.split(",")[0].strip()
         peer = request.client.host if request.client else "unknown"
         forwarded = request.headers.get("x-forwarded-for")
         if forwarded and self._is_trusted(peer):

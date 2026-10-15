@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the console here and push the built output to Vercel with the CLI (--prebuilt), so the API URL
 # is baked in from this machine and Vercel never builds from source. No git integration.
-#   VITE_API_URL   the API's HTTPS URL (required)
+#   VITE_API_URL   /api (proxied by vercel.json to the VPS, the default) or an absolute HTTPS URL
 set -euo pipefail
 
 cd "$(dirname "$0")/.."

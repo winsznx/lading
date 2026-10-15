@@ -146,3 +146,15 @@ def test_forwarded_for_uses_the_proxys_entry():
         "client": ("10.0.0.2", 1234),
     }
     assert limiter.client_ip(Request(scope)) == "203.0.113.9"
+
+
+def test_rate_limit_keys_on_the_vercel_visitor():
+    from starlette.requests import Request
+
+    limiter = RateLimiter(per_minute=1, burst=1, trusted_proxies=["10.0.0.0/8"])
+    scope = {
+        "type": "http",
+        "headers": [(b"x-vercel-forwarded-for", b"198.51.100.7"), (b"x-forwarded-for", b"76.76.21.9")],
+        "client": ("10.0.0.2", 1234),
+    }
+    assert limiter.client_ip(Request(scope)) == "vercel:198.51.100.7"

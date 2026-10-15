@@ -70,7 +70,15 @@ limiter = RateLimiter(
     trusted_proxies=TRUSTED_PROXIES,
 )
 
-app = FastAPI(title="Lading API", version="1.0.0", docs_url="/docs", redoc_url=None)
+app = FastAPI(
+    title="Lading API",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url=None,
+    servers=[
+        {"url": os.environ.get("LADING_PUBLIC_PREFIX", "/api"), "description": "through the console's origin"}
+    ],
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
