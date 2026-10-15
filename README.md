@@ -14,6 +14,8 @@ Lading is a dispatch planner for a produce aggregation hub. Each morning it deci
 
 0 constraint violations across all 50 Lading plans, from a validator that imports none of the planner's code. Source: [`results/heldout.json`](results/heldout.json), [`results/verdict.json`](results/verdict.json), produced by `make reproduce`. All data is synthetic (see [How could this be misleading](#how-could-this-be-misleading)).
 
+Read four things with that table. The headline arm is Lading-point, picked by a rule written before the freeze; the PRD had pre-registered Lading-robust. The FEFO baseline was strengthened after a cold audit, and these numbers come from the rerun against the stronger version. The P2 healthy-day control failed. Solver runs on the build Mac and the deploy VPS drift: the Mac gave +₹46,412, and the numbers here come from the VPS, where the console solves. Each is detailed under [How could this be misleading](#how-could-this-be-misleading).
+
 - Console: **https://lading-seven.vercel.app**
 - API, through the same origin: https://lading-seven.vercel.app/api ([docs](https://lading-seven.vercel.app/api/docs), [health](https://lading-seven.vercel.app/api/health), [verdict](https://lading-seven.vercel.app/api/results/verdict.json))
 
