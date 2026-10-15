@@ -9,7 +9,7 @@ Dated log of checkpoints, pre-registered splits, freezes, failures and withdrawn
 | 2026-10-14 23:20 | 0.0 | 0.0 | 0.1 | 20.1 | Repo scaffolded, build contract written |
 | 2026-10-15 00:12 | 0.7 | 0.25 | 0.15 | 19.3 | Steps 1-10 done. API live at https://vps-api-host.invalid. Held-out measured, falsifier not triggered. Console in progress. |
 | 2026-10-15 00:38 | 0.9 | 0.45 | 0.2 | 18.85 | Audit fixed, re-frozen, held-out rerun. Console still building. |
-| 2026-10-15 01:40 | 1.5 | 0.8 | 0.4 | 17.8 | Steps 1-15 done. Console live on Vercel (all browser traffic on its origin), API on the VPS, results from the deploy host, clean-room identical. |
+| 2026-10-15 01:25 | 1.3 | 0.7 | 0.3 | 18.1 | Steps 1-15 done. Console live on Vercel (all browser traffic on its origin), API on the VPS, results from the deploy host, clean-room identical. |
 
 ## Held-out exposure during development (2026-10-15 00:00 WAT)
 
@@ -67,12 +67,12 @@ Live testing showed both arms could put a dispatcher's new fixed-price order (a 
 
 The console solves on the VPS (linux/amd64). With the same pinned HiGHS, the same seed and the same 0.5% gap, the VPS stopped at a different plan for seed 1007 than the build Mac (arm64): 5,833 vs 5,850 kg spoiled, INR 17,47,756 vs 17,44,891 net. Both are valid plans within the gap. So that the live canonical run matches `results/canonical.json` exactly, `results/` is now produced on the deploy host by `deploy/reproduce-on-host.sh` (fresh clone in a pinned python:3.11.11 container, `uv sync --frozen`). Runs on other CPU architectures can differ slightly per day; the size of that drift is recorded below once measured.
 
-## Deploy-host results and cross-platform drift (2026-10-15 01:25 WAT)
+## Deploy-host results and cross-platform drift (2026-10-15 01:12 WAT)
 
 `deploy/reproduce-on-host.sh adopt` ran the full evaluation on the VPS (linux/amd64, python:3.11.11 container, fresh clone of `04827a0`, eval commit `7b33fe4`). Lading-point vs FEFO: median paired net +INR 48,588 (IQR 30,258 to 80,447, 50/50), spoiled -366 kg (IQR -859 to -27, 39/50), demand filled +1.64 pp (44/50), 0 violations, HOLDS, P2 still failed (6.8%). The live canonical run now equals `results/canonical.json` (5,832.55 kg, INR 17,47,756.49).
 
 Drift against the same code run on the build Mac (arm64): FEFO and FIFO identical on every day; the Lading-point plan matched on 6 of 50 days, median per-day net difference INR 1,590, largest INR 39,301; headline median +INR 48,588 here vs +INR 46,412 on the Mac. Both are honest runs; the README quotes the deploy host's because the console solves there, and discloses the drift.
 
-## Clean-room check (2026-10-15 01:40 WAT)
+## Clean-room check (2026-10-15 01:25 WAT)
 
 `make clean-room` (`deploy/reproduce-on-host.sh check`): git bundle of `f48d023`, fresh clone in a new python:3.11.11 container on the deploy host, `uv sync --frozen`, full `pytest` (pass), full `make reproduce`, byte diff against the committed `results/`. All ten files identical: ablations, canonical, controls, freeze, heldout, manifest, sensitivity, stress, tuning, verdict (`timings.json` excluded as wall-clock).
