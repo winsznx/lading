@@ -14,8 +14,8 @@ Lading is a dispatch planner for a produce aggregation hub. Each morning it deci
 
 0 constraint violations across all 50 Lading plans, from a validator that imports none of the planner's code. Source: [`results/heldout.json`](results/heldout.json), [`results/verdict.json`](results/verdict.json), produced by `make reproduce`. All data is synthetic (see [How could this be misleading](#how-could-this-be-misleading)).
 
-- Console: **CONSOLE_URL**
-- API: https://vps-api-host.invalid ([/docs](https://vps-api-host.invalid/docs))
+- Console: **https://lading-seven.vercel.app**
+- API, through the same origin: https://lading-seven.vercel.app/api ([docs](https://lading-seven.vercel.app/api/docs), [health](https://lading-seven.vercel.app/api/health), [verdict](https://lading-seven.vercel.app/api/results/verdict.json))
 
 GIFS_HERE
 

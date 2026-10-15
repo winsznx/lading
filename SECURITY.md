@@ -19,7 +19,8 @@ The claim Lading makes is "this plan is feasible and beats FEFO on days it never
 ## Runtime
 
 - The API container runs as a non-root user, with a read-only root filesystem, `no-new-privileges`, a 1 GB memory cap and a 3 CPU cap.
-- CORS allows only the origins in `ALLOWED_ORIGINS` (the Vercel production URL and `http://localhost:5173`), never `*`, and only GET and POST.
+- Browsers reach the API only through the console's own origin (a server-side Vercel rewrite), so the browser never sees the VPS hostname. CORS on the API itself still allows only the origins in `ALLOWED_ORIGINS` (the Vercel production URL and `http://localhost:5173`), never `*`, and only GET and POST.
+- Proxied requests are rate limited per visitor using `x-vercel-forwarded-for`. Someone calling the VPS directly can forge that header to spread requests over several keys; the cap of two concurrent solves per worker is what bounds CPU in that case.
 - TLS is terminated by Caddy with automatic certificates. The console can't call plain HTTP.
 
 ## Secrets

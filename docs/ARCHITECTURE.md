@@ -87,4 +87,13 @@ HiGHS runs single-threaded with a fixed seed and stops on a 0.5% relative gap, n
 
 ## Deployment
 
-The API runs as one container on a VPS, behind Caddy for TLS. On the current host another project's Caddy already owns ports 80/443, so the API joins that proxy's Docker network and `deploy/deploy-api.sh` adds one validated site block for the API hostname (see [SETUP.md](SETUP.md)). The console is a static Vite build pushed to Vercel with the CLI; it reaches the API only through `VITE_API_URL`. `results/` is baked into the image from the committed files and served read-only.
+The browser only ever talks to the Vercel origin. The console is a static Vite build pushed to Vercel with the CLI (`--prebuilt`, built locally) and calls `/api/*` on its own origin; `web/vercel.json` rewrites that server-side to the API on the VPS, so no VPS hostname, certificate or CORS check is ever in the browser's path.
+
+```mermaid
+flowchart LR
+  B[browser] -->|HTTPS| V[lading-seven.vercel.app<br/>static console]
+  V -->|/api/* rewrite, server-side| C[Caddy on the VPS<br/>TLS]
+  C --> A[API container<br/>FastAPI + HiGHS]
+```
+
+The API runs as one container on a VPS, behind Caddy for TLS. On the current host another project's Caddy already owns ports 80/443, so the API joins that proxy's Docker network and `deploy/deploy-api.sh` adds one validated site block for the API hostname (see [SETUP.md](SETUP.md)). `results/` is generated on that same host (`deploy/reproduce-on-host.sh`), baked into the image and served read-only, so the live canonical run matches `results/canonical.json`.
