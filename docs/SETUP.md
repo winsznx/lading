@@ -12,7 +12,7 @@ make serve        # API on http://127.0.0.1:8000 (docs at /docs)
 make web-dev      # console on http://localhost:5173, talking to the local API
 ```
 
-`make reproduce` uses every core but one. Set `LADING_WORKERS=1` to run it serially. `results/timings.json` is the only output that changes between runs; `make clean-room` clones the repo into a temp dir, reruns everything and diffs the rest byte for byte.
+`make reproduce` uses every core but one. Set `LADING_WORKERS=1` to run it serially. `results/timings.json` is the only output that changes between runs on the same machine. The committed `results/` were produced on the deploy host (linux/amd64), so `make clean-room` runs the byte-for-byte check there; `make clean-room-local` runs it on your machine, where Lading rows can differ slightly if your CPU differs (HiGHS can stop at a different plan inside the same 0.5% gap; FEFO and FIFO don't move).
 
 ## Evaluate one scenario by hand
 

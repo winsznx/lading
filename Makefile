@@ -1,4 +1,4 @@
-.PHONY: setup test lint typecheck reproduce reproduce-small tune serve web-dev deploy deploy-api deploy-web smoke clean-room
+.PHONY: setup test lint typecheck reproduce reproduce-small tune serve web-dev deploy deploy-api deploy-web smoke clean-room clean-room-local
 
 PY := uv run python
 
@@ -42,5 +42,10 @@ deploy-web:
 smoke:
 	$(PY) -m deploy.smoke
 
+# The committed results come from the deploy host, so the authoritative clean-room check runs there.
 clean-room:
+	./deploy/reproduce-on-host.sh check
+
+# Same check on this machine. On a different CPU than the deploy host, Lading rows can drift (see README).
+clean-room-local:
 	./deploy/clean-room.sh
