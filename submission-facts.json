@@ -1,0 +1,133 @@
+{
+  "product": "Lading",
+  "line": "Plans which produce goes where, when, and at what price, so less of it rots.",
+  "urls": {
+    "console": "https://lading-seven.vercel.app",
+    "api": "https://lading-seven.vercel.app/api"
+  },
+  "headline": {
+    "arm": "lading-point",
+    "vs": "fefo",
+    "heldout_days": 50,
+    "draws_per_day": 30,
+    "median_net_gain_inr": 48588.08,
+    "net_gain_iqr_inr": [
+      30257.52,
+      80446.57
+    ],
+    "net_wins": 50,
+    "median_spoiled_delta_kg": -366.42,
+    "spoiled_delta_iqr_kg": [
+      -858.59,
+      -27.47
+    ],
+    "spoiled_wins": 39,
+    "median_fill_delta_pp": 1.64,
+    "fill_wins": 44,
+    "validator_violations": 0,
+    "verdict": "HOLDS",
+    "statement": "On 50 held-out days, lading-point vs FEFO: median paired net gain INR 48,588 (wins 50/50), median spoiled kg change -366 (fewer in 39/50), median demand filled change +1.64 pp, 0 validator violations. Failed controls: p2_healthy (see controls.json)."
+  },
+  "canonical_run": {
+    "seed": 1007,
+    "scenario_id": "gen-base-1007",
+    "draws": 30,
+    "lading": {
+      "spoiled_kg": 5832.55,
+      "demand_filled_pct": 94.44,
+      "net_inr": 1747756.49
+    },
+    "fefo": {
+      "spoiled_kg": 8522.61,
+      "demand_filled_pct": 95.0,
+      "net_inr": 1660137.95
+    },
+    "validator": {
+      "status": "PASS",
+      "violation_count": 0
+    }
+  },
+  "lading_robust": {
+    "median_net_gain_inr": 48678.24,
+    "net_wins": 38,
+    "median_spoiled_delta_kg": -100.27,
+    "spoiled_wins": 31
+  },
+  "ablations": {
+    "ablation-no-discount": {
+      "median_net_delta_inr": -27818.43,
+      "median_spoiled_delta_kg": 955.29,
+      "plans_failing_validator": 0,
+      "violations": 0
+    },
+    "ablation-soft-shelf": {
+      "median_net_delta_inr": -275.09,
+      "median_spoiled_delta_kg": 0.0,
+      "plans_failing_validator": 15,
+      "violations": 20
+    }
+  },
+  "stress": {
+    "demand_shock": {
+      "median_net_gain_inr": 29585.06,
+      "net_wins": 9,
+      "median_spoiled_delta_kg": -133.39,
+      "spoiled_wins": 5,
+      "days": 10
+    },
+    "route_delay": {
+      "median_net_gain_inr": 48762.97,
+      "net_wins": 9,
+      "median_spoiled_delta_kg": -481.45,
+      "spoiled_wins": 8,
+      "days": 10
+    },
+    "truck_loss": {
+      "median_net_gain_inr": 59185.46,
+      "net_wins": 10,
+      "median_spoiled_delta_kg": -568.12,
+      "spoiled_wins": 8,
+      "days": 10
+    },
+    "wide_shelf": {
+      "median_net_gain_inr": 73538.93,
+      "net_wins": 10,
+      "median_spoiled_delta_kg": -507.87,
+      "spoiled_wins": 8,
+      "days": 10
+    }
+  },
+  "controls": {
+    "no_op": {
+      "passed": true,
+      "detail": "30 scenario-draws checked"
+    },
+    "p2_healthy": {
+      "passed": false,
+      "detail": "max spoilage 6.8% of stock, max net gap 1.3% across 5 healthy days"
+    },
+    "p3_infeasible": {
+      "passed": true,
+      "detail": "16 unreachable batches over 5 days (15 injected), all flagged and held by both arms"
+    },
+    "p4_harmful": {
+      "passed": true,
+      "detail": "lading-point sends 4 batches to Delhi, all able to arrive fresh; FIFO sends 9 and loses 4,510 kg in transit"
+    },
+    "p6_replay": {
+      "passed": true,
+      "detail": "identical"
+    }
+  },
+  "fifo_heldout_validator_fails": 43,
+  "solve_time_median_s": 1.778,
+  "manifest": {
+    "commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
+    "frozen_at_commit": "7b33fe4d27a3a28a8625becbe6318c807d720f6a",
+    "cost_model_sha256": "ed910ec77d18e3a3081664f30f65fa20738894f3b9dfd11f9524a8d19bd2f0bc",
+    "planner_config_sha256": "97860b7834cd9321a24f82309c9149bc98ff61851458cc31913b9a6c1315c5d3",
+    "host": "Linux x86_64"
+  },
+  "synthetic": true,
+  "data_note": "All scenarios are synthetic, from a disclosed seeded generator (docs/ASSUMPTIONS.md). Hub and mandi names are real places; every number attached to them is an assumption."
+}

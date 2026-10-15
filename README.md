@@ -17,7 +17,13 @@ Lading is a dispatch planner for a produce aggregation hub. Each morning it deci
 - Console: **https://lading-seven.vercel.app**
 - API, through the same origin: https://lading-seven.vercel.app/api ([docs](https://lading-seven.vercel.app/api/docs), [health](https://lading-seven.vercel.app/api/health), [verdict](https://lading-seven.vercel.app/api/results/verdict.json))
 
-GIFS_HERE
+![Plan run on held-out seed 1007: press R, the board fills, Lading vs FEFO outcome strip, a batch drawer with its reasons](docs/media/plan-run.gif)
+
+*Real session, real time: the deployed console solving held-out day 1007 live (about 4 s), then a batch's reasons.*
+
+![Disruption replan: a +8 h delay on every trip to Bengaluru, two leafy-green batches move, the cause → effect line updates](docs/media/disruption-replan.gif)
+
+*Real session, real time: plan, then disruption 1 (Bengaluru +8 h). The replan runs live; moved cards are outlined and the changes panel gives each one's reason.*
 
 ## Try it (about 2 minutes)
 
