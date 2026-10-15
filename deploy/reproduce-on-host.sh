@@ -23,21 +23,23 @@ trap 'rm -rf "$work"' EXIT
 git bundle create "$work/lading.bundle" HEAD 2>/dev/null
 commit="$(git rev-parse --short HEAD)"
 
+image=python:3.11.11-slim-bookworm
+owner="$(remote 'echo $(id -u):$(id -g)')"
 echo "→ shipping $commit to $LADING_SSH"
-remote "rm -rf lading-repro && mkdir -p lading-repro"
+# Earlier runs leave root-owned files from the container; clean up through Docker too.
+remote "mkdir -p lading-repro && docker run --rm -v \"\$HOME/lading-repro\":/w $image sh -c 'rm -rf /w/* /w/.[!.]* 2>/dev/null; true'"
 scp -q "${ssh_opts[@]}" "$work/lading.bundle" "$LADING_SSH:lading-repro/"
 
 tests=""
 [[ "$mode" == "check" ]] && tests="uv run pytest -q -p no:warnings &&"
 echo "→ fresh clone, uv sync --frozen, ${mode} (this takes several minutes)"
-remote "cd lading-repro && docker run --rm -e LADING_WORKERS=${LADING_WORKERS:-4} -v \"\$PWD\":/w -w /w python:3.11.11-slim-bookworm sh -c '
-  apt-get update -qq >/dev/null && apt-get install -y -qq git >/dev/null &&
-  git config --global --add safe.directory \"*\" &&
-  git clone -q lading.bundle repo && cd repo &&
-  pip install -q --root-user-action=ignore uv==0.12.5 &&
-  uv sync --frozen -q &&
-  $tests uv run python -m evaluation.harness reproduce &&
-  chown -R $(remote id -u):$(remote id -g) /w'"
+remote "cd lading-repro && docker run --rm -e LADING_WORKERS=${LADING_WORKERS:-4} -v \"\$PWD\":/w -w /w $image sh -c '
+  (apt-get update -qq >/dev/null && apt-get install -y -qq git >/dev/null &&
+   git config --global --add safe.directory \"*\" &&
+   git clone -q lading.bundle repo && cd repo &&
+   pip install -q --root-user-action=ignore uv==0.12.5 &&
+   uv sync --frozen -q &&
+   $tests uv run python -m evaluation.harness reproduce); rc=\$?; chown -R $owner /w; exit \$rc'"
 
 mkdir -p "$work/results"
 rsync -az -e "ssh ${ssh_opts[*]}" "$LADING_SSH:lading-repro/repo/results/" "$work/results/"
