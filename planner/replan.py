@@ -193,7 +193,7 @@ def effect_line(
         verb = "no longer reach" if len(expired) > 1 else "no longer reaches"
         parts.append(f"{what} batch{'es' if len(expired) > 1 else ''} {verb} {target} fresh")
     if moved:
-        targets = Counter(c.after.split(" at ")[0] for c in moved).most_common(2)
+        targets = Counter(c.after.split(" at ")[0] for c in (expired or moved)).most_common(2)
         parts.append("moved to " + " and ".join(name for name, _ in targets))
     rediscounted = [
         c for c in changes if c.kind == "rediscounted" or (c.kind == "moved" and "off" in c.after)

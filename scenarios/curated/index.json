@@ -9,14 +9,14 @@
         "seed": 1007,
         "family": "base"
       },
-      "live_verified": "2026-10-15",
+      "live_verified": null,
       "expected_solve_s": 3.9,
       "disruptions": [
         {
           "kind": "route_delay",
-          "label": "Delay on Kolar → Chennai: +8h on every trip",
+          "label": "Delay on Kolar → Bengaluru: +8h on every trip",
           "at_slot": 0,
-          "market_id": "chennai_koyambedu",
+          "market_id": "bengaluru_kr",
           "extra_h": 8
         },
         {

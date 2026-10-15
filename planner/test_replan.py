@@ -119,3 +119,31 @@ def test_replan_objective_equals_forecast_net_with_stock_on_the_road():
     assert result.scenario["controls"]["dispatched"]
     assert result.plan.solver is not None
     assert result.plan.solver.objective_inr == pytest.approx(result.plan.expected.net_inr, abs=0.05)
+
+
+def test_a_fixed_order_is_never_marked_down():
+    s = two_markets()
+    plan = plan_lading(s, "lading-point")
+    order = NewOrder(
+        id="hotel_order",
+        name="Hotel order",
+        commodity_id="tomato",
+        kg=1000,
+        price_inr_per_kg=40,
+        deliver_by_h=10,
+        travel_h=2,
+        transport_inr_per_kg=0.8,
+        handling_h=1,
+        handling_inr_per_kg=0.5,
+    )
+    result = replan(s, plan, Disruption(kind="new_order", label="order", at_slot=0, order=order))
+    assert all(p.discount == 0 for p in result.plan.prices if p.market_id == "hotel_order")
+    from baselines.fefo import plan_fefo
+
+    assert all(
+        p.discount == 0
+        for p in plan_fefo(
+            apply(s, plan, Disruption(kind="new_order", label="o", at_slot=0, order=order))
+        ).prices
+        if p.market_id == "hotel_order"
+    )

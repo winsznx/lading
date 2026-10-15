@@ -204,7 +204,12 @@ def plan_lading(
         x[(b.id, m.id)] = model.col(coef + stick, 1.0, True, lower=1.0 if locked else 0.0)
         bonus[x[(b.id, m.id)]] = stick
 
-    levels = pol.discount_levels if spec.discounts else [0.0]
+    ladder = pol.discount_levels if spec.discounts else [0.0]
+
+    def levels_at(market_id: str) -> list[float]:
+        """A fixed order (a destination with a deadline) is bought at its agreed price, never marked down."""
+        return [0.0] if scenario.market(market_id).deliver_by_h is not None else ladder
+
     pick: dict[tuple[str, str, float], int] = {}
     sold: dict[tuple[str, str, float], int] = {}
     cells = sorted({(arc.market.id, arc.batch.commodity_id) for arc in arcs} | set(arriving))
@@ -212,7 +217,7 @@ def plan_lading(
         offer = scenario.offer(mid, cid)
         assert offer is not None
         c = commodity[cid]
-        for d in levels:
+        for d in levels_at(mid):
             cap = cost_model.demand_cap_kg(offer.demand_kg, c.elasticity, d)
             unit = cost_model.sale_inr_per_kg(offer.price_inr_per_kg, d) + cost_model.spoilage_inr_per_kg(
                 c.purchase_inr_per_kg
@@ -232,6 +237,7 @@ def plan_lading(
         model.row(cols, [1.0] * len(cols), 0.0, 1.0)
 
     for mid, cid in cells:
+        levels = levels_at(mid)
         cols = [sold[(mid, cid, d)] for d in levels]
         shipped = by_cell[(mid, cid)]
         model.row(

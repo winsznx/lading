@@ -133,6 +133,8 @@ def plan_fefo(scenario: Scenario) -> Plan:
                 parts = fleet.fit(world.fresh_slots(b, m), qty)
                 if parts is None:
                     continue
+                if m.deliver_by_h is not None:
+                    continue
                 for level in (x for x in ladder if x > discount[cell]):
                     if room_left(m, b.commodity_id, level) <= 0:
                         continue
