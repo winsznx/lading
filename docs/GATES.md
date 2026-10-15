@@ -7,7 +7,7 @@ Dated log of checkpoints, pre-registered splits, freezes, failures and withdrawn
 | When (WAT) | Product h | Proof h | Docs h | Hours left | Note |
 |---|---|---|---|---|---|
 | 2026-10-14 23:20 | 0.0 | 0.0 | 0.1 | 20.1 | Repo scaffolded, build contract written |
-| 2026-10-15 00:12 | 0.7 | 0.25 | 0.15 | 19.3 | Steps 1-10 done. API live at https://vps-api-host.invalid. Held-out measured, falsifier not triggered. Console in progress. |
+| 2026-10-15 00:12 | 0.7 | 0.25 | 0.15 | 19.3 | Steps 1-10 done. API live on the VPS. Held-out measured, falsifier not triggered. Console in progress. |
 | 2026-10-15 00:38 | 0.9 | 0.45 | 0.2 | 18.85 | Audit fixed, re-frozen, held-out rerun. Console still building. |
 | 2026-10-15 01:25 | 1.3 | 0.7 | 0.3 | 18.1 | Steps 1-15 done. Console live on Vercel (all browser traffic on its origin), API on the VPS, results from the deploy host, clean-room identical. |
 

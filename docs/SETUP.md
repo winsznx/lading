@@ -38,7 +38,7 @@ LADING_SSH=user@host
 LADING_SSH_KEY=$HOME/.ssh/your_key
 API_DOMAIN=lading-api.<ip-with-dashes>.sslip.io     # or your own domain pointing at the host
 ALLOWED_ORIGINS=https://<your-vercel-app>.vercel.app,http://localhost:5173
-VITE_API_URL=/api                                   # proxied by web/vercel.json; set its destination to API_DOMAIN
+VITE_API_URL=/api                                   # proxied to API_DOMAIN by the generated web/vercel.json
 EDGE_MODE=standalone                                # or shared, see below
 ```
 
@@ -48,7 +48,7 @@ make deploy-web   # npm ci, build with VITE_API_URL, vercel deploy --prod
 make smoke        # LADING_API_URL=... LADING_WEB_URL=... : health, scenarios, one plan, page → API, CORS
 ```
 
-Both scripts are safe to re-run. The console calls `/api/*` on its own origin and `web/vercel.json` rewrites that to `https://API_DOMAIN/*` on Vercel's side, so the browser never connects to the VPS. Point the two rewrite destinations in `web/vercel.json` at your `API_DOMAIN`.
+Both scripts are safe to re-run. The console calls `/api/*` on its own origin and `web/vercel.json` rewrites that to `https://API_DOMAIN/*` on Vercel's side, so the browser never connects to the VPS. `deploy-web.sh` writes `web/vercel.json` from `web/vercel.template.json` with your `API_DOMAIN`, so the API host lives only in the untracked deploy env.
 
 `deploy/reproduce-on-host.sh adopt` runs `make reproduce` on the deploy host from a fresh clone in a pinned container and copies `results/` back; `deploy/reproduce-on-host.sh check` is the clean-room version that diffs instead. Results are generated where the console solves, because HiGHS can stop at a different plan inside the same 0.5% gap on a different CPU.
 

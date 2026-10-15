@@ -7,8 +7,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 [[ -f deploy/.env.deploy ]] && source deploy/.env.deploy
 : "${VITE_API_URL:?set VITE_API_URL to the API HTTPS URL}"
+: "${API_DOMAIN:?set API_DOMAIN, the host vercel.json proxies /api to}"
 
 cd web
+# vercel.json is generated so the API host stays in the untracked deploy env, not in the repo.
+sed "s#__LADING_API_DOMAIN__#$API_DOMAIN#g" vercel.template.json > vercel.json
 npm ci --no-audit --no-fund
 VITE_API_URL="$VITE_API_URL" vercel build --prod --yes
 grep -rq "$VITE_API_URL" .vercel/output/static/assets || { echo "built bundle doesn't contain $VITE_API_URL" >&2; exit 1; }
