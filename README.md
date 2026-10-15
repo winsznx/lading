@@ -27,6 +27,8 @@ Read four things with that table. The headline arm is Lading-point, picked by a 
 
 *Real session, real time: plan, then disruption 1 (Bengaluru +8 h). The replan runs live; moved cards are outlined and the changes panel gives each one's reason.*
 
+Demo film (1:50, narrated, real session): [film/lading-demo-1080p.mp4](film/lading-demo-1080p.mp4).
+
 ## Try it (about 2 minutes)
 
 1. Open the console. Held-out day seed 1007 is preloaded (58 batches, 6 mandis around Kolar, 4 trucks).
